@@ -139,9 +139,9 @@ def main():
             binary = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs/cursor/Cursor.exe"
             if not binary.exists():
                 raise ValueError("Open the generated .code-workspace file in Cursor; executable was not found")
-            subprocess.Popen([str(binary), str(output)])
+            subprocess.Popen([str(binary), "--new-window", str(output)])
         elif shutil.which("cursor"):
-            subprocess.Popen([shutil.which("cursor"), str(output)])
+            subprocess.Popen([shutil.which("cursor"), "--new-window", str(output)])
         else:
             raise ValueError("Enable Cursor's command-line launcher, then rerun this command")
         print("Opened Cursor workspace. Run task: AI Constitution: Local Codex. Native Cursor Agent is unchanged.")
