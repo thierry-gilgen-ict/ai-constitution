@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add guided local setup, durable jobs with interrupted-work recovery, bounded inference queues, process-identity/session tracking and graceful controller stop.
+- Verify function calls, full-history replay, context and CPU placement before route switching; retain ordered fallbacks and drain machines for maintenance.
+- Add expiring one-use pairing, distinct revocable credentials, worker removal/rotation, health checks and an allowlisted support report.
+- Add explicit bounded coding evaluations, dashboard project launch, optional tray/login startup and portable unsigned Windows/macOS/Linux build jobs.
+- Keep physical hardware, signed distribution, mixed-fleet soak and external usability validation as documented preview release gates.
+
 - Add explicit portable-lock adoption, private policy overlays, immutable instruction-library upgrades with transactional activation, and effective-policy explanations.
 - Make routine model refreshes private; contributors use `--source-checkout`. Validate known capability, context, modality and cost types while preserving unknown upstream fields.
 - Retain pending source changes until an exact observed revision is explicitly reviewed; migrate legacy observations without treating them as acknowledgments.

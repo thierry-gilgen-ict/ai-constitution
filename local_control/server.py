@@ -9,7 +9,7 @@ import threading
 from contextlib import nullcontext
 from urllib.parse import parse_qs, urlsplit
 
-from . import hardware
+from . import hardware, credentials, diagnostics, launcher
 from .core import ALIAS, model_name
 from .transport import connect
 
@@ -83,9 +83,19 @@ class Handler(BaseHTTPRequestHandler):
                 token = cookies["local_control"].value if "local_control" in cookies else ""
             except Exception:
                 token = ""
-        if self.path.startswith("/v1/") and hmac.compare_digest(token, self.server.control.config["gateway_token"]):
+        config = self.server.control.config
+        self.principal = None
+        if self.server.worker:
+            inference = self.path.startswith('/node/v1/')
+            self.principal = credentials.principal(config, token, inference=inference)
+            if self.principal:
+                return not self.path.startswith('/node/admin/')
+            if self.path.startswith('/node/admin/'):
+                return hmac.compare_digest(token, config['token'])
+            return bool(config.get('legacy_worker_token') and hmac.compare_digest(token, config['token']))
+        if self.path.startswith("/v1/") and hmac.compare_digest(token, config["gateway_token"]):
             return True
-        return hmac.compare_digest(token, self.server.control.config["token"])
+        return hmac.compare_digest(token, config["token"])
 
     def guard(self):
         if self.headers.get("Host") not in self.server.hosts:
@@ -124,6 +134,10 @@ class Handler(BaseHTTPRequestHandler):
                 return
             parsed = urlsplit(self.path)
             path, query = parsed.path, parse_qs(parsed.query)
+            if self.server.worker and post and path == '/node/pair':
+                body = self.read_body()
+                self.reply(self.server.control.redeem_pairing(body.get('code'), body.get('name')))
+                return
             if not post and path in ASSETS and not self.server.worker:
                 filename, mime = ASSETS[path]
                 data = (WEB / filename).read_bytes()
@@ -148,7 +162,18 @@ class Handler(BaseHTTPRequestHandler):
                     self.reply({"error": "Not a worker node"}, 404)
                     return
                 target = path.removeprefix("/node")
-                if target == "/hardware" and not post:
+                if target == '/admin/pairing' and post:
+                    self.reply(control.pairing_code())
+                elif target == '/admin/controllers' and not post:
+                    self.reply({'controllers': [{'id': k, 'name': v['name'], 'created': v['created']} for k, v in control.config['controllers'].items()],
+                                'legacy_enabled': control.config.get('legacy_worker_token', False)})
+                elif target == '/admin/credentials' and post:
+                    self.reply(control.worker_credentials(body.get('action'), body.get('id')))
+                elif target == '/credentials/revoke' and post and self.principal:
+                    self.reply(control.worker_credentials('revoke', self.principal))
+                elif target == '/credentials/rotate' and post and self.principal:
+                    self.reply(control.worker_credentials('rotate', self.principal))
+                elif target == "/hardware" and not post:
                     self.reply(hardware.run_fit(control.root, ["--json", "system"]))
                 elif target == "/recommendations" and not post:
                     self.reply(hardware.recommendations(control.root))
@@ -164,6 +189,18 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply({"authenticated": True}, cookie=True)
             elif path == "/api/status" and not post:
                 self.reply(control.status())
+            elif path == '/api/setup' and not post:
+                self.reply(control.setup_status())
+            elif path == '/api/diagnostics' and not post:
+                self.reply(diagnostics.report(control))
+            elif path == '/api/evaluations' and not post:
+                self.reply(control.evaluations())
+            elif path == '/api/session' and post:
+                self.reply(control.session(body.get('action'), body))
+            elif path == '/api/stop' and post:
+                result = control.stop_ready(body.get('acknowledge_external') is True)
+                self.reply(result)
+                threading.Thread(target=self.server.shutdown, daemon=True).start()
             elif path == "/api/inventory" and not post:
                 self.reply(control.inventory(query.get("node", ["local"])[0]))
             elif path in ("/api/hardware", "/api/recommendations") and not post:
@@ -189,6 +226,31 @@ class Handler(BaseHTTPRequestHandler):
                     self.reply(control.submit("Download / update model", control.pull, node, model))
                 elif action == "pair":
                     self.reply(control.pair(body.get("code"), body.get("name")))
+                elif action == 'cancel':
+                    self.reply(control.cancel(body.get('job')))
+                elif action == 'health':
+                    self.reply(control.submit('Check machines', control.health_check))
+                elif action == 'maintenance':
+                    self.reply(control.submit('Change machine maintenance', control.maintenance, node, body.get('enabled')))
+                elif action == 'upgrade-runtime':
+                    self.reply(control.submit('Upgrade local Ollama', control.upgrade_runtime))
+                elif action == 'remove-node':
+                    self.reply(control.submit('Remove worker', control.remove_node, node))
+                elif action == 'rotate-node':
+                    self.reply(control.rotate_node(node))
+                elif action == 'setup':
+                    self.reply(control.submit('Set up component', control.setup_component, body.get('component')))
+                elif action == 'context':
+                    self.reply(control.set_context(body.get('context')))
+                elif action == 'launch':
+                    self.reply(launcher.open_project(control.root, body.get('project', ''), body.get('client')))
+                elif action == 'benchmark':
+                    self.reply(control.submit('Evaluate configured model', control.benchmark, body.get('role')))
+                elif action == 'autostart':
+                    from .desktop import startup
+                    if type(body.get('enabled')) is not bool:
+                        raise ValueError('Choose enable or disable for autostart')
+                    self.reply(startup(control.root, body['enabled']))
                 else:
                     raise ValueError("Unknown action")
             else:

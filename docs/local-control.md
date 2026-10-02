@@ -11,7 +11,7 @@ From this checkout, with Python 3.11+ installed:
 ```sh
 python scripts/local_control.py setup --ollama --llmfit
 python scripts/local_control.py doctor
-python scripts/local_control.py serve --open
+python scripts/local_control.py start --open
 ```
 
 Start the Ollama application if doctor reports it offline. Windows installation uses the official winget package; macOS uses Homebrew's Ollama cask. Linux users install Ollama from its official download page. An existing installation is reused. Package managers may show their normal installation prompts.
@@ -22,8 +22,8 @@ The dashboard opens at `http://127.0.0.1:8766`. The launch link signs you in; it
 python scripts/local_control.py open
 ```
 
-1. Open **Model library**. Use an installed tool-capable model, or choose **Find models for my hardware**.
-2. Choose **Use in project → Primary**. This creates a 64K-context alias using existing weights, checks tool metadata, and makes a small local Responses API request.
+1. Open **Get started** for guided runtime, context and route setup. In **Model library**, Use an installed tool-capable model, or choose **Find models for my hardware**.
+2. Choose **Use in project → Primary**. This creates an alias using existing weights and your chosen context (64K by default), then tests a function call, valid arguments, full-history tool-result replay, resident context capacity and CPU placement where relevant.
 3. Set a **Fallback** on another machine, or select **Run on CPU** for this computer. CPU setup starts a separate loopback Ollama process on port 11435 and reuses the active model store. It verifies actual GPU allocation after loading.
 4. Start a project through a launcher below. Use **Make room to play** to switch new requests and drain the GPU.
 
@@ -78,7 +78,7 @@ CPU fallback uses RAM and CPU time and can affect game performance. A second com
 
 ## Choose models using evidence
 
-The hardware helper is [llmfit](https://github.com/AlexsJones/llmfit). It estimates quantization, context memory and throughput from detected hardware. Suggestions reserve 15% of reported VRAM, require advertised tool use and 64K context, and retain candidates with an Ollama tag or a GGUF source. These are **predictions, not measured coding scores**. A very low-bit quantization that fits may still be a poor coding choice.
+The hardware helper is [llmfit](https://github.com/AlexsJones/llmfit). It estimates quantization, context memory and throughput from detected hardware. Suggestions reserve 15% of reported VRAM, require advertised tool use and the selected session context, and retain candidates with an Ollama tag or a GGUF source. These are **predictions, not measured coding scores**. A very low-bit quantization that fits may still be a poor coding choice.
 
 Hugging Face browsing shows model cards, license metadata, GGUF filenames and available sizes. Select a file, review it, and click **Download / update**. Ollama accepts `hf.co/owner/repository:filename.gguf` for supported GGUF architectures. Gated repositories need publisher access; there is no token-entry or access-bypass flow in this preview. [Hugging Face integration](https://huggingface.co/docs/hub/ollama).
 
@@ -100,11 +100,11 @@ In another terminal on that worker:
 python scripts/local_control.py pairing --address 192.168.1.50
 ```
 
-Replace the example IP with that computer's private IPv4 address. Paste the pairing JSON into **Your machines → Add a machine** on the controller. The record contains a bearer credential and certificate fingerprint: transfer it privately and never commit it. The controller verifies the certificate pin before sending credentials. Workers expose only the authenticated node API; Ollama itself stays on loopback.
+Replace the example IP with that computer's private IPv4 address. Paste the pairing JSON into **Your machines → Add a machine** on the controller. The record contains a single-use pairing code that expires after five minutes and a certificate fingerprint: transfer it privately and never commit it. Each paired controller receives separate management and inference credentials; the worker stores their hashes. The controller verifies the certificate pin before sending credentials. Workers expose only the authenticated node API; Ollama itself stays on loopback.
 
 Allow the selected worker port through that machine's firewall only for trusted home-network peers. The tool does not change firewall rules, scan the LAN, open router ports or install remote shells. Use separate state directories if one computer runs both a controller and a worker; each directory has its own credentials and process lock.
 
-The cluster schedules **whole requests** to selected machines. It does not combine VRAM, shard weights or implement distributed tensor inference. The preview has one controller and explicit primary/fallback routes; controller high availability, automatic failover, per-user quotas and fleet-wide software rollout are future work. Remote model inventory, loading, unloading and downloads are available now.
+The cluster schedules **whole requests** to selected machines. It does not combine VRAM, shard weights or implement distributed tensor inference. The preview has one controller and explicit primary/fallback routes. Configuring another fallback retains earlier alternatives; Gaming mode tries eligible alternatives in order before switching. Requests have a bounded queue and per-machine concurrency limit. Automatic failover after a generation begins, controller high availability, per-user quotas and unattended fleet-wide software rollout are not provided. Remote model inventory, loading, unloading and downloads are available now.
 
 ## Updating without surprises
 
@@ -115,7 +115,7 @@ The cluster schedules **whole requests** to selected machines. It does not combi
 | Installed model weights | **Download / update** the same tag on the selected machine |
 | Ollama runtime | `python scripts/local_control.py setup --upgrade-ollama` |
 | Reviewed llmfit binary | Update this checkout, then `python scripts/local_control.py setup --llmfit` |
-| Companion code | Stop the controller after requests finish, update the checkout, run checks, restart it |
+| Companion code | Close managed sessions, safely stop the controller, update source or portable package, run checks, restart |
 
 Model-data refresh does not download model weights. `llmfit update` stores its own metadata cache in a platform-specific data directory; `llmfit update --status` reports its location and age. Model pulls retain resumable partial downloads. Software updates are explicit; never update an inference runtime while relying on an active response to continue.
 
@@ -129,9 +129,23 @@ State defaults to `~/.config/ai-constitution/local-control/`; override it using 
 
 The dashboard binds only to loopback and requires authentication. Browser requests receive same-origin checks and a strict cookie. The gateway supports `/v1/responses` and `/v1/chat/completions` with model `constitution-local` and bearer authentication. It does not record prompts or completions. Codex and Ollama may keep their own normal logs.
 
-Stop the controller with Ctrl+C in its terminal **after active requests finish**. Stopping it during a request interrupts that connection. A locally created CPU runtime remains available; its PID and URL are recorded in `cpu-runtime.json`. To reclaim its RAM, unload its model from Model library, then stop that recorded process if desired. On restart, Gaming mode remains routed to fallback, rather than silently loading the GPU. CPU runtime startup is restored when its saved configuration is present.
+Use **Stop controller** or `stop --acknowledge-external-clients` after closing managed coding sessions. The new launcher tracks the client process between requests, so an idle but open session blocks a normal stop. Active responses, queued requests and pending operations also block it. Ctrl+C follows the same checks; a forced OS termination cannot be protected. Direct clients are not discoverable and require acknowledgement. Gaming mode frees GPU memory while keeping the gateway available.
 
-There is no operating-system autostart registration, tray app or background updater in this preview. Run `serve --open` when needed. Pairing revocation currently requires stopping the worker, removing its token from private configuration and generating a replacement through a fresh state directory; do not expose workers to untrusted networks.
+A local CPU runtime remains available when the controller stops. New process records include executable/start identity, preventing PID reuse from being mistaken for ownership. Older CPU records can be reused read-only but are never grounds for terminating a process. Restart preserves Gaming mode. Schema migration saves the old configuration privately, and unfinished jobs become interrupted entries; downloads can be explicitly retried to reuse Ollama's existing chunks. Queued operations and active downloads expose cancellation where safe.
+
+Pairing codes expire and work once. **Your machines** provides credential rotation and revoke/remove for reachable workers. On the worker, `controllers --address PRIVATE_IP` lists controller IDs; use `--revoke ID` to revoke one. Migrated workers retain legacy-token compatibility until you re-pair controllers and run `controllers --address PRIVATE_IP --disable-legacy`. New workers disable legacy access by default. Rotation invalidates old credentials for new requests; existing streams finish. If a reply or local save is lost, revoke the visible controller entry on the worker and re-pair explicitly. Offline removal cannot honestly claim worker revocation.
+
+For login startup, tray controls and portable builds, see [Desktop preview](desktop-preview.md).
+
+## Maintenance and measured results
+
+**Your machines → Drain for maintenance** verifies another eligible route when needed, redirects new requests, waits for existing responses, and unloads only owned models. Maintenance exclusions persist across restarts. Leaving maintenance checks that the runtime responds; selecting it for work revalidates stale compatibility evidence. External clients can still load models and are reported separately.
+
+**Upgrade local Ollama** requires both local runtimes to be drained and a compatible remote route to remain available. It invokes the computer's official package manager; it does not run remote shell commands. Update each remote computer from that computer, then check its runtime and return it to service. Package-manager updates can require interactive prompts or an Ollama restart; rollback is vendor/package-manager specific. With only one computer, finish sessions before updating the runtime manually.
+
+**Connect a project → Evaluate** runs a bounded, opt-in protocol check and a small coding fixture. It asks for a single clamp-function patch and checks eight cases using a restricted AST interpreter: generated Python is never executed. Results include digest, quantization, context, runtime, first-text latency, output tokens over total request time and post-request residency. Peak memory is explicitly not measured. Close managed sessions first. A changed digest or runtime marks earlier results stale. A passing fixture is useful evidence, not a general coding-quality score.
+
+**Overview → Preview support report** shows an allowlisted report before download. It excludes credentials, addresses, host/project paths, names, prompts, responses and raw logs. There is no automatic upload or telemetry. The core `constitution.py explain --project PATH --json` separately reports instruction provenance and drift; installing a file is not evidence that a client loaded it.
 
 ## Compatibility and verification
 

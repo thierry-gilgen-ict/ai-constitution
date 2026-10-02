@@ -42,8 +42,9 @@ def connect(node, path, payload=None, *, timeout=180, method=None):
                 raise ValueError("Machine certificate changed; pairing must be reviewed")
         body = json.dumps(payload).encode() if payload is not None else None
         headers = {"Content-Type": "application/json", "Connection": "close"}
-        if node.get("token"):
-            headers["Authorization"] = "Bearer " + node["token"]
+        token = node.get("inference_token", node.get("token")) if path.startswith('/v1/') else node.get('token')
+        if token:
+            headers["Authorization"] = "Bearer " + token
         prefix = "/node" if node.get("kind") == "worker" else ""
         conn.request(method or ("POST" if body is not None else "GET"), prefix + path, body, headers)
         response = conn.getresponse()

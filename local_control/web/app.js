@@ -41,8 +41,8 @@ async function api(path, body, headers = {}) {
 }
 async function action(body) {
   try {
-    await api("/api/action", body);
-    notice("Operation started. Follow its progress in Overview → Activity.");
+    const result = await api("/api/action", body);
+    notice(result.job ? "Operation started. Follow its progress in Overview → Activity." : (result.note || result.applies || "Updated."));
     await refresh();
   } catch (e) {
     notice(e.message, true);
@@ -62,8 +62,10 @@ function page(name) {
       models: "Model library",
       machines: "Your machines",
       connect: "Connect a project",
+      setup: "Get started",
     }[name];
   if (name === "models") loadInventory();
+  if (name === "setup") loadSetup();
 }
 document
   .querySelectorAll(".nav")
@@ -78,6 +80,9 @@ $("gaming-mode").onclick = () => action({ action: "mode", mode: "gaming" });
 function renderState() {
   $("connection").textContent = "● Connected locally";
   $("active-count").textContent = state.active_requests;
+  $("session-status").textContent = `${(state.sessions || []).filter(s => s.status === "open").length} open managed sessions · ${state.queued_requests || 0} queued requests. Interrupted operations remain visible below.`;
+  $("gaming-mode").disabled = !state.primary || !state.fallback || state.phase !== "idle";
+  $("work-mode").disabled = !state.primary || state.phase !== "idle";
   $("phase").textContent =
     state.phase === "idle" ? "No responses interrupted" : state.phase;
   $("mode-badge").textContent =
@@ -99,7 +104,7 @@ function renderState() {
       .filter((j) => j.status !== "done")
       .map(
         (j) =>
-          `<div class="job ${j.status === "failed" ? "failed" : ""}"><strong>${escapeHTML(j.label)}</strong><br>${escapeHTML(j.detail)}</div>`,
+          `<div class="job ${["failed", "interrupted"].includes(j.status) ? "failed" : ""}"><strong>${escapeHTML(j.label)} · ${escapeHTML(j.status)}</strong><br>${escapeHTML(j.detail)}${j.status === "queued" || (j.status === "running" && j.operation === "pull") ? `<button data-cancel="${escapeHTML(j.id)}">Cancel</button>` : ""}</div>`,
       )
       .join("") +
       state.events
@@ -109,6 +114,7 @@ function renderState() {
             `<div class="event"><time>${escapeHTML(e.time)}</time><span>${escapeHTML(e.message)}</span></div>`,
         )
         .join("") || '<p class="muted">Your next action will appear here.</p>';
+  $("activity").querySelectorAll("[data-cancel]").forEach(b => b.onclick = () => action({action: "cancel", job: b.dataset.cancel}));
   const latest = state.jobs.find(
     (j) => j.status === "done" && j.result?.gpu_released === false,
   );
@@ -127,7 +133,7 @@ function renderState() {
   $("machine-list").innerHTML = Object.entries(state.nodes)
     .map(
       ([id, n]) =>
-        `<article class="panel machine-card"><div class="machine-icon">${n.kind === "ollama" ? "▣" : "⌘"}</div><div><h2>${escapeHTML(n.name)}</h2><p class="muted">${escapeHTML(n.url)} · ${n.kind === "ollama" ? "Local Ollama" : "Paired HTTPS worker"}</p></div><button data-machine="${escapeHTML(id)}">Manage models ↗</button></article>`,
+        `<article class="panel machine-card"><div class="machine-icon">${n.kind === "ollama" ? "▣" : "⌘"}</div><div><h2>${escapeHTML(n.name)}</h2><p class="muted">${escapeHTML(n.url)} · ${escapeHTML(state.health?.[id]?.status || "Health not checked")} · ${n.kind === "ollama" ? "Local Ollama" : "Paired HTTPS worker"}</p></div><div class="button-row"><button data-machine="${escapeHTML(id)}">Manage models ↗</button>${`<button data-maintenance="${escapeHTML(id)}">${state.maintenance.includes(id) ? "Leave maintenance" : "Drain for maintenance"}</button>`}${n.kind === "worker" ? `<button data-rotate="${escapeHTML(id)}">Rotate credentials</button><button data-remove="${escapeHTML(id)}">Revoke &amp; remove</button>` : ""}</div></article>`,
     )
     .join("");
   $("machine-list")
@@ -140,6 +146,9 @@ function renderState() {
           page("models");
         }),
     );
+  $("machine-list").querySelectorAll("[data-maintenance]").forEach(b => b.onclick = () => action({action:"maintenance",node:b.dataset.maintenance,enabled:!state.maintenance.includes(b.dataset.maintenance)}));
+  $("machine-list").querySelectorAll("[data-rotate]").forEach(b => b.onclick = () => action({action:"rotate-node",node:b.dataset.rotate}));
+  $("machine-list").querySelectorAll("[data-remove]").forEach(b => b.onclick = () => action({action:"remove-node",node:b.dataset.remove}));
 }
 async function refresh() {
   if (!authorized || refreshing) return;
@@ -151,6 +160,7 @@ async function refresh() {
     if (signature !== lastJobState) {
       lastJobState = signature;
       loadInventory();
+      if ($("setup").classList.contains("active")) loadSetup();
     }
   } catch (e) {
     $("connection").textContent = "Disconnected";
@@ -326,6 +336,75 @@ $("pull-form").onsubmit = (e) => {
     model: $("pull-model").value.trim(),
   });
 };
+let supportReport = null;
+$("evaluate-primary").onclick = () => action({action:"benchmark", role:"primary"});
+$("evaluate-fallback").onclick = () => action({action:"benchmark", role:"fallback"});
+$("show-evaluations").onclick = async () => {
+  try {
+    const rows = await api("/api/evaluations");
+    $("evaluation-results").innerHTML = rows.map(r => `<article class="model-row"><div><strong>${escapeHTML(r.model)}</strong><p>${escapeHTML(r.level)} · ${escapeHTML(r.status)}${r.stale ? " · stale or unavailable" : ""}</p><small>${r.coding ? `${r.coding.passed}/${r.coding.total} fixture checks · ` : ""}${r.first_text_seconds ?? "—"}s to first text · ${r.output_tokens_per_second ?? "—"} output tokens/s over total request time · ${escapeHTML(r.quantization || "Unknown quantization")}</small></div></article>`).join("") || "<p>No measurements yet. Start with a configured route.</p>";
+  } catch (e) { notice(e.message, true); }
+};
+async function loadSetup() {
+  if (!authorized) return;
+  try {
+    const setup = await api("/api/setup");
+    $("setup-summary").textContent = `${setup.inventory.version ? "Ollama " + setup.inventory.version + " is running" : "Start Ollama to continue"} · ${bytes(setup.disk_free_bytes)} free on the configuration volume · ${setup.primary_ready ? "Primary ready" : "Primary needed"} · ${setup.fallback_ready ? "Fallback ready" : "Fallback needed"}`;
+    $("setup-context").value = String(setup.context);
+    $("setup-context").disabled = setup.primary_ready || setup.fallback_ready;
+    $("save-context").disabled = setup.primary_ready || setup.fallback_ready;
+    $("setup-ollama").disabled = setup.ollama;
+    $("setup-ollama").textContent = setup.ollama ? "Ollama installed" : "Install Ollama";
+    $("setup-fit").disabled = setup.llmfit;
+    $("setup-fit").textContent = setup.llmfit ? "Hardware helper installed" : "Install hardware helper";
+    const selected = $("setup-model").value;
+    $("setup-model").innerHTML = setup.inventory.models.filter(m => !m.name.startsWith("constitution-")).map(m => `<option value="${escapeHTML(m.name)}">${escapeHTML(m.name)} · ${bytes(m.size)}</option>`).join("");
+    if ([...$("setup-model").options].some(o => o.value === selected)) $("setup-model").value = selected;
+    $("setup-primary").disabled = !$("setup-model").value;
+    $("setup-fallback").disabled = !$("setup-model").value;
+  } catch (e) { notice(e.message, true); }
+}
+$("setup-ollama").onclick = () => action({action:"setup", component:"ollama"});
+$("setup-fit").onclick = () => action({action:"setup", component:"llmfit"});
+$("save-context").onclick = () => action({action:"context", context:Number($("setup-context").value)});
+$("setup-find").onclick = () => { page("models"); $("suggest").click(); };
+$("setup-machines").onclick = () => page("machines");
+$("setup-project").onclick = () => page("connect");
+$("setup-primary").onclick = () => action({action:"configure", node:"local", model:$("setup-model").value, role:"primary", cpu:false});
+$("setup-fallback").onclick = () => action({action:"configure", node:"local", model:$("setup-model").value, role:"fallback", cpu:true});
+$("check-machines").onclick = () => action({action:"health"});
+$("upgrade-runtime").onclick = () => action({action:"upgrade-runtime"});
+$("enable-startup").onclick = () => action({action:"autostart",enabled:true});
+$("disable-startup").onclick = () => action({action:"autostart",enabled:false});
+$("launch-form").onsubmit = async e => {
+  e.preventDefault();
+  try {
+    const result = await api("/api/action", {action:"launch", project:$("launch-project").value.trim(), client:$("launch-client").value});
+    notice(result.note);
+  } catch (e) { notice(e.message, true); }
+};
+$("stop-controller").onclick = async () => {
+  if (!confirm("Stop Local Control? Open managed sessions will block this action. Untracked clients may be disconnected. To keep tasks running and free GPU memory, use Gaming mode instead.")) return;
+  try {
+    await api("/api/stop", {acknowledge_external:true});
+    authorized = false;
+    $("connection").textContent = "Stopped";
+    notice("Controller stopped. Start Local Control again to reconnect.");
+  } catch (e) { notice(e.message, true); }
+};
+$("support-export").onclick = async () => {
+  try {
+    supportReport = await api("/api/diagnostics");
+    $("support-preview").textContent = JSON.stringify(supportReport, null, 2);
+    $("support-preview").hidden = false;
+    $("download-support").hidden = false;
+  } catch (e) { notice(e.message, true); }
+};
+$("download-support").onclick = () => {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(supportReport, null, 2)], {type:"application/json"}));
+  const link = document.createElement("a"); link.href = url; link.download = "local-control-diagnostics.json"; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
 $("pair-form").onsubmit = async (e) => {
   e.preventDefault();
   try {
@@ -356,6 +435,7 @@ $("pair-form").onsubmit = async (e) => {
     state = await api("/api/status");
     authorized = true;
     renderState();
+    if (!state.primary) page("setup");
     loadHardware();
     loadInventory();
   } catch (e) {

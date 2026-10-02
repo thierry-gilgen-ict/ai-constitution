@@ -9,8 +9,8 @@ import urllib.parse
 import zipfile
 from catalog import atomic_bytes, digest, json_bytes
 
-TOP = {"VERSION", "LICENSE", "README.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "requirements-local-node.txt", "THIRD_PARTY_NOTICES.md"}
-DIRS = {"scripts", "registry", "adapters", "skills", "templates", "onboarding", "checks", "docs", "local_control"}
+TOP = {"VERSION", "LICENSE", "README.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "requirements-local-node.txt", "requirements-desktop.txt", "requirements-build.txt", "THIRD_PARTY_NOTICES.md"}
+DIRS = {"scripts", "registry", "adapters", "skills", "templates", "onboarding", "checks", "docs", "local_control", "packaging"}
 SUFFIXES = {".py", ".ps1", ".json", ".md", ".mdc", ".html", ".js", ".css", ".txt", ".png"}
 
 

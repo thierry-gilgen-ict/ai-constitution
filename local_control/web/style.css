@@ -873,3 +873,12 @@ dialog::backdrop {
     display: none;
   }
 }
+/* Guided setup shares the dashboard's existing type and surface system. */
+.setup-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.service-panel { margin-top: 24px; }
+.job button { display: block; margin-top: 8px; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+:focus-visible { outline: 3px solid #a87b3e; outline-offset: 3px; }
+@media (max-width: 760px) { .setup-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

@@ -23,7 +23,7 @@ from local_control.transport import request, validate_url
 class FakeOllama:
     def __init__(self):
         self.calls = []
-        self.resident = [{"name": "gpu:latest", "size_vram": 100}]
+        self.resident = [{"name": "gpu:latest", "size_vram": 100, 'context_length': 65536}]
         self.fail = False
 
     def __call__(self, node, path, payload=None, **kwargs):
@@ -33,9 +33,15 @@ class FakeOllama:
         if path == "/api/show":
             return {"capabilities": ["tools", "completion"]}
         if path == "/v1/responses":
-            return {"output": [{"type": "message"}]}
+            if payload.get('tools') and not any(isinstance(v, dict) and v.get('type') == 'function_call_output' for v in payload.get('input', [])):
+                return {'output': [{'type': 'function_call', 'name': 'constitution_probe', 'call_id': 'probe', 'arguments': '{"value":"ready"}'}]}
+            return {"output": [{"type": "message", 'content': [{'type': 'output_text', 'text': 'LOCAL_TOOL_OK'}]}]}
+        if path == '/api/version':
+            return {'version': 'fixture'}
+        if path == '/api/tags':
+            return {'models': [{'name': name, 'digest': name + '-digest'} for name in ('gpu:latest', 'cpu:latest')]}
         if path == "/api/ps":
-            return {"models": self.resident + [{"name": "cpu:latest", "size_vram": 0}]}
+            return {"models": self.resident + [{"name": "cpu:latest", "size_vram": 0, 'context_length': 65536}]}
         if path == "/api/generate" and payload["keep_alive"] == 0:
             self.resident = [m for m in self.resident if m["name"] != payload["model"]]
         return {"status": "success"}
@@ -51,6 +57,7 @@ class ControlTests(unittest.TestCase):
                                    fallback={"node": "local", "model": "cpu:latest", "cpu": True},
                                    managed={"local": ["gpu:latest", "cpu:latest"]})
         self.control.save()
+        self.control.config['limits']['concurrent_per_node'] = 2
 
     def tearDown(self):
         self.control.pool.shutdown(wait=True)
@@ -309,6 +316,7 @@ class StreamingTests(unittest.TestCase):
             root = Path(directory).resolve()
             cert, key, fingerprint = certificate(root, "127.0.0.1")
             control = Control(root)
+            control.config['legacy_worker_token'] = True
             control.config["nodes"]["local"]["url"] = "http://127.0.0.1:" + str(upstream.server_port)
             worker = Server(("127.0.0.1", 0), control, worker=True)
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -320,6 +328,17 @@ class StreamingTests(unittest.TestCase):
                     "token": control.config["token"], "fingerprint": fingerprint}
             try:
                 self.assertEqual(request(node, "/api/version"), {"version": "fixture"})
+                code = request(node, '/admin/pairing', {})
+                issued = request({k:v for k,v in node.items() if k != 'token'}, '/pair', {'code':code['code'],'name':'Test controller'})
+                paired = {**node, **issued}
+                self.assertEqual(request(paired, '/api/version'), {'version':'fixture'})
+                with self.assertRaisesRegex(ValueError,'401'):
+                    request({**paired,'token':issued['inference_token']}, '/api/version')
+                request(paired, '/credentials/revoke', {})
+                with self.assertRaisesRegex(ValueError,'401'):
+                    request(paired, '/api/version')
+                with self.assertRaisesRegex(ValueError,'400'):
+                    request({k:v for k,v in node.items() if k != 'token'}, '/pair', {'code':code['code'],'name':'Replay'})
                 with self.assertRaisesRegex(ValueError, "certificate changed"):
                     request({**node, "fingerprint": "0" * 64}, "/api/version")
                 with self.assertRaisesRegex(ValueError, "401"):

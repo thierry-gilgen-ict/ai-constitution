@@ -99,10 +99,12 @@ These commands list model metadata. They do not load weights or run inference. I
 
 ```sh
 python scripts/local_control.py setup --ollama --llmfit
-python scripts/local_control.py serve --open
+python scripts/local_control.py start --open
 ```
 
-Choose a primary model and a CPU or second-computer fallback in the dashboard. **Gaming mode** checks the fallback, moves new requests, waits for active responses to finish, and verifies GPU memory was released. A local-only Codex session can run directly or inside Cursor's terminal. Windows, macOS and Linux share the same controller and worker code.
+The **Get started** guide prepares your runtime, hardware helper, context budget and tested routes. **Gaming mode** checks the fallback, moves new requests, waits for active responses to finish, and verifies GPU memory was released. Open a project from the dashboard, compare small measured coding checks, or drain a machine for maintenance. A local Codex session can run directly or inside Cursor's terminal.
+
+Prefer a desktop launcher? [Build or download the unsigned preview](docs/desktop-preview.md). It includes the Python runtime, optional tray controls and opt-in login startup on Windows/macOS. The core constitution remains independent of this companion.
 
 This does not replace Cursor's native Agent, migrate an in-progress generation, or pool GPU memory across PCs. Physical Mac and multi-computer validation remain preview milestones. [Setup, compatibility, switching and upgrades →](docs/local-control.md)
 
@@ -138,7 +140,7 @@ The source repository can live anywhere, including a development drive. Runtime 
 - **Know what changed.** A project lock records its release and hashes. `doctor` checks installed files and reports drift.
 - **Recover cleanly.** Installation snapshots restore the previous bytes and refuse to erase subsequent edits.
 - **Keep scope clear.** Grok Bot uses managed model selection. Local model discovery is not proof of tool support. Instructions are not permissions enforcement.
-- **Upgrade predictably.** `upgrade` fast-forwards a clean checkout and synchronizes enrolled, unpinned targets. [Upgrade guide](docs/updates.md).
+- **Upgrade predictably.** `upgrade` verifies an immutable instruction release and synchronizes enrolled, unpinned targets in one transaction. Personal policies and catalog snapshots stay outside the checkout. [Upgrade guide](docs/updates.md).
 
 ## Choose your path
 

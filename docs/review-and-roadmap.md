@@ -19,7 +19,15 @@ The original release was a useful foundation, but its local-model feature only d
 
 Regression tests exercise these failure cases in temporary workspaces. The Local Control service independently serializes lifecycle operations and uses request leases before unloading models.
 
-## Highest-value remaining work
+## Implementation update
+
+The follow-up implements portable adoption; immutable library activation and private policy/catalog state; durable source review; known-field validation; effective-policy explanations; guided setup; recoverable jobs and session-aware shutdown; expiring, revocable pairing; bounded queues; machine draining; small measured coding fixtures; and unsigned portable build automation. See [Local Control](local-control.md) and [Desktop preview](desktop-preview.md) for exact behavior and limitations.
+
+Automated verification now includes 92 tests on the reference Windows environment (91 passed, one symlink privilege skip). The updated Windows controller preserved Gaming mode on restart, its CPU route passed function-call/full-history checks and all eight bounded coding cases, and measured GPU allocation remained zero. Cross-platform CI and physical-device evidence must be reported separately.
+
+The original priorities below are retained for context. Their implementations do not satisfy every release gate: signed/notarized distribution, physical Mac and second-computer tests, a 48-hour mixed-fleet soak, repeated sleep/wake tests, external first-run usability trials, broad coding evaluations, interoperability adapters and unattended fleet rollout remain open. Automated tests cannot substitute for missing hardware or test participants.
+
+## Original review priorities
 
 | Priority | Addition or enhancement | Why it matters | Acceptance evidence |
 | --- | --- | --- | --- |

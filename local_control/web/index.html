@@ -14,6 +14,7 @@
         ><span>AI Constitution<small>LOCAL CONTROL</small></span></a
       >
       <nav aria-label="Main navigation">
+        <button class="nav" data-page="setup"><span>✦</span> Get started</button>
         <button class="nav active" data-page="overview">
           <span>◉</span> Overview</button
         ><button class="nav" data-page="models">
@@ -39,6 +40,16 @@
         </div>
       </header>
       <div id="notice" role="status" aria-live="polite" hidden></div>
+      <section id="setup" class="page">
+        <div class="page-heading"><span class="eyebrow">A FEW STEPS. YOUR OWN WORKSPACE.</span><h1>Make yourself at home.</h1><p>Use what is already installed. Add only what you need.</p></div>
+        <div id="setup-summary" class="panel" role="status">Checking this computer…</div>
+        <div class="setup-grid">
+          <article class="panel"><span class="step">01 / PREPARE</span><h2>Meet your hardware.</h2><p>Ollama runs the models. The hardware helper estimates which ones fit. Installation may show an operating-system prompt.</p><div class="button-row"><button id="setup-ollama">Install Ollama</button><button id="setup-fit">Install hardware helper</button></div><p class="caption">After installing Ollama, start its application and refresh this page.</p></article>
+          <article class="panel"><span class="step">02 / CHOOSE</span><h2>A model that fits.</h2><p>Choose the session context before configuring models. Larger contexts need more memory.</p><label>Context budget<select id="setup-context"><option value="4096">4K · small tasks</option><option value="8192">8K</option><option value="16384">16K</option><option value="32768">32K</option><option value="65536" selected>64K · larger projects</option><option value="131072">128K</option></select></label><div class="button-row"><button id="save-context">Save context</button><button id="setup-find">Find models for me ↗</button></div><p class="caption">Review download size, model card and license in the model library. Estimates are separate from measured results.</p></article>
+          <article class="panel"><span class="step">03 / VERIFY</span><h2>Prepare both routes.</h2><label>Installed model<select id="setup-model"></select></label><div class="button-row"><button id="setup-primary">Test as primary</button><button id="setup-fallback">Test as CPU fallback</button></div><p class="caption">Tests a real function call and its result, context capacity and CPU placement. This can take longer on CPU.</p><button id="setup-machines">Use another computer instead ↗</button></article>
+          <article class="panel"><span class="step">04 / WORK</span><h2>Bring a project.</h2><p>Open a supported local session with your project instructions and normal approval settings.</p><button id="setup-project" class="primary">Connect a project ↗</button><p class="caption">Your GPU can be released once a compatible fallback is ready. Existing direct-provider sessions keep their original connection.</p></article>
+        </div>
+      </section>
       <section id="overview" class="page active">
         <div class="hero">
           <div>
@@ -132,6 +143,7 @@
             </div>
           </article>
         </div>
+        <article class="panel service-panel"><h2>Service &amp; recovery</h2><p id="session-status" class="muted">Checking managed sessions…</p><div class="button-row"><button id="check-machines">Check machines</button><button id="support-export">Preview support report</button><button id="stop-controller">Stop controller</button></div><p class="caption">Stopping the controller is different from freeing the GPU. Open managed sessions block a normal stop.</p><div class="button-row"><button id="enable-startup">Start at login</button><button id="disable-startup">Disable login startup</button></div><pre id="support-preview" hidden></pre><button id="download-support" hidden>Download this report</button></article>
       </section>
       <section id="models" class="page">
         <div class="page-heading">
@@ -212,7 +224,7 @@
             them here.
           </p>
         </div>
-        <div id="machine-list"></div>
+        <div id="machine-list"></div><article class="panel"><h2>Update without breaking a session.</h2><p>Drain each runtime on this computer before updating Ollama. A tested remote fallback keeps new requests moving. Updates use the official package manager and may need your input.</p><button id="upgrade-runtime">Upgrade local Ollama</button><p class="caption">Leave maintenance after the updated runtime is running. Each remote computer updates its own runtime; there is no remote shell access.</p></article>
         <div class="panel">
           <h2>Add a machine</h2>
           <p class="muted">
@@ -257,6 +269,8 @@ python scripts/local_control.py pairing --address PRIVATE_IP</pre
           <h1>Bring your project.</h1>
           <p>A fresh local session, with the same shared constitution.</p>
         </div>
+        <form id="launch-form" class="panel"><h2>Open your project</h2><label>Project directory<input id="launch-project" required placeholder="Full path to your project" autocomplete="off"></label><label>Client<select id="launch-client"><option value="cursor">Cursor · Local Codex terminal task</option><option value="codex">Codex · new terminal session</option></select></label><button class="primary">Open project ↗</button><p class="caption">Codex CLI must be installed. Launching the client is separate from verifying a successful model request.</p></form>
+        <article class="panel"><h2>Know what your models can do.</h2><p>Run a bounded function-call and coding fixture on a configured route. Close managed coding sessions first. Results stay on this computer.</p><div class="button-row"><button id="evaluate-primary">Evaluate primary</button><button id="evaluate-fallback">Evaluate fallback</button><button id="show-evaluations">Compare results</button></div><div id="evaluation-results"></div><p class="caption">Hardware-fit predictions are estimates. Passing this small fixture is useful evidence, not a general coding benchmark.</p></article>
         <div class="connect-grid">
           <article class="panel">
             <span class="step">01 / CODEX CLI</span>
@@ -269,7 +283,7 @@ python scripts/local_control.py pairing --address PRIVATE_IP</pre
 python scripts/local_control.py codex --project /path/to/project</pre
             >
             <p class="caption">
-              Uses the Responses API, a 64K context setting and the stable model
+              Uses the Responses API, your configured context budget and the stable model
               alias. Start new sessions through this launcher to use switching.
             </p>
           </article>
@@ -355,8 +369,8 @@ python scripts/local_control.py cursor --project /path/to/project</pre
           GPU free</label
         >
         <p class="caption">
-          Creates a 64K-context alias using the existing weights and runs a
-          small local compatibility probe. CPU placement is checked, not
+          Creates an alias with your configured context using existing weights and runs a
+          function-call and full-history compatibility check. CPU placement is checked, not
           assumed.
         </p>
         <div class="dialog-actions">

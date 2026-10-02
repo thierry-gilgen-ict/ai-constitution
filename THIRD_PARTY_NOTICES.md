@@ -14,6 +14,8 @@ Local Control invokes separately installed [Ollama](https://github.com/ollama/ol
 
 Optional worker certificates use the separately installed [cryptography](https://github.com/pyca/cryptography) package under its upstream license. The dashboard uses system fonts, original CSS artwork and no third-party frontend bundle.
 
+Optional desktop builds use [pystray](https://github.com/moses-palmer/pystray) (LGPL-3.0), [Pillow](https://github.com/python-pillow/Pillow) (MIT-CMU), and [PyInstaller](https://github.com/pyinstaller/pyinstaller) (GPL with its distribution exception). These are optional build/desktop dependencies, not requirements for the core constitution. Packaged artifacts include a dependency inventory and available distribution license files in `licenses/`; retain those alongside the app when redistributing. Refer to the respective upstream sources for source code and complete license terms.
+
 ## Visual reference
 
 The repository presentation is inspired by [Engawa](https://github.com/thierry-gilgen-ict/engawa). Its image and source code were not copied into this project. The banner is an original AI-generated asset; [provenance](docs/provenance.md) records the method and prompt.

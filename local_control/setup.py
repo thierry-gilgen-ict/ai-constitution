@@ -77,6 +77,7 @@ def cpu_runtime(root, source_model=None):
     import json
     import re
     from .storage import atomic
+    from .processes import identity, matches
     from .transport import request
     endpoint = {"kind": "ollama", "url": "http://127.0.0.1:11435", "name": "This computer · CPU fallback"}
     marker = root / "cpu-runtime.json"
@@ -84,6 +85,11 @@ def cpu_runtime(root, source_model=None):
         request(endpoint, "/api/version", timeout=2)
         if not marker.exists():
             raise ValueError("Port 11435 is already occupied by an unmanaged service")
+        existing = json.loads(marker.read_text(encoding='utf-8'))
+        if 'process' not in existing:
+            return {**endpoint, 'ownership': 'legacy-unverified; reuse only, never terminate by PID'}
+        if not matches(existing):
+            raise ValueError('CPU process identity changed; inspect the existing service before adopting it')
         return endpoint
     except OSError:
         pass
@@ -114,7 +120,11 @@ def cpu_runtime(root, source_model=None):
             raise ValueError("CPU Ollama process exited; inspect its private runtime log")
         try:
             request(endpoint, "/api/version", timeout=1)
-            atomic(marker, {"pid": child.pid, "url": endpoint["url"], "model_store": model_store})
+            process = identity(child.pid)
+            if not process:
+                child.terminate()
+                raise ValueError('CPU process identity could not be verified')
+            atomic(marker, {"pid": child.pid, 'process': process, "url": endpoint["url"], "model_store": model_store})
             return endpoint
         except OSError:
             time.sleep(.25)
