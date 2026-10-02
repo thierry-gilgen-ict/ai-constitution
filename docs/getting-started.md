@@ -28,6 +28,8 @@ The source checkout is not copied into `.config`. Runtime copies are generated f
 
 `--home <directory>` is available on `install` for a sandboxed trial. It does not change the real home directory or a shell profile. Custom `CODEX_HOME` layouts currently use the manual exported adapter; the installer refuses an ambiguous layout rather than writing into the wrong profile.
 
+If your `.cursor` directory is a junction or symlink to a relocated profile, first inspect its destination. Pass that real, existing configuration directory explicitly with `install --platform cursor --cursor-dir /real/cursor/configuration`. The installer records the selected location privately, so later `sync` and `doctor` commands work without repeating it. The normal rule against writing through links still applies. Instruction libraries stay under `.config`.
+
 ## Confirm activation
 
 Restart or start a fresh agent session. Ask it to identify its active constitution version and instruction sources. File installation is deterministic; actual instruction loading depends on the client. Follow [acceptance.md](../checks/acceptance.md).

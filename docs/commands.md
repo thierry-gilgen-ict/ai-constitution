@@ -7,6 +7,7 @@ Run from the source checkout. Prefix every command below with `python scripts/co
 | `install --dry-run` | Preview global Codex/Cursor files without writing them |
 | `install` | Install both clients, instruction libraries, and skills |
 | `install --platform codex` | Install only one client (`cursor` is also supported) |
+| `install --platform cursor --cursor-dir /real/cursor/configuration` | Use an explicitly verified, relocated Cursor profile |
 | `onboard --project /path/to/project` | Preserve existing instructions and add portable project guidance |
 | `onboard --project /path/to/project --pin` | Enroll a project while excluding it from ordinary synchronization |
 | `doctor` | Check enrolled files for drift and instruction shadowing |

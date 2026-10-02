@@ -49,6 +49,12 @@ def safe_path(root, relative):
     return path
 
 
+def installed_path(root, relative, cursor_dir=None):
+    if cursor_dir is not None and relative.startswith(".cursor/"):
+        return safe_path(Path(cursor_dir), relative[len(".cursor/"):])
+    return safe_path(root, relative)
+
+
 def managed(existing, content):
     block = BEGIN + "\n" + content.rstrip() + "\n" + END
     starts, ends = existing.count(BEGIN), existing.count(END)
@@ -217,7 +223,7 @@ def transaction(state, writes, *, dry_run=False):
     return {"status": "installed", "snapshot": snapshot, "files": [p["path"] for p in prepared]}
 
 
-def install(root, state, *, platform=None, project=None, home=None, dry_run=False, pin=False):
+def install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=False):
     validate(root)
     build(root, check=True)
     db = state_load(state)
@@ -227,10 +233,21 @@ def install(root, state, *, platform=None, project=None, home=None, dry_run=Fals
         raise ValueError("Project directory must already exist")
     identity = ("project:" if project else platform + ":") + str(target_root)
     previous = db["targets"].get(identity, {})
+    if platform == "cursor":
+        cursor_dir = cursor_dir or (Path(previous["cursor_dir"]) if previous.get("cursor_dir") else None)
+        if cursor_dir is not None:
+            cursor_dir = cursor_dir.absolute()
+            no_links(cursor_dir)
+            if not cursor_dir.is_dir():
+                raise ValueError("The explicit Cursor configuration directory must already exist")
+            if previous and previous.get("cursor_dir") != str(cursor_dir):
+                raise ValueError("Cursor is already enrolled at another location; preserve or roll back that installation first")
+    else:
+        cursor_dir = None
     writes, tracked = {}, {}
 
     def add(relative, data, block=False, create_only=False):
-        path = safe_path(target_root, relative)
+        path = installed_path(target_root, relative, cursor_dir)
         existing = path.read_bytes() if path.exists() else b""
         if create_only and path.exists():
             return
@@ -287,6 +304,8 @@ def install(root, state, *, platform=None, project=None, home=None, dry_run=Fals
             add(f".{platform}/skills/{name}/SKILL.md", skill.encode())
     db["targets"][identity] = {"kind": "project" if project else platform, "root": str(target_root),
                                "version": version, "pinned": pin, "files": tracked}
+    if cursor_dir is not None:
+        db["targets"][identity]["cursor_dir"] = str(cursor_dir)
     writes[state / "installations.json"] = json_bytes(db)
     return transaction(state, writes, dry_run=dry_run)
 
@@ -340,7 +359,7 @@ def doctor(root, state, project=None):
     for target in targets:
         problems = []
         for relative, expected in target["files"].items():
-            path = Path(target["root"]) / relative
+            path = installed_path(Path(target["root"]), relative, target.get("cursor_dir"))
             if not path.exists():
                 problems.append(relative + ": missing")
             else:
@@ -451,6 +470,7 @@ def main(argv=None):
     setup = sub.add_parser("install", help="Install global Codex/Cursor instructions and skills")
     setup.add_argument("--platform", choices=["codex", "cursor", "all"], default="all")
     setup.add_argument("--home", type=Path)
+    setup.add_argument("--cursor-dir", type=Path, help="Explicit real Cursor configuration directory for relocated profiles; retained privately for sync")
     setup.add_argument("--dry-run", action="store_true")
     onboard = sub.add_parser("onboard", help="Adopt a project without replacing its own guidance")
     onboard.add_argument("--project", type=Path, required=True)
@@ -510,7 +530,9 @@ def main(argv=None):
         result = {k: len(v) if isinstance(v, list) else v for k, v in result.items()}
     elif args.command == "install":
         platforms = ["codex", "cursor"] if args.platform == "all" else [args.platform]
-        result = [install(root, state, platform=p, home=args.home, dry_run=args.dry_run) for p in platforms]
+        if args.cursor_dir and args.platform == "codex":
+            raise ValueError("--cursor-dir applies to Cursor installation")
+        result = [install(root, state, platform=p, home=args.home, cursor_dir=args.cursor_dir, dry_run=args.dry_run) for p in platforms]
     elif args.command == "onboard":
         result = install(root, state, project=args.project, pin=args.pin, dry_run=args.dry_run)
     elif args.command == "sync":

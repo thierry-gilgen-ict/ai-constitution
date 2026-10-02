@@ -68,6 +68,28 @@ class Workspace(unittest.TestCase):
         self.onboard()
         self.assertIn("make check", path.read_text())
 
+    def test_explicit_cursor_directory_survives_sync_and_rollback(self):
+        relocated = self.base / "relocated cursor"
+        relocated.mkdir()
+        result = kit.install(self.root, self.state, platform="cursor", home=self.home, cursor_dir=relocated)
+        self.assertTrue((relocated / "rules/ai-constitution.mdc").exists())
+        self.assertTrue((relocated / "skills/constitution-maintenance/SKILL.md").exists())
+        self.assertFalse((self.home / ".cursor").exists())
+        self.assertEqual(kit.doctor(self.root, self.state)[0]["status"], "files-verified")
+        self.assertEqual(kit.sync(self.root, self.state)[0]["status"], "unchanged")
+        kit.rollback(self.state, result["snapshot"])
+        self.assertFalse((relocated / "rules/ai-constitution.mdc").exists())
+
+    def test_explicit_cursor_directory_does_not_overwrite_existing_rule(self):
+        relocated = self.base / "relocated cursor"
+        (relocated / "rules").mkdir(parents=True)
+        path = relocated / "rules/ai-constitution.mdc"
+        path.write_text("Existing user rule", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Unmanaged file"):
+            kit.install(self.root, self.state, platform="cursor", home=self.home, cursor_dir=relocated)
+        self.assertEqual(path.read_text(), "Existing user rule")
+        self.assertFalse(self.state.exists())
+
     def test_edit_outside_managed_block_survives_sync(self):
         self.onboard()
         path = self.project / "AGENTS.md"
@@ -287,7 +309,7 @@ class Catalog(unittest.TestCase):
 class PublicFiles(unittest.TestCase):
     def test_exports_exclude_private_state_and_catalog(self):
         with tempfile.TemporaryDirectory() as folder:
-            path = Path(folder) / "bundle.zip"
+            path = Path(folder).resolve() / "bundle.zip"
             kit.export_bundle(ROOT, path)
             with zipfile.ZipFile(path) as archive:
                 self.assertIn("constitution.md", archive.namelist())

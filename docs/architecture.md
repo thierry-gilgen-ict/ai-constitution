@@ -16,6 +16,8 @@ All writes are preflighted. Each transaction journals the prior bytes privately,
 
 Symlinks and junctions in installation destinations are rejected. New source releases must preserve these boundaries. The tool does not recursively delete directories.
 
+For a relocated Cursor profile, `--cursor-dir` selects its real configuration directory explicitly. The choice is retained in private enrollment state; library and project files keep their standard locations. No path through a junction is traversed to perform writes.
+
 ## Deterministic generation
 
 `build` produces `routing.md` and native adapters from the authored core and small route registry. `check` recomputes those artifacts and fails on drift. Source URLs and evidence are retained. The large catalog never enters every agent prompt.
