@@ -313,6 +313,30 @@ class HTTPTests(unittest.TestCase):
     def test_worker_api_disabled_on_dashboard(self):
         self.assertEqual(self.get("/node/api/tags", self.auth())[0], 404)
 
+    def test_worker_metadata_remains_available_during_administration(self):
+        self.server.worker = True
+        self.control.config['legacy_worker_token'] = True
+        forwarded = []
+        def forward(handler, node, path, body, *, timeout=600):
+            forwarded.append((path, timeout))
+            handler.reply({'status': 'read-only metadata'})
+        with patch('local_control.server.Handler.forward', new=forward):
+            for path, method, body in [('/api/version', 'GET', None), ('/api/tags', 'GET', None),
+                                       ('/api/ps', 'GET', None), ('/api/show', 'POST', '{"model":"fixture:latest"}')]:
+                result, finished = [], threading.Event()
+                def read():
+                    result.append(self.get('/node' + path, self.auth(), method, body))
+                    finished.set()
+                with self.control.operation:
+                    thread = threading.Thread(target=read)
+                    thread.start()
+                    available = finished.wait(1)
+                thread.join(3)
+                self.assertTrue(available, path + ' waited behind an unrelated operation')
+                self.assertEqual(result[0][0], 200)
+        self.assertEqual([path for path, _ in forwarded], ['/api/version', '/api/tags', '/api/ps', '/api/show'])
+        self.assertTrue(all(timeout <= 10 for _, timeout in forwarded))
+
     def test_inference_credential_cannot_control_machines(self):
         headers = {"Authorization": "Bearer " + self.control.config["gateway_token"]}
         self.assertEqual(self.get("/v1/models", headers)[0], 200)

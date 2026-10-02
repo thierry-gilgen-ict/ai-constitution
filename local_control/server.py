@@ -272,8 +272,8 @@ class Handler(BaseHTTPRequestHandler):
                 # Once headers/tokens have been emitted, close the stream. Never silently replay.
                 self.close_connection = True
 
-    def forward(self, node, path, body):
-        conn, response = connect(node, path, body, timeout=600)
+    def forward(self, node, path, body, *, timeout=600):
+        conn, response = connect(node, path, body, timeout=timeout)
         try:
             self.send_response(response.status)
             self.headers_common(response.getheader("Content-Type", "application/json"))
@@ -295,6 +295,12 @@ class Handler(BaseHTTPRequestHandler):
         if path.startswith("/v1/"):
             with control.lease(body, direct=direct) as (node, payload):
                 self.forward(node, path, payload)
+        elif path in NODE_GET or path == '/api/show':
+            if body and 'model' in body:
+                model_name(body['model'])
+            # Read-only metadata must remain available during downloads and lifecycle
+            # work. A stalled read must not hold the worker's administration lock.
+            self.forward(control.node('local'), path, body, timeout=10)
         else:
             if body and "model" in body:
                 model_name(body["model"])
