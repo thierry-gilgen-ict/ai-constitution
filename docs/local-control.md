@@ -163,7 +163,9 @@ For login startup, tray controls and portable builds, see [Desktop preview](desk
 | macOS Intel / Apple Silicon | Portable Python, Homebrew install and pinned helper binaries; physical Mac inference validation still needed |
 | Linux x86_64 / ARM64 | Portable controller/worker and helper binaries; Ollama installation follows its official instructions |
 | Windows ARM64 | Pinned helper binary; physical inference validation still needed |
-| AMD / Intel GPU | Discovery depends on llmfit and runtime support; no blanket inference certification |
-| Remote workers | Automated HTTPS, authentication and certificate-change tests; multi-computer soak testing still needed |
+| AMD / Intel GPU | Windows RX 580 (8 GB), Ollama 0.35.0 and Qwen 3.5 4B passed GPU-residency and 64K function-call/history checks; full coding-client latency remains unqualified. Other GPUs depend on llmfit and runtime support |
+| Remote workers | Two physical Windows machines passed pinned pairing, download and protocol checks; a live drain moved new requests to CPU while retaining the existing remote lease. Multi-computer soak testing still needed |
 
 Automated tests cover authentication, origin checks, request streaming, model leases, failed fallback checks, drain-before-unload, interrupted client cleanup and restart behavior. Live testing on the reference Windows machine verified an active stream finishing, the next request using CPU, zero managed GPU allocation afterward, and a real Codex shell command on the CPU fallback.
+
+The small AMD-worker model did not finish the default coding fixture within its 1,024-output-token budget, and a real Codex smoke test exceeded five minutes before its first tool call. These failures are retained as qualification evidence: fitting in VRAM and passing a short tool probe do not establish useful coding performance. Keep a proven fallback available while evaluating another model or reasoning setting.
