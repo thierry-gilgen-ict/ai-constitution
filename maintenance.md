@@ -2,7 +2,7 @@
 
 Keep the constitution useful, short, and evidence based.
 
-1. Run `python scripts/constitution.py update` to collect official-source change observations. Network errors are reported separately; they never remove a working route.
+1. Run `python scripts/constitution.py update --sources` to refresh provider definitions and collect official-source change observations. Network errors are reported separately; they never remove a working route.
 2. Review the generated local report. A changed page hash is a signal to investigate, not proof of a model release. Open relevant sources and verify exact product availability.
 3. Edit `registry/models.json` for verified facts and `registry/routes.json` for deliberate routing choices. Record source references, verification dates, and the basis for each choice.
 4. For a new default, compare representative tasks using `checks/evaluation.md`. Initial recommendations are explicitly provisional. Do not call paid APIs without an agreed budget.
