@@ -4,7 +4,7 @@ The toolkit uses Python's standard library. `scripts/constitution.py` owns rende
 
 ## Public source and private state
 
-The checkout holds authored policy, curated routes, generated adapters, and the community catalog snapshot. Private state defaults to `~/.config/ai-constitution/state/`, outside the checkout. Tests use isolated temporary roots. `.local/` is reserved and ignored for contributor scratch state.
+The checkout holds authored policy, curated routes, generated adapters, and the bundled community catalog snapshot. Private state defaults to `~/.config/ai-constitution/state/`, outside the checkout. Routine refreshes write immutable snapshots under `catalogs/`; private preferences live in `overrides/policy.json`; managed library upgrades use `releases/` and a journaled active-release pointer. Tests use isolated temporary roots. `.local/` is reserved and ignored for contributor scratch state.
 
 Global installs render module copies into `~/.config/ai-constitution/libraries/<client>/`. Their installation metadata points back to the source checkout. Project copies use relative paths and a lock file with no local absolute paths.
 
@@ -31,6 +31,6 @@ File verification is deterministic. Model compliance, client instruction discove
 - Codex and Cursor have native file installers; actual Grok Bots have an explicit cloud onboarding/export path.
 - Arbitrary semantic conflicts between existing instructions require agent or human review.
 - Custom `CODEX_HOME` layouts use manual adapter installation in this release.
-- Local discovery lists metadata; it does not benchmark or invoke inference.
+- Core `local` discovery lists metadata. The optional Local Control companion separately performs explicitly requested model downloads, inference probes and gateway routing; see [Local Control](local-control.md).
 - Route recommendations are provisional and small; the broad catalog has community provenance.
 - Refreshes and installations are explicit. There is no daemon or silent self-update.

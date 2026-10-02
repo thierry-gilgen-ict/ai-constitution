@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add explicit portable-lock adoption, private policy overlays, immutable instruction-library upgrades with transactional activation, and effective-policy explanations.
+- Make routine model refreshes private; contributors use `--source-checkout`. Validate known capability, context, modality and cost types while preserving unknown upstream fields.
+- Retain pending source changes until an exact observed revision is explicitly reviewed; migrate legacy observations without treating them as acknowledgments.
+
 - Add the optional Local Control preview: private dashboard, Ollama lifecycle controls, llmfit hardware suggestions, Hugging Face GGUF browsing, explicit model downloads, paired HTTPS workers, project launchers and request-boundary Gaming mode.
 - Give local coding sessions a dedicated gateway alias and session-specific metadata while retaining existing client approvals and project instructions. Cursor support runs the local Codex agent inside its terminal.
 - Serialize core enrollment changes across processes, recover from a final journal write failure, allow interrupted rollback to resume, and preserve project pins when onboarding again.

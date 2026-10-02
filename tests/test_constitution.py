@@ -255,7 +255,7 @@ class Catalog(unittest.TestCase):
             "name": "Model One", "tool_call": True, "limit": {"context": 4096}, "new_upstream_field": [1, 2]}}}}
 
     def refresh(self, payload=None, **kwargs):
-        return catalog.refresh(self.root, self.state, raw=catalog.json_bytes(payload if payload is not None else self.payload), **kwargs)
+        return catalog.refresh(self.root, self.state, raw=catalog.json_bytes(payload if payload is not None else self.payload), source_checkout=True, **kwargs)
 
     def test_preserves_provider_scoped_ids_and_unknown_fields(self):
         self.refresh()
