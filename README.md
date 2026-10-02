@@ -23,7 +23,7 @@ AI Constitution connects three jobs that are often maintained separately:
 | Current model definitions | An offline snapshot of **225 providers and 8,371 provider-scoped models**, fetched October 2, 2026; one-command refresh |
 | Easy project setup | A copy-paste onboarding prompt and an installer that preserves existing guidance |
 | Predictable maintenance | Generated routing, checksums, drift detection, private backups, and rollback |
-| Local model support | Metadata discovery for Ollama and OpenAI-compatible servers |
+| Local model support | Hardware-aware Ollama onboarding, model management, a private dashboard and GPU release with an optional companion |
 | Honest compatibility | Separate statements for files installed, instructions loaded, model access, and measured results |
 
 Catalog counts describe the bundled [models.dev](https://models.dev) snapshot, not independently verified access to every model. Aliases and provider-specific offerings are counted separately. [Coverage and provenance](docs/models.md).
@@ -93,6 +93,19 @@ python scripts/constitution.py local --kind openai-compatible --url http://127.0
 
 These commands list model metadata. They do not load weights or run inference. Inventories stay in private local state. [Local model guide](docs/local-models.md).
 
+## Your local models, ready to work
+
+**Local Control is an optional preview:** choose models for your hardware, download GGUF weights, load or unload models, and route coding sessions through one private endpoint.
+
+```sh
+python scripts/local_control.py setup --ollama --llmfit
+python scripts/local_control.py serve --open
+```
+
+Choose a primary model and a CPU or second-computer fallback in the dashboard. **Gaming mode** checks the fallback, moves new requests, waits for active responses to finish, and verifies GPU memory was released. A local-only Codex session can run directly or inside Cursor's terminal. Windows, macOS and Linux share the same controller and worker code.
+
+This does not replace Cursor's native Agent, migrate an in-progress generation, or pool GPU memory across PCs. Physical Mac and multi-computer validation remain preview milestones. [Setup, compatibility, switching and upgrades →](docs/local-control.md)
+
 ## How it fits together
 
 ```mermaid
@@ -144,6 +157,8 @@ The source repository can live anywhere, including a development drive. Runtime 
 ## Status
 
 **v0.1.0** is a small, source-first toolkit. File installation, catalog refresh, local metadata discovery, and rollback have automated tests. Each live client still needs an instruction-loading check. Initial route recommendations are provisional, not a published performance benchmark.
+
+The optional **Local Control preview** adds a separately operated inference service. Its Windows reference setup has live Codex and GPU-to-CPU handoff checks; the [review and roadmap](docs/review-and-roadmap.md) distinguishes current evidence from work still needed.
 
 The project makes no claim that a community catalog contains every model at the instant it launches, that a rule guarantees compliance, or that an exported bundle has been installed in a remote Bot. These distinctions are part of the product.
 

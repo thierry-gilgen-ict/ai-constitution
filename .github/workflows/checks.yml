@@ -35,7 +35,10 @@ jobs:
       - name: Verify generated files and catalog
         run: python scripts/constitution.py check
       - name: Test behavior in isolated workspaces
-        run: python -m unittest discover -s tests -v
+        # Optional worker dependency exercises certificate pinning on every supported CI OS.
+        run: |
+          python -m pip install -r requirements-local-node.txt
+          python -m unittest discover -s tests -v
       - name: Scan publishable files
         run: python scripts/constitution.py scan
       - name: Verify local documentation links

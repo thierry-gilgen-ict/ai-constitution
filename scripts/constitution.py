@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import base64
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 import datetime as dt
 import difflib
 import hashlib
@@ -25,6 +26,32 @@ ROOT = Path(__file__).resolve().parents[1]
 BEGIN = "<!-- ai-constitution:begin -->"
 END = "<!-- ai-constitution:end -->"
 MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "VERSION")
+
+
+@contextmanager
+def state_lock(state):
+    """Serialize read/modify/write operations across CLI processes; OS releases on exit."""
+    no_links(state)
+    lock_path = state.parent / (".constitution-" + digest(str(state.absolute()).encode())[:16] + ".lock")
+    no_links(lock_path)
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    stream = open(lock_path, "a+b")
+    try:
+        stream.write(b"\0")
+        stream.flush()
+        stream.seek(0)
+        try:
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            raise ValueError("Another installation or rollback is running; retry after it finishes") from None
+        yield
+    finally:
+        stream.close()
 
 
 def read_json(path):
@@ -208,6 +235,8 @@ def transaction(state, writes, *, dry_run=False):
         for item in prepared:
             atomic_bytes(Path(item["path"]), item["data"])
             completed.append(item)
+        record["state"] = "applied"
+        atomic_bytes(journal, json_bytes(record))
     except Exception:
         for item in reversed(completed):
             path = Path(item["path"])
@@ -218,12 +247,17 @@ def transaction(state, writes, *, dry_run=False):
         record["state"] = "reverted-on-error"
         atomic_bytes(journal, json_bytes(record))
         raise
-    record["state"] = "applied"
-    atomic_bytes(journal, json_bytes(record))
     return {"status": "installed", "snapshot": snapshot, "files": [p["path"] for p in prepared]}
 
 
-def install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=False):
+def install(root, state, **kwargs):
+    if kwargs.get("dry_run"):
+        return _install(root, state, **kwargs)
+    with state_lock(state):
+        return _install(root, state, **kwargs)
+
+
+def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=None):
     validate(root)
     build(root, check=True)
     db = state_load(state)
@@ -233,6 +267,8 @@ def install(root, state, *, platform=None, project=None, home=None, cursor_dir=N
         raise ValueError("Project directory must already exist")
     identity = ("project:" if project else platform + ":") + str(target_root)
     previous = db["targets"].get(identity, {})
+    if pin is None:
+        pin = previous.get("pinned", False)
     if platform == "cursor":
         cursor_dir = cursor_dir or (Path(previous["cursor_dir"]) if previous.get("cursor_dir") else None)
         if cursor_dir is not None:
@@ -325,21 +361,31 @@ def sync(root, state, include_pinned=False, dry_run=False):
 
 
 def rollback(state, snapshot):
+    with state_lock(state):
+        return _rollback(state, snapshot)
+
+
+def _rollback(state, snapshot):
     if not re.fullmatch(r"\d{8}T\d{6}Z-[a-f0-9]{8}", snapshot):
         raise ValueError("Invalid snapshot identifier")
     path = state / "transactions" / (snapshot + ".json")
     record = read_json(path)
-    if record["state"] != "applied":
+    if record["state"] not in ("applied", "prepared", "rolling-back"):
         raise ValueError("Snapshot is not an applied transaction")
     for item in record["files"]:
         target = Path(item["path"])
         no_links(target)
-        if not target.exists() or digest(target.read_bytes()) != item["after_sha256"]:
+        actual = target.read_bytes() if target.exists() else None
+        before = base64.b64decode(item["before"]) if item["before"] is not None else None
+        already_restored = record["state"] in ("prepared", "rolling-back") and actual == before
+        if not already_restored and (actual is None or digest(actual) != item["after_sha256"]):
             raise ValueError("A target changed since this snapshot; rollback refused to preserve later edits")
+    record["state"] = "rolling-back"
+    atomic_bytes(path, json_bytes(record))
     for item in reversed(record["files"]):
         target = Path(item["path"])
         if item["before"] is None:
-            target.unlink()
+            target.unlink(missing_ok=True)
         else:
             atomic_bytes(target, base64.b64decode(item["before"]))
     record["state"] = "rolled-back"
@@ -474,7 +520,7 @@ def main(argv=None):
     setup.add_argument("--dry-run", action="store_true")
     onboard = sub.add_parser("onboard", help="Adopt a project without replacing its own guidance")
     onboard.add_argument("--project", type=Path, required=True)
-    onboard.add_argument("--pin", action="store_true")
+    onboard.add_argument("--pin", action="store_true", default=None)
     onboard.add_argument("--dry-run", action="store_true")
     sync_parser = sub.add_parser("sync")
     sync_parser.add_argument("--all", action="store_true", required=True)

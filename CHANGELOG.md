@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add the optional Local Control preview: private dashboard, Ollama lifecycle controls, llmfit hardware suggestions, Hugging Face GGUF browsing, explicit model downloads, paired HTTPS workers, project launchers and request-boundary Gaming mode.
+- Give local coding sessions a dedicated gateway alias and session-specific metadata while retaining existing client approvals and project instructions. Cursor support runs the local Codex agent inside its terminal.
+- Serialize core enrollment changes across processes, recover from a final journal write failure, allow interrupted rollback to resume, and preserve project pins when onboarding again.
+- Document current validation, preview limits and the prioritized project review.
+
 ## 0.1.0 — 2026-10-02
 
 - Shared core, engineering and research modules, and generated client routing.

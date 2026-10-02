@@ -1,6 +1,6 @@
 # Local and self-hosted models
 
-Local support starts with **discovery**, without downloading weights or invoking a model.
+For hardware-aware onboarding, downloads, GPU controls and project launchers, use the optional **[Local Control companion](local-control.md)**. The core CLI below remains a read-only metadata discovery tool, without downloading weights or invoking a model.
 
 | Server | Example | Metadata endpoint |
 | --- | --- | --- |
