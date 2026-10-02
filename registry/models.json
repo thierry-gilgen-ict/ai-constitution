@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "max_age_days": 45,
+  "models": [
+    {
+      "key": "codex:fast",
+      "provider": "openai",
+      "surface": "codex",
+      "name": "GPT-6 Luna",
+      "selector": "gpt-6-luna",
+      "selection": "model-id",
+      "verified_at": "2026-10-02",
+      "source": "openai-luna",
+      "status": "provisional",
+      "availability": "Check the current Codex model picker; API documentation does not establish account access.",
+      "evidence": "Official model description; no comparative project evaluation yet."
+    },
+    {
+      "key": "codex:balanced",
+      "provider": "openai",
+      "surface": "codex",
+      "name": "GPT-6.1 Sol",
+      "selector": "gpt-6.1-sol",
+      "selection": "model-id",
+      "verified_at": "2026-10-02",
+      "source": "openai-sol",
+      "status": "provisional",
+      "availability": "Check the current Codex model picker; API documentation does not establish account access.",
+      "evidence": "Official model description; no comparative project evaluation yet."
+    },
+    {
+      "key": "codex:deep",
+      "provider": "openai",
+      "surface": "codex",
+      "name": "GPT-6 Astra",
+      "selector": "gpt-6-astra",
+      "selection": "model-id",
+      "verified_at": "2026-10-02",
+      "source": "openai-astra",
+      "status": "provisional",
+      "availability": "Check the current Codex model picker; reasoning settings depend on client and model.",
+      "evidence": "Official model description; no comparative project evaluation yet."
+    },
+    {
+      "key": "cursor:fast",
+      "provider": "cursor",
+      "surface": "cursor",
+      "name": "Composer 2.5",
+      "selector": null,
+      "selection": "ui-label",
+      "verified_at": "2026-10-02",
+      "source": "cursor-models",
+      "status": "provisional",
+      "availability": "Select the displayed model only if enabled in your account. API identifier intentionally unspecified.",
+      "evidence": "Official Cursor catalog; no comparative project evaluation yet."
+    },
+    {
+      "key": "cursor:deep",
+      "provider": "xai",
+      "surface": "cursor",
+      "name": "Grok 4.7",
+      "selector": null,
+      "selection": "ui-label",
+      "verified_at": "2026-10-02",
+      "source": "cursor-models",
+      "status": "provisional",
+      "availability": "Select the displayed model only if enabled in your account. API identifier intentionally unspecified.",
+      "evidence": "Official Cursor catalog; no comparative project evaluation yet."
+    },
+    {
+      "key": "grok-bot:managed",
+      "provider": "platform-managed",
+      "surface": "grok-bot",
+      "name": "Platform-managed selection",
+      "selector": null,
+      "selection": "managed",
+      "verified_at": "2026-10-02",
+      "source": "grok-settings",
+      "status": "documented",
+      "availability": "The Grok Bot product manages model selection and exposes no model picker.",
+      "evidence": "Grok Bot settings documentation."
+    }
+  ]
+}

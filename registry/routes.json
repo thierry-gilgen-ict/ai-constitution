@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "platform": "codex",
+      "task": "small",
+      "description": "Small, well-specified edits",
+      "preferred": "codex:fast",
+      "fallbacks": [
+        "codex:balanced"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "cursor",
+      "task": "small",
+      "description": "Small, well-specified edits",
+      "preferred": "cursor:fast",
+      "fallbacks": [
+        "cursor:deep"
+      ],
+      "note": "Use the supported model picker. This guide does not override Cursor Auto or its managed routing pool."
+    },
+    {
+      "platform": "grok-bot",
+      "task": "small",
+      "description": "Small, well-specified edits",
+      "preferred": "grok-bot:managed",
+      "fallbacks": [],
+      "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."
+    },
+    {
+      "platform": "codex",
+      "task": "implementation",
+      "description": "Ordinary implementation",
+      "preferred": "codex:balanced",
+      "fallbacks": [
+        "codex:deep"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "cursor",
+      "task": "implementation",
+      "description": "Ordinary implementation",
+      "preferred": "cursor:fast",
+      "fallbacks": [
+        "cursor:deep"
+      ],
+      "note": "Use the supported model picker. This guide does not override Cursor Auto or its managed routing pool."
+    },
+    {
+      "platform": "grok-bot",
+      "task": "implementation",
+      "description": "Ordinary implementation",
+      "preferred": "grok-bot:managed",
+      "fallbacks": [],
+      "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."
+    },
+    {
+      "platform": "codex",
+      "task": "deep",
+      "description": "Difficult debugging and architecture",
+      "preferred": "codex:deep",
+      "fallbacks": [
+        "codex:balanced"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "cursor",
+      "task": "deep",
+      "description": "Difficult debugging and architecture",
+      "preferred": "cursor:deep",
+      "fallbacks": [
+        "cursor:fast"
+      ],
+      "note": "Use the supported model picker. This guide does not override Cursor Auto or its managed routing pool."
+    },
+    {
+      "platform": "grok-bot",
+      "task": "deep",
+      "description": "Difficult debugging and architecture",
+      "preferred": "grok-bot:managed",
+      "fallbacks": [],
+      "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."
+    },
+    {
+      "platform": "codex",
+      "task": "review",
+      "description": "Review correctness and regressions",
+      "preferred": "codex:deep",
+      "fallbacks": [
+        "codex:balanced"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "cursor",
+      "task": "review",
+      "description": "Review correctness and regressions",
+      "preferred": "cursor:deep",
+      "fallbacks": [
+        "cursor:fast"
+      ],
+      "note": "Use the supported model picker. This guide does not override Cursor Auto or its managed routing pool."
+    },
+    {
+      "platform": "grok-bot",
+      "task": "review",
+      "description": "Review correctness and regressions",
+      "preferred": "grok-bot:managed",
+      "fallbacks": [],
+      "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."
+    },
+    {
+      "platform": "codex",
+      "task": "research",
+      "description": "Evidence gathering with appropriate tools",
+      "preferred": "codex:balanced",
+      "fallbacks": [
+        "codex:deep"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "cursor",
+      "task": "research",
+      "description": "Evidence gathering with appropriate tools",
+      "preferred": "cursor:fast",
+      "fallbacks": [
+        "cursor:deep"
+      ],
+      "note": "Use the supported model picker. This guide does not override Cursor Auto or its managed routing pool."
+    },
+    {
+      "platform": "grok-bot",
+      "task": "research",
+      "description": "Evidence gathering with appropriate tools",
+      "preferred": "grok-bot:managed",
+      "fallbacks": [],
+      "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."
+    }
+  ]
+}

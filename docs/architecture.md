@@ -1,0 +1,34 @@
+# Architecture
+
+The toolkit uses Python's standard library. `scripts/constitution.py` owns rendering, managed installation, enrollment, drift checks, rollback, exports, and the command interface. `scripts/catalog.py` owns public fetches, catalog validation and diffs, and local model discovery. The PowerShell wrapper passes arguments through unchanged.
+
+## Public source and private state
+
+The checkout holds authored policy, curated routes, generated adapters, and the community catalog snapshot. Private state defaults to `~/.config/ai-constitution/state/`, outside the checkout. Tests use isolated temporary roots. `.local/` is reserved and ignored for contributor scratch state.
+
+Global installs render module copies into `~/.config/ai-constitution/libraries/<client>/`. Their installation metadata points back to the source checkout. Project copies use relative paths and a lock file with no local absolute paths.
+
+## Managed files
+
+`AGENTS.md` uses a marked section so surrounding instructions survive byte-for-byte. Generated bundle files are owned as whole files. A previous checksum is checked before replacement; an unowned file with different contents causes a conflict. Project context is user-owned and excluded from synchronization.
+
+All writes are preflighted. Each transaction journals the prior bytes privately, writes each file through a temporary sibling and atomic replace, then marks itself applied. A caught write error restores completed files. This handles ordinary errors; abrupt power loss can leave a prepared journal requiring manual inspection. It is not a distributed transaction or a database.
+
+Symlinks and junctions in installation destinations are rejected. New source releases must preserve these boundaries. The tool does not recursively delete directories.
+
+## Deterministic generation
+
+`build` produces `routing.md` and native adapters from the authored core and small route registry. `check` recomputes those artifacts and fails on drift. Source URLs and evidence are retained. The large catalog never enters every agent prompt.
+
+## Product boundaries
+
+File verification is deterministic. Model compliance, client instruction discovery, model availability, and workflow improvement are separate acceptance checks. The program does not claim a universal precedence hierarchy, force model switches, or change host approval controls.
+
+## Intentional first-release limits
+
+- Codex and Cursor have native file installers; actual Grok Bots have an explicit cloud onboarding/export path.
+- Arbitrary semantic conflicts between existing instructions require agent or human review.
+- Custom `CODEX_HOME` layouts use manual adapter installation in this release.
+- Local discovery lists metadata; it does not benchmark or invoke inference.
+- Route recommendations are provisional and small; the broad catalog has community provenance.
+- Refreshes and installations are explicit. There is no daemon or silent self-update.

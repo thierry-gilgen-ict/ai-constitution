@@ -1,0 +1,17 @@
+# Machine state must never be published.
+.local/
+.env
+.env.*
+!.env.example
+*.local.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+.DS_Store
+Thumbs.db
