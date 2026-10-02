@@ -35,7 +35,9 @@ def main():
     command+=[str(ROOT/'packaging/entrypoint.py')]
     subprocess.run(command,cwd=ROOT,check=True)
     executable=output/'app/ai-constitution-local'/('ai-constitution-local.exe' if platform.system()=='Windows' else 'ai-constitution-local')
-    subprocess.run([str(executable),'--help'],check=True,capture_output=True)
+    smoke = subprocess.run([str(executable),'--help'],capture_output=True,text=True)
+    if smoke.returncode:
+        raise RuntimeError('Packaged entry point failed: ' + smoke.stderr[-4000:])
     checks={p.relative_to(output/'app').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in (output/'app').rglob('*') if p.is_file()}
     (output/'manifest.json').write_text(json.dumps({'schema':1,'platform':platform.system(),'architecture':platform.machine(),
         'signing':'unsigned preview; no publisher identity certification','files':checks},indent=2),encoding='utf-8')
