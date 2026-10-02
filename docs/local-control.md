@@ -31,6 +31,8 @@ Before configuring routes, **Suggest a starting context** offers a conservative 
 
 Creating a route never implicitly downloads a missing base model. Downloading and updating weights is an explicit action. Aliases share their base weights; inventory sizes are not additive disk requirements.
 
+You can configure a CPU or eligible remote fallback while Gaming mode stays on. The current route remains selected until the new model passes the protocol checks; the primary GPU stays protected. Wait for active responses before configuring, and leave maintenance on the target machine first. Earlier fallbacks, including those created before the alternatives list was introduced, remain available after adding another one. No configuration migration is needed for this update.
+
 ## Codex and Cursor
 
 ```sh

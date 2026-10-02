@@ -158,6 +158,75 @@ class ControlTests(unittest.TestCase):
         self.assertNotIn("FINGERPRINT", value)
         self.assertNotIn(self.control.config["token"], value)
 
+    def configuring_worker(self):
+        self.control.config['nodes']['remote'] = {'url': 'https://192.168.1.10:8767', 'kind': 'worker', 'name': 'Worker'}
+        tags = [{'name': 'small:latest', 'digest': 'base-digest'}]
+        resident = []
+        nodes = []
+        def rpc(node, path, payload=None, **kwargs):
+            nodes.append(node['url'])
+            if path == '/api/tags':
+                return {'models': tags}
+            if path == '/api/create':
+                tags.append({'name': payload['model'], 'digest': 'alias-digest'})
+                resident.append({'name': payload['model'], 'context_length': payload['parameters']['num_ctx'],
+                                 'size_vram': 0 if payload['parameters']['num_gpu'] == 0 else 100})
+                return {'status': 'success'}
+            if path == '/api/ps':
+                return {'models': resident}
+            return self.ollama(node, path, payload, **kwargs)
+        self.control.rpc = rpc
+        return nodes
+
+    def test_configure_remote_in_gaming_preserves_legacy_cpu_alternative(self):
+        nodes = self.configuring_worker()
+        previous = copy.deepcopy(self.control.config['fallback'])
+        self.control.mode = self.control.config['mode'] = 'gaming'
+        result = self.control.configure('remote', 'small:latest', 'fallback')
+        self.assertTrue(result['tool_execution_tested'])
+        self.assertEqual(self.control.route()['node'], 'remote')
+        self.assertEqual(self.control.mode, 'gaming')
+        self.assertEqual(self.control.config['fallbacks'], [result['route'], previous])
+        self.assertEqual(set(nodes), {'https://192.168.1.10:8767'})
+        self.control.configure('remote', 'small:latest', 'fallback')
+        self.assertEqual(len(self.control.config['fallbacks']), 2)
+
+    def test_configure_in_gaming_refuses_primary_protected_gpu_and_excluded_worker(self):
+        nodes = self.configuring_worker()
+        self.control.mode = 'gaming'
+        for identity, role in [('remote', 'primary'), ('local', 'fallback')]:
+            with self.assertRaisesRegex(ValueError, 'Gaming mode'):
+                self.control.configure(identity, 'small:latest', role)
+        self.control.config['nodes']['remote']['gaming_eligible'] = False
+        with self.assertRaisesRegex(ValueError, 'Gaming mode'):
+            self.control.configure('remote', 'small:latest', 'fallback')
+        self.assertEqual(nodes, [])
+
+    def test_configure_refuses_maintenance_and_active_responses(self):
+        nodes = self.configuring_worker()
+        self.control.config['maintenance'] = ['remote']
+        with self.assertRaisesRegex(ValueError, 'maintenance'):
+            self.control.configure('remote', 'small:latest', 'fallback')
+        self.control.config['maintenance'] = []
+        with self.control.lease({'model': ALIAS}):
+            with self.assertRaisesRegex(ValueError, 'active responses'):
+                self.control.configure('remote', 'small:latest', 'fallback')
+        self.assertEqual(nodes, [])
+
+    def test_configure_failed_verification_or_save_keeps_gaming_route(self):
+        self.configuring_worker()
+        self.control.mode = self.control.config['mode'] = 'gaming'
+        previous = copy.deepcopy(self.control.config)
+        with patch('local_control.core.compatibility.qualify', side_effect=ValueError('failed probe')):
+            with self.assertRaisesRegex(ValueError, 'failed probe'):
+                self.control.configure('remote', 'small:latest', 'fallback')
+        self.assertEqual(self.control.config, previous)
+        with patch.object(self.control, 'save', side_effect=OSError('disk full')):
+            with self.assertRaises(OSError):
+                self.control.configure('remote', 'small:latest', 'fallback')
+        self.assertEqual(self.control.config, previous)
+        self.assertEqual(self.control.mode, 'gaming')
+
     def test_single_process_ownership(self):
         lock = ProcessLock(self.root / "server.lock")
         try:

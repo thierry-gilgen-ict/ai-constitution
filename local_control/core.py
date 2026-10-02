@@ -565,8 +565,11 @@ class Control:
             with self.lock:
                 if sum(self.active.values()):
                     raise ValueError("Wait for active responses before changing model definitions")
-                if self.mode != "work":
-                    raise ValueError("Return to work mode before configuring routes")
+                if identity in self.config['maintenance']:
+                    raise ValueError("Leave maintenance before configuring this machine")
+                if self.mode != "work" and not (self.mode == 'gaming' and role == 'fallback'
+                        and self.gaming_eligible({'node': identity, 'cpu': bool(cpu)})):
+                    raise ValueError("Gaming mode allows only CPU or eligible remote fallback configuration; return to Work for primary routes")
             node = self.node(identity)
             installed = self.rpc(node, "/api/tags").get("models", [])
             if not any(m["name"] in (model, model + ":latest") for m in installed):
@@ -584,9 +587,10 @@ class Control:
             endpoint['contract'] = compatibility.qualify(self, endpoint)
             with self.lock:
                 previous = copy.deepcopy(self.config)
+                alternatives = self.fallback_candidates() if role == 'fallback' else []
                 self.config[role] = endpoint
                 if role == 'fallback':
-                    self.config['fallbacks'] = [endpoint, *[r for r in self.config['fallbacks'] if (r['node'], r['model']) != (identity, alias)]]
+                    self.config['fallbacks'] = [endpoint, *[r for r in alternatives if (r['node'], r['model']) != (identity, alias)]]
                 owned = self.config["managed"].setdefault(identity, [])
                 if alias not in owned:
                     owned.append(alias)
