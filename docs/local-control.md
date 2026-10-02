@@ -27,6 +27,8 @@ python scripts/local_control.py open
 3. Set a **Fallback** on another machine, or select **Run on CPU** for this computer. CPU setup starts a separate loopback Ollama process on port 11435 and reuses the active model store. It verifies actual GPU allocation after loading.
 4. Start a project through a launcher below. Use **Make room to play** to switch new requests and drain the GPU.
 
+Before configuring routes, **Suggest a starting context** offers a conservative hardware-based starting point. It does not establish that a particular model or KV cache fits; use the model-fit estimate and route checks. Context changes are explicit and locked once routes are configured.
+
 Creating a route never implicitly downloads a missing base model. Downloading and updating weights is an explicit action. Aliases share their base weights; inventory sizes are not additive disk requirements.
 
 ## Codex and Cursor
@@ -86,6 +88,8 @@ An advertised tool capability and a successful text response do not establish re
 
 ## Add machines
 
+For a second Windows PC, follow the [step-by-step Windows worker guide](windows-worker.md), including the scoped firewall rule and private pairing instructions.
+
 On each Windows, macOS or Linux worker:
 
 ```sh
@@ -104,7 +108,7 @@ Replace the example IP with that computer's private IPv4 address. Paste the pair
 
 Allow the selected worker port through that machine's firewall only for trusted home-network peers. The tool does not change firewall rules, scan the LAN, open router ports or install remote shells. Use separate state directories if one computer runs both a controller and a worker; each directory has its own credentials and process lock.
 
-The cluster schedules **whole requests** to selected machines. It does not combine VRAM, shard weights or implement distributed tensor inference. The preview has one controller and explicit primary/fallback routes. Configuring another fallback retains earlier alternatives; Gaming mode tries eligible alternatives in order before switching. Requests have a bounded queue and per-machine concurrency limit. Automatic failover after a generation begins, controller high availability, per-user quotas and unattended fleet-wide software rollout are not provided. Remote model inventory, loading, unloading and downloads are available now.
+The cluster schedules **whole requests** to selected machines. It does not combine VRAM, shard weights or implement distributed tensor inference. The preview has one controller and explicit primary/fallback routes. Configuring another fallback retains earlier alternatives; Gaming mode tries eligible alternatives in order before switching. Machines exposes a saved remote-first preference and per-machine Gaming eligibility. Explicit health checks retain a bounded private history; a recently observed offline route is blocked for 15 seconds before dispatch unless a new health check confirms recovery. Requests have a bounded queue and per-machine concurrency limit. Queued requests can be cancelled from Activity before inference is sent; an accepted generation is never cancelled through that control. Automatic failover after a generation begins, controller high availability, per-user quotas and unattended fleet-wide software rollout are not provided. Remote model inventory, loading, unloading and downloads are available now.
 
 ## Updating without surprises
 
@@ -143,7 +147,7 @@ For login startup, tray controls and portable builds, see [Desktop preview](desk
 
 **Upgrade local Ollama** requires both local runtimes to be drained and a compatible remote route to remain available. It invokes the computer's official package manager; it does not run remote shell commands. Update each remote computer from that computer, then check its runtime and return it to service. Package-manager updates can require interactive prompts or an Ollama restart; rollback is vendor/package-manager specific. With only one computer, finish sessions before updating the runtime manually.
 
-**Connect a project → Evaluate** runs a bounded, opt-in protocol check and a small coding fixture. It asks for a single clamp-function patch and checks eight cases using a restricted AST interpreter: generated Python is never executed. Results include digest, quantization, context, runtime, first-text latency, output tokens over total request time and post-request residency. Peak memory is explicitly not measured. Close managed sessions first. A changed digest or runtime marks earlier results stale. A passing fixture is useful evidence, not a general coding-quality score.
+**Connect a project → Evaluate** runs a bounded, opt-in protocol check and a small coding fixture. It asks for a single clamp-function patch and checks eight cases using a restricted AST interpreter: generated Python is never executed. Results include digest, quantization, context, runtime, first-text latency, output tokens over total request time and post-request residency. A 500 ms sampler records peak observed Ollama model/GPU residency. It can miss brief peaks and excludes driver, OS and other-model allocations; it is not an allocator-level peak-memory measurement. Close managed sessions first. A changed digest or runtime marks earlier results stale. A passing fixture is useful evidence, not a general coding-quality score.
 
 **Overview → Preview support report** shows an allowlisted report before download. It excludes credentials, addresses, host/project paths, names, prompts, responses and raw logs. There is no automatic upload or telemetry. The core `constitution.py explain --project PATH --json` separately reports instruction provenance and drift; installing a file is not evidence that a client loaded it.
 

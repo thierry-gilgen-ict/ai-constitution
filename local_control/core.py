@@ -38,6 +38,10 @@ class Control:
         self.jobs, self.events = operations.recover(root)
         self.cancelled = set()
         self.health = {}
+        history = root / 'health-history.json'
+        self.health_history = json.loads(history.read_text(encoding='utf-8')) if history.exists() else []
+        self.waiting = {}
+        self.cancelled_requests = set()
         self.queued = 0
         self.stopping = False
         self.pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="local-control")
@@ -69,6 +73,8 @@ class Control:
                     "jobs": list(self.jobs.values())[-15:][::-1], "events": self.events[:20], "alias": ALIAS,
                     "context": self.config["context"], "managed": copy.deepcopy(self.config["managed"]),
                     "health": copy.deepcopy(self.health), "queued_requests": self.queued,
+                    "health_history": self.health_history[-20:], "waiting_requests": list(self.waiting),
+                    "routing_policy": self.config.get('routing_policy', 'configured'), "inference_policy": "local-only",
                     "sessions": self.sessions(), "stopping": self.stopping,
                     "maintenance": self.config.get('maintenance', []),
                     "fallbacks": self.config.get('fallbacks', []),
@@ -221,11 +227,51 @@ class Control:
 
     def gaming_eligible(self, endpoint):
         primary = self.config.get('primary')
+        if self.node(endpoint['node']).get('gaming_eligible', True) is False:
+            return False
         if endpoint.get('cpu'):
             return True
         node = self.node(endpoint['node'])
         return bool(primary and endpoint['node'] != primary['node'] and node.get('kind') == 'worker'
                     and validate_url(node['url'], worker=True).hostname not in ('127.0.0.1', '::1'))
+
+    def fallback_candidates(self):
+        rows, seen = [], set()
+        for candidate in [self.config['fallback'], *self.config.get('fallbacks', [])]:
+            key = (candidate['node'], candidate['model']) if candidate else None
+            if candidate and key not in seen:
+                seen.add(key)
+                rows.append(copy.deepcopy(candidate))
+        if self.config.get('routing_policy') == 'remote-first':
+            rows.sort(key=lambda r: self.node(r['node']).get('kind') != 'worker')
+        return rows
+
+    def routing_policy(self, preference, identity=None, eligible=None):
+        if preference not in ('configured', 'remote-first'):
+            raise ValueError('Choose configured order or remote first')
+        with self.operation, self.lock:
+            previous = copy.deepcopy(self.config)
+            if identity is not None:
+                self.node(identity)
+                if type(eligible) is not bool:
+                    raise ValueError('Choose whether this machine may serve Gaming requests')
+                if self.mode != 'work' and self.config['fallback'] and self.config['fallback']['node'] == identity and not eligible:
+                    raise ValueError('Choose another active fallback before excluding this machine')
+                self.config['nodes'][identity]['gaming_eligible'] = eligible
+            self.config['routing_policy'] = preference
+            try: self.save()
+            except Exception:
+                self.config = previous
+                raise
+        return {'note': 'Saved. The next Gaming transition uses this policy; active responses keep their current machine.'}
+
+    def cancel_request(self, identity):
+        with self.changed:
+            if identity not in self.waiting:
+                raise ValueError('This request is no longer queued; an accepted generation cannot be cancelled here')
+            self.cancelled_requests.add(identity)
+            self.changed.notify_all()
+        return {'note': 'Queued request cancelled before inference; the client receives an explicit error'}
 
     def health_check(self, progress=lambda _: None):
         result = {}
@@ -239,6 +285,9 @@ class Control:
                 result[identity] = {'status': 'offline', 'checked_at': time.time()}
         with self.lock:
             self.health = result
+            self.health_history.extend({'node': n, **value} for n, value in result.items())
+            self.health_history = self.health_history[-80:]
+            atomic(self.root / 'health-history.json', self.health_history)
         return result
 
     def maintenance(self, identity, enabled, progress=lambda _: None):
@@ -262,7 +311,7 @@ class Control:
             replacement = None
             if current and current['node'] == identity:
                 progress('Checking another machine or CPU fallback before draining')
-                for candidate in [self.config['fallback'], *self.config['fallbacks']]:
+                for candidate in self.fallback_candidates():
                     if not candidate or candidate['node'] == identity or candidate['node'] in self.config['maintenance'] or not self.gaming_eligible(candidate):
                         continue
                     candidate = copy.deepcopy(candidate)
@@ -447,11 +496,18 @@ class Control:
             if self.queued >= limits['queue']:
                 raise ValueError('Request queue is full; wait for current work to finish')
             self.queued += 1
+            request_id = uuid.uuid4().hex[:12]
+            self.waiting[request_id] = time.time()
             deadline = time.monotonic() + limits['wait_seconds']
             try:
                 while True:
+                    if request_id in self.cancelled_requests:
+                        raise ValueError('Queued request cancelled before inference; no generation was sent')
                     endpoint = {'node': 'local', 'model': model_name(payload.get('model'))} if direct else self.route()
                     node_id = endpoint['node']
+                    health = self.health.get(node_id, {})
+                    if health.get('status') == 'offline' and 0 <= time.time() - health.get('checked_at', 0) < 15:
+                        raise ValueError('Selected machine is offline; check machine health or select another route after its cooldown')
                     count = sum(n for (machine, _), n in self.active.items() if machine == node_id)
                     if self.stopping:
                         raise ValueError('Controller is stopping')
@@ -465,6 +521,8 @@ class Control:
                 self.active[key] = self.active.get(key, 0) + 1
             finally:
                 self.queued -= 1
+                self.waiting.pop(request_id, None)
+                self.cancelled_requests.discard(request_id)
         try:
             body = {**payload, "model": endpoint["model"], "store": False, "truncation": "disabled"}
             yield self.node(endpoint["node"]), body
@@ -555,7 +613,7 @@ class Control:
             self.phase = "checking fallback" if mode == "gaming" else "warming GPU"
             progress(self.phase)
             if mode == 'gaming':
-                candidates = [fallback, *self.config.get('fallbacks', [])]
+                candidates = self.fallback_candidates()
                 failures, seen, endpoint = [], set(), None
                 for candidate in candidates:
                     key = (candidate['node'], candidate['model']) if candidate else None

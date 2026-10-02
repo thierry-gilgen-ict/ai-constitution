@@ -51,6 +51,14 @@ def recommendations(root, context=65536):
             "note": "Predictions, not benchmarks. Verify a GGUF file, license and Ollama tool support before adopting a model."}
 
 
+def context_advice(system):
+    """A conservative starting point, never a guarantee that a particular model fits."""
+    memory = system.get('gpu_vram_gb') or system.get('total_ram_gb') or 0
+    suggested = 65536 if memory >= 48 else 32768 if memory >= 16 else 16384 if memory >= 8 else 8192
+    return {'suggested': suggested, 'evidence': 'hardware estimate',
+            'reason': 'Starting context based on reported accelerator memory, or system RAM for CPU-only hardware. Model weights and KV cache vary; verify both routes before adopting it.'}
+
+
 def refresh_models(root):
     executable = fit_executable(root)
     if not executable:

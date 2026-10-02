@@ -8,6 +8,7 @@ from pathlib import Path
 from . import compatibility, hardware
 from .storage import atomic
 from .transport import connect
+from .memory import ResidencySampler
 
 TASK = '''Fix clamp.py. Return only a JSON object with keys path and content. path must be clamp.py.
 The file currently contains:
@@ -89,9 +90,16 @@ def benchmark(control, endpoint, progress=lambda _: None):
         start, first_token, chunks, usage = time.monotonic(), None, [], {}
         conn, response = connect(control.node(endpoint['node']), '/v1/responses', {'model': endpoint['model'], 'input': TASK,
             'stream': True, 'store': False, 'max_output_tokens': 1024, 'reasoning': {'effort': 'low'}, 'truncation': 'disabled'}, timeout=240)
+        sampler = ResidencySampler(control.rpc, control.node(endpoint['node']), endpoint['model'])
         try:
+            sampler.__enter__()
             total = 0
-            for line in response:
+            while True:
+                line = response.readline(65537)
+                if not line:
+                    break
+                if len(line) > 65536:
+                    raise ValueError('Evaluation event exceeds the bounded line size')
                 total += len(line)
                 if total > 2 * 1024 * 1024 or time.monotonic() - start > 240:
                     raise ValueError('Evaluation exceeded its output or time budget')
@@ -103,6 +111,8 @@ def benchmark(control, endpoint, progress=lambda _: None):
                 if event.get('type') == 'response.completed': usage = event.get('response',{}).get('usage',{})
         finally:
             conn.close()
+            sampler.__exit__()
+            record['memory'] = sampler.result()
         elapsed = time.monotonic() - start
         record.update(first_text_seconds=round(first_token,3) if first_token is not None else None, elapsed_seconds=round(elapsed,3),
                       output_tokens=usage.get('output_tokens'), output_tokens_per_second=round(usage['output_tokens']/elapsed,2) if usage.get('output_tokens') else None)
@@ -110,7 +120,7 @@ def benchmark(control, endpoint, progress=lambda _: None):
             record['coding'] = check_patch(''.join(chunks).strip(), Path(folder))
         resident = next((m for m in control.rpc(control.node(endpoint['node']), '/api/ps').get('models',[]) if m['name'] == endpoint['model']), {})
         record['resident_gpu_bytes_after'] = resident.get('size_vram')
-        record['peak_memory'] = 'not sampled; residency after the request is reported separately'
+        record['peak_memory'] = 'sampled model residency; see memory.method for measurement limits'
         if record['coding']['passed'] == record['coding']['total']:
             record.update(status='passed', level='coding-tested', coding_quality='bounded clamp fixture only; not a general coding ranking')
     except Exception as error:

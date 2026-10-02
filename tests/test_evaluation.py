@@ -8,6 +8,17 @@ from local_control.diagnostics import report
 
 
 class Evaluation(unittest.TestCase):
+    def test_memory_reports_only_observed_residency_peaks(self):
+        from local_control.memory import ResidencySampler
+        calls=iter([{'size':100,'size_vram':20}, {'size':110,'size_vram':40}])
+        def rpc(*args, **kwargs): return {'models':[{'name':'fixture',**next(calls)}]}
+        with ResidencySampler(rpc,{},'fixture',interval=60) as sample:
+            pass
+        result=sample.result()
+        self.assertEqual(result['peak_gpu_bytes_sampled'],40)
+        self.assertEqual(result['samples'],2)
+        self.assertIn('brief peaks can be missed',result['method'])
+
     def test_patch_checks_behavior_without_executing_code(self):
         with tempfile.TemporaryDirectory() as folder:
             source = 'def clamp(value, lower, upper):\n    return max(lower, min(value, upper))\n'

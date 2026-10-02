@@ -195,6 +195,9 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply(diagnostics.report(control))
             elif path == '/api/evaluations' and not post:
                 self.reply(control.evaluations())
+            elif path == '/api/context-advice' and not post:
+                value = hardware.run_fit(control.root, ['--json', 'system'])
+                self.reply(hardware.context_advice(value.get('system', value)))
             elif path == '/api/session' and post:
                 self.reply(control.session(body.get('action'), body))
             elif path == '/api/stop' and post:
@@ -228,6 +231,10 @@ class Handler(BaseHTTPRequestHandler):
                     self.reply(control.pair(body.get("code"), body.get("name")))
                 elif action == 'cancel':
                     self.reply(control.cancel(body.get('job')))
+                elif action == 'cancel-request':
+                    self.reply(control.cancel_request(body.get('request')))
+                elif action == 'routing-policy':
+                    self.reply(control.routing_policy(body.get('preference'), body.get('node'), body.get('eligible')))
                 elif action == 'health':
                     self.reply(control.submit('Check machines', control.health_check))
                 elif action == 'maintenance':

@@ -100,7 +100,7 @@ function renderState() {
     })
     .join("");
   $("activity").innerHTML =
-    state.jobs
+    (state.waiting_requests || []).map(id => `<div class="job">Queued request ${escapeHTML(id)} <button data-request="${escapeHTML(id)}">Cancel request</button></div>`).join("") + state.jobs
       .filter((j) => j.status !== "done")
       .map(
         (j) =>
@@ -114,6 +114,7 @@ function renderState() {
             `<div class="event"><time>${escapeHTML(e.time)}</time><span>${escapeHTML(e.message)}</span></div>`,
         )
         .join("") || '<p class="muted">Your next action will appear here.</p>';
+  $("activity").querySelectorAll("[data-request]").forEach(b => b.onclick = () => action({action:"cancel-request",request:b.dataset.request}));
   $("activity").querySelectorAll("[data-cancel]").forEach(b => b.onclick = () => action({action: "cancel", job: b.dataset.cancel}));
   const latest = state.jobs.find(
     (j) => j.status === "done" && j.result?.gpu_released === false,
@@ -133,7 +134,7 @@ function renderState() {
   $("machine-list").innerHTML = Object.entries(state.nodes)
     .map(
       ([id, n]) =>
-        `<article class="panel machine-card"><div class="machine-icon">${n.kind === "ollama" ? "▣" : "⌘"}</div><div><h2>${escapeHTML(n.name)}</h2><p class="muted">${escapeHTML(n.url)} · ${escapeHTML(state.health?.[id]?.status || "Health not checked")} · ${n.kind === "ollama" ? "Local Ollama" : "Paired HTTPS worker"}</p></div><div class="button-row"><button data-machine="${escapeHTML(id)}">Manage models ↗</button>${`<button data-maintenance="${escapeHTML(id)}">${state.maintenance.includes(id) ? "Leave maintenance" : "Drain for maintenance"}</button>`}${n.kind === "worker" ? `<button data-rotate="${escapeHTML(id)}">Rotate credentials</button><button data-remove="${escapeHTML(id)}">Revoke &amp; remove</button>` : ""}</div></article>`,
+        `<article class="panel machine-card"><div class="machine-icon">${n.kind === "ollama" ? "▣" : "⌘"}</div><div><h2>${escapeHTML(n.name)}</h2><p class="muted">${escapeHTML(n.url)} · ${escapeHTML(state.health?.[id]?.status || "Health not checked")} ${escapeHTML(state.health?.[id]?.version || "")} · ${n.kind === "ollama" ? "Local Ollama" : "Paired HTTPS worker"}</p></div><div class="button-row"><button data-machine="${escapeHTML(id)}">Manage models ↗</button>${`<button data-maintenance="${escapeHTML(id)}">${state.maintenance.includes(id) ? "Leave maintenance" : "Drain for maintenance"}</button>`}${`<button data-eligible="${escapeHTML(id)}">${n.gaming_eligible === false ? "Allow for Gaming" : "Exclude from Gaming"}</button>`}${n.kind === "worker" ? `<button data-rotate="${escapeHTML(id)}">Rotate credentials</button><button data-remove="${escapeHTML(id)}">Revoke &amp; remove</button>` : ""}</div></article>`,
     )
     .join("");
   $("machine-list")
@@ -146,6 +147,10 @@ function renderState() {
           page("models");
         }),
     );
+  $("fallback-order").textContent = [state.fallback, ...(state.fallbacks || [])].filter(Boolean).filter((r,i,a) => a.findIndex(v => v.node === r.node && v.model === r.model) === i).map(r => `${state.nodes[r.node]?.name || r.node}: ${r.source_model || r.model}`).join(" → ") || "Configure a fallback in Model library.";
+  $("health-history").textContent = (state.health_history || []).slice(-8).reverse().map(v => `${new Date(v.checked_at * 1000).toLocaleTimeString()} · ${state.nodes[v.node]?.name || "Removed machine"} · ${v.status}${v.version ? " · Ollama " + v.version : ""}`).join("\n") || "No health observations yet. Use Check machines in Overview.";
+  if (document.activeElement !== $("routing-policy")) $("routing-policy").value = state.routing_policy || "configured";
+  $("machine-list").querySelectorAll("[data-eligible]").forEach(b => b.onclick = () => action({action:"routing-policy",preference:state.routing_policy,node:b.dataset.eligible,eligible:state.nodes[b.dataset.eligible].gaming_eligible === false}));
   $("machine-list").querySelectorAll("[data-maintenance]").forEach(b => b.onclick = () => action({action:"maintenance",node:b.dataset.maintenance,enabled:!state.maintenance.includes(b.dataset.maintenance)}));
   $("machine-list").querySelectorAll("[data-rotate]").forEach(b => b.onclick = () => action({action:"rotate-node",node:b.dataset.rotate}));
   $("machine-list").querySelectorAll("[data-remove]").forEach(b => b.onclick = () => action({action:"remove-node",node:b.dataset.remove}));
@@ -342,7 +347,7 @@ $("evaluate-fallback").onclick = () => action({action:"benchmark", role:"fallbac
 $("show-evaluations").onclick = async () => {
   try {
     const rows = await api("/api/evaluations");
-    $("evaluation-results").innerHTML = rows.map(r => `<article class="model-row"><div><strong>${escapeHTML(r.model)}</strong><p>${escapeHTML(r.level)} · ${escapeHTML(r.status)}${r.stale ? " · stale or unavailable" : ""}</p><small>${r.coding ? `${r.coding.passed}/${r.coding.total} fixture checks · ` : ""}${r.first_text_seconds ?? "—"}s to first text · ${r.output_tokens_per_second ?? "—"} output tokens/s over total request time · ${escapeHTML(r.quantization || "Unknown quantization")}</small></div></article>`).join("") || "<p>No measurements yet. Start with a configured route.</p>";
+    $("evaluation-results").innerHTML = rows.map(r => `<article class="model-row"><div><strong>${escapeHTML(r.model)}</strong><p>${escapeHTML(r.level)} · ${escapeHTML(r.status)}${r.stale ? " · stale or unavailable" : ""}</p><small>${r.coding ? `${r.coding.passed}/${r.coding.total} fixture checks · ` : ""}${r.first_text_seconds ?? "—"}s to first text · ${r.output_tokens_per_second ?? "—"} output tokens/s over total request time · ${escapeHTML(r.quantization || "Unknown quantization")}${r.memory ? ` · ${bytes(r.memory.peak_gpu_bytes_sampled)} peak sampled model GPU allocation (${r.memory.samples} observations)` : " · Peak allocation not sampled in this earlier result"}</small></div></article>`).join("") || "<p>No measurements yet. Start with a configured route.</p>";
   } catch (e) { notice(e.message, true); }
 };
 async function loadSetup() {
@@ -353,6 +358,7 @@ async function loadSetup() {
     $("setup-context").value = String(setup.context);
     $("setup-context").disabled = setup.primary_ready || setup.fallback_ready;
     $("save-context").disabled = setup.primary_ready || setup.fallback_ready;
+    $("suggest-context").disabled = setup.primary_ready || setup.fallback_ready;
     $("setup-ollama").disabled = setup.ollama;
     $("setup-ollama").textContent = setup.ollama ? "Ollama installed" : "Install Ollama";
     $("setup-fit").disabled = setup.llmfit;
@@ -364,6 +370,10 @@ async function loadSetup() {
     $("setup-fallback").disabled = !$("setup-model").value;
   } catch (e) { notice(e.message, true); }
 }
+$("suggest-context").onclick = async () => {
+  try { const advice = await api("/api/context-advice"); $("setup-context").value = String(advice.suggested); notice(`${advice.suggested.toLocaleString()} context suggested. ${advice.reason} Click Save context to apply.`); } catch(e) { notice(e.message,true); }
+};
+$("save-routing-policy").onclick = () => action({action:"routing-policy",preference:$("routing-policy").value});
 $("setup-ollama").onclick = () => action({action:"setup", component:"ollama"});
 $("setup-fit").onclick = () => action({action:"setup", component:"llmfit"});
 $("save-context").onclick = () => action({action:"context", context:Number($("setup-context").value)});

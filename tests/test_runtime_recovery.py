@@ -143,6 +143,52 @@ class Recovery(unittest.TestCase):
             startup(self.root,True,home=home,system='Darwin')
         self.assertEqual(path.read_bytes(),before)
 
+    def test_remote_first_and_machine_exclusion_are_explicit_policy(self):
+        self.control.config['nodes']['remote']={'url':'https://192.168.1.10:8767','kind':'worker','name':'Remote'}
+        remote={'node':'remote','model':'gpu:latest','cpu':False}
+        self.control.config['fallbacks']=[remote]
+        self.assertEqual(self.control.fallback_candidates()[0]['node'],'local')
+        self.control.routing_policy('remote-first')
+        self.assertEqual(self.control.fallback_candidates()[0]['node'],'remote')
+        self.control.routing_policy('remote-first','remote',False)
+        self.assertFalse(self.control.gaming_eligible(remote))
+        self.assertEqual(self.control.mode,'work')
+
+    def test_health_history_is_durable_and_offline_cooldown_blocks_dispatch(self):
+        self.rpc.fail=True
+        self.control.health_check()
+        self.assertEqual(json.loads((self.root/'health-history.json').read_text())[0]['status'],'offline')
+        with self.assertRaisesRegex(ValueError,'offline'):
+            with self.control.lease({'model':ALIAS}):pass
+        self.assertFalse(any(path=='/v1/responses' for path,_ in self.rpc.calls))
+        self.rpc.fail=False
+        self.control.health_check()
+        with self.control.lease({'model':ALIAS}) as (_,body):
+            self.assertEqual(body['truncation'],'disabled')
+
+    def test_queued_request_can_be_cancelled_without_sending_generation(self):
+        errors=[]
+        with self.control.lease({'model':ALIAS}):
+            def waiting():
+                try:
+                    with self.control.lease({'model':ALIAS}): self.fail('cancelled request was dispatched')
+                except ValueError as error:errors.append(str(error))
+            thread=threading.Thread(target=waiting);thread.start()
+            deadline=time.monotonic()+2
+            while not self.control.waiting and time.monotonic()<deadline:time.sleep(.005)
+            self.control.cancel_request(next(iter(self.control.waiting)))
+            thread.join(2)
+        self.assertIn('cancelled before inference',errors[0])
+        self.assertEqual(self.rpc.calls,[])
+        self.assertEqual(self.control.waiting,{})
+
+    def test_context_advice_is_an_estimate_and_scales_with_memory(self):
+        from local_control.hardware import context_advice
+        small=context_advice({'gpu_vram_gb':8,'total_ram_gb':64})
+        large=context_advice({'gpu_vram_gb':48,'total_ram_gb':64})
+        self.assertLess(small['suggested'],large['suggested'])
+        self.assertEqual(small['evidence'],'hardware estimate')
+
 
 class Credentials(unittest.TestCase):
     def setUp(self):

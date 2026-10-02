@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add conservative hardware-based context advice, sampled model-residency peaks, explicit remote-first/Gaming eligibility policy, durable health history and cancellation before queued inference is sent.
+
 - Add guided local setup, durable jobs with interrupted-work recovery, bounded inference queues, process-identity/session tracking and graceful controller stop.
 - Verify function calls, full-history replay, context and CPU placement before route switching; retain ordered fallbacks and drain machines for maintenance.
 - Add expiring one-use pairing, distinct revocable credentials, worker removal/rotation, health checks and an allowlisted support report.
