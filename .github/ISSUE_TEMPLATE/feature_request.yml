@@ -1,0 +1,23 @@
+name: Workflow improvement
+description: Suggest a change that saves setup or maintenance work.
+title: "Workflow: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to accomplish?
+      description: Describe the repeated task and where the current workflow gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the steps you would like to take and the result you expect.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Compatibility and evidence
+      description: Relevant clients, operating systems, official integration documentation, alternatives or a way to measure success. Do not include private account data.

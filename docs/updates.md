@@ -95,6 +95,12 @@ Rollback restores original file bytes and removes files created by the transacti
 
 An upgrade snapshot also restores the previous active-release pointer and enrolled files. Immutable release content and downloaded metadata remain cached. Keep private state backups; snapshots can contain private preexisting instructions and must never be committed.
 
-## Convenience without a hidden scheduler
+## Upgrade Local Control separately
 
-The installed onboarding and maintenance skills work from Codex or Cursor. A manual GitHub Actions catalog-refresh workflow produces a reviewable artifact. No scheduled job or paid evaluation is enabled by installation. If you add a schedule later, notify only on actionable changes and run the same tested commands.
+The instruction-library updater does not replace a running controller or worker. Use the versioned native packages from [GitHub Releases](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest), keep the existing private state directory, and follow the idle-session stop/start procedure in [Desktop preview](desktop-preview.md). Dashboard **Set up a worker** provides complete commands and cached packages. Account diagnostics need the newer worker and a local sharing opt-in; inference pairing alone does not enable account collection.
+
+Version 0.2.0 keeps existing enrollment and private configuration mappings. Configuration backup schedules begin disabled. The optional controller automatically reconciles locally enrolled projects that follow shared settings; pins, per-project pauses and drift checks still apply. Existing cloud Bots require the documented export and onboarding steps. See [Control center](control-center.md) for upgrade behavior, storage relocation and restore.
+
+## Optional background work
+
+The installed onboarding and maintenance skills work from Codex or Cursor. A manual GitHub Actions catalog-refresh workflow produces a reviewable artifact. Installing the core enables no scheduler or paid evaluation. The separately started Local Control companion reconciles enrolled projects and runs enabled account collection and configuration-backup schedules. Its work stops when the controller is stopped; schedules do not update models or charge for inference.

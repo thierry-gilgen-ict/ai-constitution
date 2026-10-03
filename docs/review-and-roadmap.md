@@ -1,6 +1,6 @@
 # Review and roadmap
 
-Reviewed October 2, 2026. The baseline was v0.1.0, commit `96c2b277a3ed86c6119b3f4481342838434e4b54`. This document separates reproduced findings, fixes in this change, and proposed work. It is not an independent certification or a claim to be the best product in the category.
+Updated October 3, 2026 for v0.2.0. The original review baseline was v0.1.0, commit `96c2b277a3ed86c6119b3f4481342838434e4b54`. This document separates implemented behavior, validation evidence and remaining work. It is not an independent certification or a claim to be the best product in the category.
 
 ## Assessment
 
@@ -23,7 +23,11 @@ Regression tests exercise these failure cases in temporary workspaces. The Local
 
 The follow-up implements portable adoption; immutable library activation and private policy/catalog state; durable source review; known-field validation; effective-policy explanations; guided setup; recoverable jobs and session-aware shutdown; expiring, revocable pairing; bounded queues; machine draining; small measured coding fixtures; and unsigned portable build automation. See [Local Control](local-control.md) and [Desktop preview](desktop-preview.md) for exact behavior and limitations.
 
-Automated verification now includes 97 tests on the reference Windows environment (96 passed, one symlink privilege skip). The updated Windows controller preserved Gaming mode on restart, its CPU route passed function-call/full-history checks and all eight bounded coding cases, and measured GPU allocation remained zero. Cross-platform CI and physical-device evidence must be reported separately.
+The workspace update adds editable architecture templates and capture, a private instruction editor, automatic enrolled-project synchronization, driver inventory, subscription/account observations, worker downloads, configurable storage and verified configuration backups. The [control center guide](control-center.md) distinguishes live collectors from manual data, local project ownership from worker pairing, and scheduled copies from encrypted/offsite backup services.
+
+The feature revision had 158 automated tests on the reference Windows environment (156 passed, two symlink privilege skips). [Checks on Windows/macOS/Linux and Python 3.11/3.13](https://github.com/thierry-gilgen-ict/ai-constitution/actions/runs/37120882424) and [native package builds](https://github.com/thierry-gilgen-ict/ai-constitution/actions/runs/37120882455) passed for commit `25ea79d`. Current branch and release evidence is available in [Actions](https://github.com/thierry-gilgen-ict/ai-constitution/actions) and [release notes](https://github.com/thierry-gilgen-ict/ai-constitution/releases). Browser checks used isolated fixture data for desktop/mobile layouts, subscription editing, worker instructions, backup/restore and architecture capture.
+
+The Windows controller preserved Gaming mode on restart with no active requests or GPU-resident models. Earlier CPU-route function-call/full-history checks and eight bounded coding cases passed. A physical second Windows worker was paired but inference qualification was suspended after a reported freeze; it remains a pending acceptance gate. Build success is separate from physical GPU, OS and network reliability.
 
 The original priorities below are retained for context. Their implementations do not satisfy every release gate: signed/notarized distribution, physical Mac and second-computer tests, a 48-hour mixed-fleet soak, repeated sleep/wake tests, external first-run usability trials, broad coding evaluations, interoperability adapters and unattended fleet rollout remain open. Automated tests cannot substitute for missing hardware or test participants.
 
@@ -56,6 +60,6 @@ These projects were compared from their public source repositories and documenta
 
 ## Release criteria
 
-Before calling Local Control generally available: validate real Macs and a two-machine cluster; test a coding task through repeated mode switches; finish token revocation and graceful service controls; document recovery from interrupted downloads, controller restarts and Ollama upgrades; and run a small external usability trial. Keep the preview label until those checks have evidence.
+Before calling Local Control generally available: validate physical Macs and a two-machine cluster, complete repeated mode-switch/sleep/wake/network-loss tests and a 48-hour mixed-fleet soak, exercise recovery and upgrades on those machines, provide signed/notarized distribution, and run an external first-run usability trial. Token revocation, graceful service controls and documented recovery are implemented; their existence does not complete those physical acceptance checks. Keep the preview label until the release gates have evidence.
 
 The useful promise is specific: **less setup, clearer model choices, fewer repeated instructions, and predictable control over local resources.**

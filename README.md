@@ -4,14 +4,15 @@
 
 > **Your way of working. Every project. Every agent.**
 
-Shared instructions, a refreshable model catalog, and project onboarding for **Codex, Cursor, and xAI Grok Bots**. Keep the principles in one place. Let a small, reversible tool handle the copies.
+Shared instructions, reusable project architectures, and a private workspace dashboard for **Codex, Cursor, and xAI Grok Bots**. Set up once, carry your preferences between projects, and manage local models without scattering configuration across your machine.
 
 [![Checks](https://github.com/thierry-gilgen-ict/ai-constitution/actions/workflows/checks.yml/badge.svg)](https://github.com/thierry-gilgen-ict/ai-constitution/actions/workflows/checks.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-657458)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-967550)](docs/getting-started.md)
-[![No runtime packages](https://img.shields.io/badge/runtime_packages-zero-b7ab95)](scripts/constitution.py)
+[![Core: no runtime packages](https://img.shields.io/badge/core_runtime_packages-zero-b7ab95)](scripts/constitution.py)
+[![Release](https://img.shields.io/github/v/release/thierry-gilgen-ict/ai-constitution)](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest)
 
-**[Start here](docs/getting-started.md) · [Onboard a project](onboarding/project.md) · [Browse models](docs/models.md) · [Update everything](docs/updates.md)**
+**[Start here](docs/getting-started.md) · [Download](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest) · [Documentation](docs/README.md) · [Control center](docs/control-center.md) · [Upgrade](docs/updates.md)**
 
 Switching agents should not mean explaining your working style again. A new model release should not mean finding every stale model name in every project. And a shared configuration should never turn your home directory into a public repository.
 
@@ -26,13 +27,15 @@ AI Constitution connects the setup and maintenance jobs that are often kept sepa
 | Personal instruction editing | Searchable library, private drafts, generated-file rebuilds, reviewed activation and rollback |
 | Predictable maintenance | Generated routing, checksums, drift detection, private backups, and rollback |
 | Local model support | Hardware-aware Ollama onboarding, model management, a private dashboard and GPU release with an optional companion |
+| Workspace visibility | Application/account labels, supported Codex usage readings, worker health and integration logs |
+| Private configuration | Central project folders, configurable storage, verified backups and opt-in backup schedules |
 | Honest compatibility | Separate statements for files installed, instructions loaded, model access, and measured results |
 
 Catalog counts describe the bundled [models.dev](https://models.dev) snapshot, not independently verified access to every model. Aliases and provider-specific offerings are counted separately. [Coverage and provenance](docs/models.md).
 
 ## Five-minute start
 
-**Requirements:** Python 3.11+ and Git. No API key, package installation, paid inference, or background service is needed.
+**For the shared instruction toolkit:** Python 3.11+ and Git. No API key, package installation, paid inference, or background service is needed. Prefer a dashboard? Follow the [Local Control setup](docs/local-control.md) or download an [unsigned portable preview](docs/desktop-preview.md).
 
 ```sh
 git clone https://github.com/thierry-gilgen-ict/ai-constitution.git
@@ -59,11 +62,20 @@ For the actual xAI Grok Bot product, follow the [Bot onboarding guide](onboardin
 
 ## Your next project, already thought through
 
-Open **Project templates** in [Local Control](docs/local-control.md). Start with a web product, data dashboard or Python service. Choose repositories for authentication, charts, email and deployment, record your setup decisions, then preview the files before applying them to a project. Export the baseline to reuse or share it. [Template guide](docs/project-templates.md).
+Open **Project templates** in [Local Control](docs/local-control.md). Start with a web product, data dashboard or Python service, or choose **From existing project** to capture a baseline from supported manifests and environment-variable names. Choose repositories for authentication, charts, email and deployment, record your setup decisions, then preview the files before applying them to a project. Capture excludes secret values, package scripts and application code. Export the reviewed baseline to reuse or share it. [Template guide](docs/project-templates.md).
 
 Open **Constitution files** to browse the library and tailor its instructions privately. Saving validates changes and rebuilds generated routing/adapters. **Project sync** updates enrolled projects that follow shared settings, preserving pins and reporting local edits; global client activation remains explicitly reviewed. [Editor and upgrade guide](docs/constitution-studio.md).
 
 The [workspace control center](docs/control-center.md) adds account login labels, supported Codex usage readings, per-machine diagnostics, worker downloads and setup commands, configurable storage, central private project configuration with verified/scheduled backups, and architecture capture from existing projects. Provider availability and observation times are explicit; secret values stay out of templates and public packages.
+
+<details>
+<summary>See the workspace dashboard</summary>
+
+![Local Control applications and subscriptions dashboard with explicitly labelled demonstration data](https://github.com/thierry-gilgen-ict/ai-constitution/releases/download/v0.2.0/control-center-preview.jpg)
+
+This screenshot uses demonstration accounts and usage figures. Codex collection is opt-in; Cursor and other providers currently use manual/imported observations. [Monitoring scope](docs/control-center.md).
+
+</details>
 
 ## New models? One command.
 
@@ -160,17 +172,20 @@ The source repository can live anywhere, including a development drive. Runtime 
 | --- | --- |
 | Setting this up for yourself | [Getting started](docs/getting-started.md) |
 | Bringing an existing project | [Project onboarding prompt](onboarding/project.md) |
+| Reusing a project's architecture | [Project templates and capture](docs/project-templates.md) |
+| Editing instructions through the dashboard | [Constitution Studio](docs/constitution-studio.md) |
+| Managing machines, subscriptions and backups | [Workspace control center](docs/control-center.md) |
 | Working with xAI Grok Bots | [Bot onboarding](onboarding/bot.md) |
 | Exploring providers and models | [Catalog and provenance](docs/models.md) |
 | Running models on your own machine | [Local models](docs/local-models.md) |
 | Updating models or agent instructions | [Maintenance and upgrades](docs/updates.md) |
 | Finding the right command | [Command reference](docs/commands.md) |
 | Evaluating this against other tools | [Alternatives and scope](docs/alternatives.md) |
-| Contributing | [Contributing](CONTRIBUTING.md) · [Architecture](docs/architecture.md) |
+| Contributing | [Contributing](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/CONTRIBUTING.md) · [Architecture](docs/architecture.md) |
 
 ## Status
 
-**v0.1.0** is a small, source-first toolkit. File installation, catalog refresh, local metadata discovery, and rollback have automated tests. Each live client still needs an instruction-loading check. Initial route recommendations are provisional, not a published performance benchmark.
+**v0.2.0** brings the shared toolkit and workspace control center together. Automated checks cover installation, catalogs, templates, private configuration, synchronization and recovery on Windows, macOS and Linux. Each live client still needs an instruction-loading check. Initial route recommendations are provisional, not a published performance benchmark.
 
 The optional **Local Control preview** adds a separately operated inference service. Its Windows reference setup has live Codex and GPU-to-CPU handoff checks; the [review and roadmap](docs/review-and-roadmap.md) distinguishes current evidence from work still needed.
 
@@ -180,4 +195,4 @@ The project makes no claim that a community catalog contains every model at the 
 
 The visual presentation is inspired by [Engawa](https://github.com/thierry-gilgen-ict/engawa), with an original generated banner. Model data comes from the community-maintained [models.dev](https://github.com/anomalyco/models.dev) project; its MIT notice is included. [Asset and data provenance](docs/provenance.md).
 
-MIT licensed. See [LICENSE](LICENSE), [security notes](SECURITY.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
+MIT licensed. See [LICENSE](LICENSE), [security notes](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/SECURITY.md), and [third-party notices](THIRD_PARTY_NOTICES.md).

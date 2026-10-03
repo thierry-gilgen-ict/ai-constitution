@@ -28,11 +28,17 @@ For a relocated Cursor profile, `--cursor-dir` selects its real configuration di
 
 File verification is deterministic. Model compliance, client instruction discovery, model availability, and workflow improvement are separate acceptance checks. The program does not claim a universal precedence hierarchy, force model switches, or change host approval controls.
 
-## Intentional first-release limits
+## Workspace services
+
+The optional controller keeps its state separately from the core enrollment database. `services.py` schedules project reconciliation, enabled account collection and due configuration backups as visible jobs. `synchronization.py` applies shared-library/template changes through per-project transactions, respecting pins, pauses and local drift. Worker pairing grants inference/administration access, not arbitrary access to remote project files.
+
+`monitoring.py` stores bounded subscription observations and reads only allowlisted Codex account methods. `project_vault.py` manages explicit private configuration mappings, verified snapshots and restore into new directories. `locations.py` plans verified copies and stopped-service relocation. `distribution.py` packages reviewed application files, while `project_capture.py` proposes architecture components and variable names without copying secret values or executable setup content. See [the control center guide](control-center.md) for permissions, schedules and operational limits.
+
+## Current limits
 
 - Codex and Cursor have native file installers; actual Grok Bots have an explicit cloud onboarding/export path.
 - Arbitrary semantic conflicts between existing instructions require agent or human review.
 - Custom `CODEX_HOME` layouts use manual adapter installation in this release.
 - Core `local` discovery lists metadata. The optional Local Control companion separately performs explicitly requested model downloads, inference probes and gateway routing; see [Local Control](local-control.md).
 - Route recommendations are provisional and small; the broad catalog has community provenance.
-- Refreshes and installations are explicit. There is no daemon or silent self-update.
+- Core refreshes and installations are explicit. The optional controller runs background project synchronization and opt-in monitoring/backups while it is running; it does not silently replace its executable or update model weights.

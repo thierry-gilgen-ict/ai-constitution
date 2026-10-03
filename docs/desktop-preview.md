@@ -4,7 +4,11 @@ Local Control can run without a separate Python installation using an **unsigned
 
 ## Get a build
 
-The [Package Local Control preview workflow](https://github.com/thierry-gilgen-ict/ai-constitution/actions/workflows/package-preview.yml) builds on Windows, macOS and Linux. A successful run provides an artifact for each runner OS/architecture. Download only a run from a revision you intend to trust, extract the entire artifact, and retain its `licenses`, `dependencies.json` and `manifest.json` files. GitHub may require sign-in for workflow artifacts; artifacts expire after seven days. These are preview builds, not permanent release assets.
+Download a versioned package from [GitHub Releases](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest). Choose `ai-constitution-worker-<os>-<architecture>.zip` for your machine and verify its SHA-256 against `SHA256SUMS.txt` or the adjacent `.zip.sha256` file. The package can run either the dashboard controller or a worker. The release notes identify the tested revision and limitations. Checksums verify bytes, not publisher identity.
+
+For unreleased builds, the [Package Local Control preview workflow](https://github.com/thierry-gilgen-ict/ai-constitution/actions/workflows/package-preview.yml) builds on Windows, macOS and Linux. A successful run provides an artifact for each runner OS/architecture. Download only a run from a revision you intend to trust. GitHub may require sign-in for workflow artifacts; artifacts expire after seven days. The artifact contains a portable worker ZIP as well as unpacked build files: use the inner `ai-constitution-worker-*.zip` for dashboard registration and transfer. Release assets do not have this workflow-artifact expiry.
+
+Extract the whole portable ZIP and retain its `licenses`, `dependencies.json` and `manifest.json` files. Match its architecture to the target computer; a successful build on one runner architecture does not establish compatibility with every CPU or GPU.
 
 Run `app/ai-constitution-local/ai-constitution-local.exe` on Windows, or `app/ai-constitution-local/ai-constitution-local` on macOS/Linux. Running with no arguments starts a per-user background controller and opens its dashboard. Keep the full application directory together. The macOS output is a command-line executable, not a notarized `.app` bundle. Do not bypass operating-system security warnings; source execution remains available.
 

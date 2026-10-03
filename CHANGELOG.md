@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-10-03
+
+Shared toolkit release with an optional **Local Control preview**. Native companion packages remain unsigned; physical fleet validation is still in progress. See [upgrade instructions](docs/updates.md) and [preview boundaries](docs/desktop-preview.md).
+
+- Publish managed-upgrade archives, portable worker packages and checksums with the release. Add a documentation index, contribution issue forms, current validation evidence and a maintainer release guide.
 
 - Add the private workspace control center: per-project automatic instruction/template synchronization with pin and drift protection; subscription login mappings; an opt-in, read-only Codex account/usage collector; worker diagnostics and bounded integration logs; manual/imported provider observations with explicit freshness and scope.
 - Add configurable library, package and Ollama storage, verified model copies and stopped-service profile relocation; dashboard worker downloads and complete cross-platform setup/upgrade commands. Native builds produce a registerable portable ZIP.

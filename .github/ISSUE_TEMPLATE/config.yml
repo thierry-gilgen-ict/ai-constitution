@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation and setup
+    url: https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/docs/README.md
+    about: Find instructions for onboarding, templates, local models, workers and recovery.
+  - name: Private vulnerability report
+    url: https://github.com/thierry-gilgen-ict/ai-constitution/security/advisories/new
+    about: Report security problems privately; never post secrets in a public issue.

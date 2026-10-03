@@ -14,6 +14,11 @@ import releases
 import source_review
 
 
+def next_version(root):
+    major, minor, patch = map(int, (root / 'VERSION').read_text().strip().split('.'))
+    return f'{major}.{minor}.{patch + 1}'
+
+
 class Adoption(unittest.TestCase):
     setUp = fixtures.Workspace.setUp
 
@@ -26,7 +31,8 @@ class Adoption(unittest.TestCase):
         context = self.project / ".ai/project.md"
         context.write_bytes(b"Private project facts\r\n")
         before = {p: p.read_bytes() for p in self.project.rglob('*') if p.is_file()}
-        (self.root / "VERSION").write_text("0.2.0", encoding="utf-8")
+        upgraded_version = next_version(self.root)
+        (self.root / "VERSION").write_text(upgraded_version, encoding="utf-8")
         kit.build(self.root)
         kit.adopt(state, self.project, dry_run=True)
         self.assertFalse(state.exists())
@@ -35,7 +41,7 @@ class Adoption(unittest.TestCase):
         self.assertEqual(before, {p: p.read_bytes() for p in before})
         self.assertEqual(kit.sync(self.root, state)[0]["status"], "installed")
         self.assertEqual(context.read_bytes(), b"Private project facts\r\n")
-        self.assertEqual((self.project / '.ai/shared/VERSION').read_text(), '0.2.0')
+        self.assertEqual((self.project / '.ai/shared/VERSION').read_text(), upgraded_version)
 
     def test_preserves_pin_and_rollback_only_unenrolls(self):
         state = self.original(pin=True)
@@ -94,7 +100,7 @@ class ReleasePolicy(unittest.TestCase):
         before = (self.project / 'AGENTS.md').read_bytes()
         prefs = self.state.parent / 'overrides/policy.json'
         catalog.atomic_bytes(prefs, catalog.json_bytes({'schema_version': 1, 'instructions': {'constitution.md': 'Private preference.'}}))
-        (self.root / 'VERSION').write_text('0.2.0', encoding='utf-8')
+        (self.root / 'VERSION').write_text(next_version(self.root), encoding='utf-8')
         kit.build(self.root)
         source_files = releases.files(self.root)
         preview = kit.upgrade(self.root, self.state, dry_run=True)
@@ -128,7 +134,7 @@ class ReleasePolicy(unittest.TestCase):
         kit.install(self.root, self.state, project=self.project)
         global_before = (self.home / '.codex/AGENTS.md').read_bytes()
         (self.project / '.ai/shared/research.md').write_text('User edits', encoding='utf-8')
-        (self.root / 'VERSION').write_text('0.2.0', encoding='utf-8')
+        (self.root / 'VERSION').write_text(next_version(self.root), encoding='utf-8')
         kit.build(self.root)
         with self.assertRaisesRegex(ValueError, 'Local edits'):
             kit.upgrade(self.root, self.state)
