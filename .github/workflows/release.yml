@@ -82,4 +82,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ inputs.version }}
         run: |
-          gh release create "v${RELEASE_VERSION}" .local/release/* --target "$GITHUB_SHA" --title "AI Constitution ${RELEASE_VERSION}" --notes-file docs/release-notes.md --latest
+          gh release create "v${RELEASE_VERSION}" .local/release/* --target "$GITHUB_SHA" --title "AI Constitution ${RELEASE_VERSION}" --notes-file docs/release-notes.md --draft
+          gh release edit "v${RELEASE_VERSION}" --draft=false --latest
