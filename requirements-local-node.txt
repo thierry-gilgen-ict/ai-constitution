@@ -1,2 +1,2 @@
 # Only remote HTTPS workers need this. Core, dashboard and gateway use Python's standard library.
-cryptography>=46,<48
+cryptography>=50.0.2,<51
