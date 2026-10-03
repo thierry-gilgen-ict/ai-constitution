@@ -34,6 +34,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify generated files and catalog
         run: python scripts/constitution.py check
+      - name: Verify public release inventory
+        run: python scripts/release_inventory.py
       - name: Test behavior in isolated workspaces
         # Optional worker dependency exercises certificate pinning on every supported CI OS.
         run: |

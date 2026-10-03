@@ -25,7 +25,19 @@ Portable companions are unsigned previews. Verify the release revision and check
 
 `scan` checks tracked and nonignored files for private filenames, common credential patterns, personal Windows home paths, and unexpected binaries. It reports file names and rule IDs rather than secret values. Also run a dedicated secret scanner over Git history and review the staged diff.
 
-Heuristics cannot prove the absence of all secrets. Keep the public checkout separate from personal configuration and never initialize a Git repository around your entire configuration directory.
+Public source exports and native build inputs use the reviewed `checks/release-files.json` inventory. Files merely present in an allowed directory are not automatically published, even if Git ignores them. Sensitive filenames are rejected, declared inputs must exist, and links/reparse points are refused. Private Studio editing still uses its separate runtime library; it does not expand the public export inventory.
+
+Native builds require an empty output directory and compile from an isolated inventory copy. Complete release assembly accepts only the expected native ZIP/checksum/SBOM inputs. Existing files are preserved when a stale output is rejected.
+
+Only the native build's `public/` directory is uploaded. Internal compiler aliases must resolve within the application tree; escaping or cyclic links are rejected. ZIP members are ordinary files, including internal alias-directory contents, and the extracted ZIP receives its own smoke test. Intermediate build trees never bypass the upload scanner's link rejection.
+
+Every workflow upload is gated by `scripts/scan_publication.py`. It verifies a pinned Gitleaks download, inspects nested ZIP paths and private filenames, and scans the actual upload inputs with fully redacted output. Missing inputs, scanner failures, excessive archive nesting and unresolved findings block publication, including failure reports. A generic-key flag in a manifest is dismissed only when its exact redacted match reconstructs a declared SHA-256 and the referenced packaged file has that digest; manifests are never blanket-ignored. See the [release guide](docs/releasing.md) for local commands.
+
+GitHub secret scanning, push protection, dependency alerts and automatic dependency security-fix pull requests are enabled. Weekly Dependabot reviews cover Python, npm and GitHub Actions. Dependency proposals still require review and passing checks; enabling security fixes does not enable automatic merging.
+
+Publication scans use the scanner's default rule set with an explicit empty ignore file and ignore `gitleaks:allow` comments. A local scanner config or inline annotation cannot silently exempt upload inputs.
+
+Heuristics cannot prove the absence of all secrets. The upload scanner does not OCR images or unpack PyInstaller bytecode; review screenshot pixels and use synthetic data, and build only on an isolated host/environment. Keep the public checkout separate from personal configuration and never initialize a Git repository around your entire configuration directory.
 
 ## Reporting
 

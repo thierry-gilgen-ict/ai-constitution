@@ -36,6 +36,8 @@ python -m pip install -r requirements-build.txt
 python scripts/package_local.py --output .local/package
 ```
 
+Use a new empty build directory. Publish only its `public/` directory, which contains the portable ZIP, checksum and SBOM; intermediate build/application directories stay private. Native package tests run against an extracted copy of the actual ZIP as well as the build tree.
+
 The script produces an app directory, dependency inventory, license files and a SHA-256 file manifest. It smoke-tests the frozen entry point. The manifest detects changed bytes; it is not publisher authentication. Build logs, temporary spec files and build caches are not release assets. Dependencies for desktop/build features are pinned separately from the dependency-free core.
 
 ## Upgrade or remove
@@ -54,8 +56,8 @@ CI build success is not physical inference certification. Signed Windows install
 
 **In the dashboard · Get a verified worker package.** Choose Windows x64, Apple Silicon or Linux x64. Source packages support other compatible environments.
 
-![Get a verified worker package — demonstration data, UI 0.3.0](assets/screenshots/worker-download.png)
+![Get a verified worker package — demonstration data, UI 0.3.1](assets/screenshots/worker-download.png)
 
-[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.3.0.
+[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.3.1.
 
 <!-- screenshots:packages:end -->

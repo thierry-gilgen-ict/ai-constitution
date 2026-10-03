@@ -7,11 +7,23 @@ import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from scripts import constitution as kit, releases
 from local_control.distribution import inspect_archive
+from scripts.paths import no_links
 
 
 def assemble(root, output):
     kit.validate(root);kit.build(root,check=True)
+    no_links(output)
     output.mkdir(parents=True,exist_ok=True)
+    # Only the exact native inputs belong in this staging directory. Refuse
+    # leftovers rather than signing or uploading arbitrary files with a wildcard.
+    expected = {f'ai-constitution-worker-{platform}{suffix}'
+                for platform in ('windows-amd64', 'darwin-arm64', 'linux-x86_64')
+                for suffix in ('.zip', '.zip.sha256', '.cdx.json')}
+    if {p.name for p in output.iterdir()} != expected:
+        raise ValueError('Release staging must contain only the three native ZIPs, checksums and SBOMs; use a fresh directory')
+    for path in output.iterdir():
+        no_links(path)
+        if not path.is_file(): raise ValueError('Release staging inputs must be ordinary files')
     result=releases.export(root,output/'ai-constitution-release.zip')
     (output/'ai-constitution-release.sha256').write_text(result['sha256']+'  ai-constitution-release.zip\n',encoding='utf-8')
     releases.unpack((output/'ai-constitution-release.zip').read_bytes(),result['sha256'])

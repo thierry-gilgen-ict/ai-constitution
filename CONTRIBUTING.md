@@ -7,6 +7,7 @@ Contributions should reduce setup work, improve correctness, or make a real limi
 ```sh
 python scripts/constitution.py build
 python scripts/constitution.py check
+python scripts/release_inventory.py
 python -m unittest discover -s tests -v
 python scripts/constitution.py scan
 python scripts/check_docs.py
@@ -32,6 +33,8 @@ Explain the recurring problem the instruction solves. Keep the core small and mo
 Describe the problem, resulting behavior, validation, and relevant limitations. For a new adapter, include a native loading reference and a reproducible activation check. For installation changes, test preservation, drift, failure recovery, and rollback.
 
 Never commit local state, credentials, personal paths, account exports, or private project facts. Review the staged diff and run the scanner before publishing. A clean heuristic scan does not replace that review.
+
+After adding or removing a public source file, run `python scripts/release_inventory.py --write` and review the inventory diff. Exporting does not recursively pick up unrelated or ignored files. Native builds require a fresh empty output directory. CI scans actual upload inputs before publishing packages or reports; a failed scan blocks the upload even when the preceding test failed. Do not bypass a scanner finding by excluding an entire manifest or report.
 
 Maintainers should follow the [release guide](docs/releasing.md) for versioned archives, package checksums, smoke checks and upgrade documentation.
 

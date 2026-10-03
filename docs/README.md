@@ -14,6 +14,7 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 | Encrypt backups and schedule them outside the dashboard | [Encrypted backups](encrypted-backups.md) |
 | Try a disposable demonstration | [Synthetic browser journeys](demonstration.md) |
 | Check physical compatibility and release gates | [Acceptance matrix](compatibility-matrix.md) |
+| Understand public-file and secret-upload safeguards | [Security and privacy](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/SECURITY.md) · [Release guide](releasing.md) |
 | Install shared instructions for Codex or Cursor | [Getting started](getting-started.md) |
 | Bring an existing project into the shared setup | [Project onboarding](../onboarding/project.md) |
 | Configure an actual xAI Grok Bot | [Bot onboarding](../onboarding/bot.md) |

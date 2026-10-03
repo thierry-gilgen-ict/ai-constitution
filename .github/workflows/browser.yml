@@ -19,8 +19,13 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      - id: publication
         if: always()
+        uses: ./.github/actions/scan-publication
+        with:
+          paths: .local/browser-report
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always() && steps.publication.outcome == 'success'
         with:
           name: synthetic-browser-journeys
           path: .local/browser-report

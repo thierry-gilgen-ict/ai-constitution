@@ -556,7 +556,7 @@ def scan(root):
     findings = []
     for name in names:
         parts = Path(name).parts
-        if any(p in {".local", ".env", "credentials", "auth.json"} or p.startswith(".env.") for p in parts):
+        if releases.private_path(name):
             findings.append({"file": name, "rule": "private-file"})
             continue
         path = root / name

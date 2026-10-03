@@ -22,6 +22,7 @@ jobs:
           python -c "import os,re,pathlib; v=os.environ['REQUESTED_VERSION']; assert re.fullmatch(r'\d+\.\d+\.\d+',v); assert pathlib.Path('VERSION').read_text().strip()==v; assert os.environ['GITHUB_REF']=='refs/heads/main'"
       - run: python -m pip install -r requirements-local-node.txt
       - run: python scripts/constitution.py check
+      - run: python scripts/release_inventory.py
       - run: python -m unittest discover -s tests -q
       - run: python scripts/constitution.py scan
       - run: python scripts/check_docs.py
@@ -49,13 +50,13 @@ jobs:
       # Publisher identities are optional; see docs/releasing.md. Builds without
       # configured identities remain explicitly unsigned in their manifests.
       - run: python scripts/package_local.py --output .local/package
+      - uses: ./.github/actions/scan-publication
+        with:
+          paths: .local/package/public
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: release-${{ runner.os }}-${{ runner.arch }}
-          path: |
-            .local/package/*.zip
-            .local/package/*.sha256
-            .local/package/*.cdx.json
+          path: .local/package/public
           retention-days: 14
   publish:
     needs: build
@@ -75,6 +76,9 @@ jobs:
           merge-multiple: true
           path: .local/release
       - run: python scripts/assemble_release.py --output .local/release
+      - uses: ./.github/actions/scan-publication
+        with:
+          paths: .local/release
       - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
           subject-path: .local/release/*
