@@ -40,6 +40,8 @@ Use a new empty build directory. Publish only its `public/` directory, which con
 
 The script produces an app directory, dependency inventory, license files and a SHA-256 file manifest. It smoke-tests the frozen entry point. The manifest detects changed bytes; it is not publisher authentication. Build logs, temporary spec files and build caches are not release assets. Dependencies for desktop/build features are pinned separately from the dependency-free core.
 
+Version 0.3.1 includes the patched optional TLS dependency `cryptography>=50.0.2,<51`. Its upstream platform support excludes Intel macOS and 32-bit Windows, so these hosts cannot build the complete companion with the supported dependency. The standard-library toolkit, dashboard and local gateway remain available from source without it. See the [compatibility matrix](compatibility-matrix.md); do not downgrade the dependency to bypass this limit.
+
 ## Upgrade or remove
 
 Close managed coding sessions before replacing the controller application. Use Gaming mode to free the GPU while sessions stay open; that does not make an application restart seamless. Stop reports active responses, queued work, jobs and managed sessions rather than terminating them. Unknown external clients require explicit acknowledgement.

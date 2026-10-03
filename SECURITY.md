@@ -35,6 +35,8 @@ Every workflow upload is gated by `scripts/scan_publication.py`. It verifies a p
 
 GitHub secret scanning, push protection, dependency alerts and automatic dependency security-fix pull requests are enabled. Weekly Dependabot reviews cover Python, npm and GitHub Actions. Dependency proposals still require review and passing checks; enabling security fixes does not enable automatic merging.
 
+Version 0.3.1 requires `cryptography>=50.0.2,<51` for remote worker TLS, clearing GHSA-m2h6-j472-rp4c, GHSA-jwv3-5hgf-82ww, GHSA-g6cj-pr64-35w5 and GHSA-537c-gmf6-5ccf. Upgrade source workers' isolated environments with `python -m pip install --upgrade -r requirements-local-node.txt`, or install the current portable companion. Retain private worker state and certificates. Existing installations do not receive dependency patches merely because this repository changed. Consult the [compatibility matrix](docs/compatibility-matrix.md) before upgrading an unsupported host.
+
 Publication scans use the scanner's default rule set with an explicit empty ignore file and ignore `gitleaks:allow` comments. A local scanner config or inline annotation cannot silently exempt upload inputs.
 
 Heuristics cannot prove the absence of all secrets. The upload scanner does not OCR images or unpack PyInstaller bytecode; review screenshot pixels and use synthetic data, and build only on an isolated host/environment. Keep the public checkout separate from personal configuration and never initialize a Git repository around your entire configuration directory.

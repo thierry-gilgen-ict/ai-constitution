@@ -8,6 +8,7 @@
 - Separate public native assets from compiler intermediates, reject escaping/cyclic native aliases, include internal alias contents and smoke-test an extracted copy of the distributed ZIP.
 - Added checksum-verified Gitleaks publication gates for native packages, complete release assets, browser reports, screenshot comparisons and catalog patches. Reject unsafe archives and block uploads on unresolved findings or scanner failures; dismiss only cryptographically verified manifest checksums.
 - Enabled dependency security-fix pull requests and added weekly dependency reviews for Python, npm and GitHub Actions. Isolated remaining test home defaults from real private configuration.
+- Raised the optional worker TLS dependency to `cryptography>=50.0.2,<51` to clear four dependency advisories. Existing pairing and certificates are retained. The dependency no longer supports Intel macOS or 32-bit Windows; the standard-library toolkit, dashboard and local gateway remain available without it.
 - Added an illustrated manual with 80 images across all 14 dashboard pages, detailed workflows, recovery states and responsive layouts. Updated the README and guides with screenshots beside their instructions.
 - Added one-command fixture captures, real isolated CLI transcripts, screenshot provenance and integrity/freshness/coverage checks. CI produces visual comparisons and enforces image and release-size budgets. External native application captures remain explicitly pending.
 

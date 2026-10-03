@@ -15,6 +15,8 @@ Report evidence separately for source tests, packaged startup and real inference
 
 Current CI results are linked from the README. Consult the workflow run for the exact release commit; this table describes the test matrix rather than claiming every future build passed.
 
+Remote HTTPS workers require `cryptography>=50.0.2,<51`. Its [upstream compatibility changes](https://cryptography.io/en/latest/changelog/#v49-0-0) remove Intel macOS and 32-bit Windows support. The instruction toolkit, dashboard and local gateway use the standard library and can run without this optional dependency on hosts supporting Python 3.11+. For remote TLS, choose a supported worker host; do not restore an older vulnerable dependency to work around the platform limit. CI covers Windows x64, macOS ARM64 and Linux x64 with this dependency.
+
 ## Repeatable two-machine check
 
 Use disposable projects, a small model known to fit each machine, and private worker pairing. Record OS/runtime/driver versions locally. Never publish pairing codes, account identifiers or private logs.
