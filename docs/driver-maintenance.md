@@ -14,6 +14,16 @@ Each physical host shows adapters, reported versions, driver dates where availab
 
 Updating the main computer pauses **both** its GPU and CPU runtimes. Its CPU fallback cannot protect a task from that computer restarting. With open managed sessions or active requests, a qualified route on another computer is required. With no active/managed sessions and external clients acknowledged idle, a single-computer setup can pause its route until resumption. A full computer reboot also stops any client or gateway running on it: the app does not migrate desktop processes or promise uninterrupted tasks across a controller reboot.
 
+<!-- screenshots:update:begin -->
+
+**In the dashboard · Prepare driver maintenance.** Review the target computer and update method. Confirm other clients are idle before opening that machine’s native updater.
+
+![Prepare driver maintenance — demonstration data, UI 0.3.0](assets/screenshots/driver-update.png)
+
+[Illustrated walkthrough](manual/machines.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:update:end -->
+
 ## Platform coverage
 
 | Platform | Installed information | Update controls |

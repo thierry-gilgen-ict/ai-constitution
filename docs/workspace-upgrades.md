@@ -25,6 +25,16 @@ This flow does not reset Git branches or discard local edits. Checksums detect c
 
 Workers supporting protocol 2 expose the same guarded staging and restart flow over their pinned management connection. Use **Set up a worker → Version, updates & startup**. Put the worker in maintenance before applying an update, and ensure other controllers using it are idle. Older packages require the existing manual upgrade once before these controls become available.
 
+<!-- screenshots:updates:begin -->
+
+**In the dashboard · Updates & model inbox.** Open Updates & model inbox from the sidebar. The page below uses fictional documentation data.
+
+![Updates & model inbox — demonstration data, UI 0.3.0](assets/screenshots/updates.png)
+
+[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:updates:end -->
+
 ## Maintain the model catalog
 
 Choose **Check model definitions** to create a private review inbox containing added, changed and removed models, capability/price differences and affected curated routes. Applying the reviewed inbox retains a transaction snapshot and rebuilds generated files. A stale preview is refused.
@@ -51,6 +61,16 @@ Read-only API cost connectors support OpenAI and Anthropic organization reports 
 
 Background readiness checks use model inventory, bounded timeouts and offline cooldowns. A fresh, healthy, protocol-tested fallback may be selected before dispatch. Accepted generations are never replayed or migrated. Active response leases and Gaming exclusions always apply.
 
+<!-- screenshots:measurements:begin -->
+
+**In the dashboard · Measured performance.** Open Measured performance from the sidebar. The page below uses fictional documentation data.
+
+![Measured performance — demonstration data, UI 0.3.0](assets/screenshots/insights.png)
+
+[Illustrated walkthrough](manual/insights.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:measurements:end -->
+
 ## Progress and recovery
 
 Operations stay visible in an inline progress panel. Unacknowledged failures and interrupted work survive the successful-job retention limit. Repeated background failures are coalesced, and idle synchronization checks do not consume Activity history. Notifications link to the page where a fresh preview or retry can resolve the problem; destructive operations are never blindly replayed.
@@ -60,3 +80,13 @@ Windows private state uses a protected current-user/SYSTEM ACL before credential
 See [encrypted backups](encrypted-backups.md), [physical acceptance](compatibility-matrix.md), [demonstration](demonstration.md) and [release provenance](releasing.md).
 
 Cost connector schemas follow the official [OpenAI costs API](https://platform.openai.com/docs/api-reference/usage/costs) and [Anthropic usage and cost API](https://platform.claude.com/docs/en/manage-claude/usage-cost-api). API organization costs are distinct from flat-rate coding subscriptions.
+
+<!-- screenshots:notifications:begin -->
+
+**In the dashboard · Review actionable failures.** Unacknowledged failures remain visible. Open the recovery page for a fresh preview and retry.
+
+![Review actionable failures — demonstration data, UI 0.3.0](assets/screenshots/notifications.png)
+
+[Illustrated walkthrough](manual/recovery.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:notifications:end -->

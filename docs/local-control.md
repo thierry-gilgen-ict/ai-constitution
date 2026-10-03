@@ -35,6 +35,16 @@ Creating a route never implicitly downloads a missing base model. Downloading an
 
 You can configure a CPU or eligible remote fallback while Gaming mode stays on. The current route remains selected until the new model passes the protocol checks; the primary GPU stays protected. Wait for active responses before configuring, and leave maintenance on the target machine first. Earlier fallbacks, including those created before the alternatives list was introduced, remain available after adding another one. No configuration migration is needed for this update.
 
+<!-- screenshots:overview:begin -->
+
+**In the dashboard · Overview.** Open Overview from the sidebar. The page below uses fictional documentation data.
+
+![Overview — demonstration data, UI 0.3.0](assets/screenshots/overview.png)
+
+[Illustrated walkthrough](manual/overview.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:overview:end -->
+
 ## Codex and Cursor
 
 ```sh
@@ -53,6 +63,16 @@ python scripts/local_control.py codex --project /path/to/project -- exec "Explai
 ```
 
 The launcher needs a Codex CLI with `debug models --bundled`. Custom gateway aliases need matching model metadata; configuration is applied at session startup. [Official gateway guidance](https://learn.chatgpt.com/docs/enterprise/roll-out-a-gateway). Ollama's own direct Codex integration remains an alternative when switching is unnecessary. [Ollama integration](https://docs.ollama.com/integrations/codex).
+
+<!-- screenshots:connect:begin -->
+
+**In the dashboard · Open a local Codex session.** Select the project directory and client. The launcher starts a new session; it does not migrate a running direct-provider session.
+
+![Open a local Codex session — demonstration data, UI 0.3.0](assets/screenshots/connect-launch.png)
+
+[Illustrated walkthrough](manual/connect.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:connect:end -->
 
 ## What Gaming mode guarantees
 
@@ -82,6 +102,16 @@ sequenceDiagram
 
 CPU fallback uses RAM and CPU time and can affect game performance. A second computer is the best option when you want the gaming computer's CPU free too. Switching to a different model can change reasoning quality and tool behavior even if transport succeeds.
 
+<!-- screenshots:gaming:begin -->
+
+**In the dashboard · Wait for the current response.** A transition waits for the response already using the GPU. The next request can then use the fallback.
+
+![Wait for the current response — demonstration data, UI 0.3.0](assets/screenshots/gpu-draining.png)
+
+[Illustrated walkthrough](manual/overview.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:gaming:end -->
+
 ## Choose models using evidence
 
 The hardware helper is [llmfit](https://github.com/AlexsJones/llmfit). It estimates quantization, context memory and throughput from detected hardware. Suggestions reserve 15% of reported VRAM, require advertised tool use and the selected session context, and retain candidates with an Ollama tag or a GGUF source. These are **predictions, not measured coding scores**. A very low-bit quantization that fits may still be a poor coding choice.
@@ -89,6 +119,16 @@ The hardware helper is [llmfit](https://github.com/AlexsJones/llmfit). It estima
 Hugging Face browsing shows model cards, license metadata, GGUF filenames and available sizes. Select a file, review it, and click **Download / update**. Ollama accepts `hf.co/owner/repository:filename.gguf` for supported GGUF architectures. Gated repositories need publisher access; there is no token-entry or access-bypass flow in this preview. [Hugging Face integration](https://huggingface.co/docs/hub/ollama).
 
 An advertised tool capability and a successful text response do not establish reliable agent performance. Try a disposable project and verify actual tool execution before adopting a model for important work.
+
+<!-- screenshots:fit:begin -->
+
+**In the dashboard · Find models for your hardware.** Choose Find models for my hardware. Estimated fit is shown separately from measured results.
+
+![Find models for your hardware — demonstration data, UI 0.3.0](assets/screenshots/model-fit.png)
+
+[Illustrated walkthrough](manual/models.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:fit:end -->
 
 ## Add machines
 

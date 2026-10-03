@@ -2,6 +2,12 @@
 
 Choose the workflow you want to complete. The shared instruction toolkit works on its own; Local Control is an optional preview for your models, machines and private workspace.
 
+<!-- screenshots:manual-summary:begin -->
+
+**[Illustrated manual](manual/README.md)** · 80 images of the actual UI, with fictional data and step-by-step captions.
+
+<!-- screenshots:manual-summary:end -->
+
 | I want to… | Guide |
 | --- | --- |
 | See the 0.3 workspace features | [Workspace maintenance](workspace-upgrades.md) |
@@ -33,4 +39,4 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 
 ## Contribute and maintain
 
-[Contributing](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/CONTRIBUTING.md) · [Release guide](releasing.md) · [Changelog](../CHANGELOG.md) · [Report a bug](https://github.com/thierry-gilgen-ict/ai-constitution/issues/new/choose)
+[Screenshot maintenance](screenshot-maintenance.md) · [Contributing](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/CONTRIBUTING.md) · [Release guide](releasing.md) · [Changelog](../CHANGELOG.md) · [Report a bug](https://github.com/thierry-gilgen-ict/ai-constitution/issues/new/choose)

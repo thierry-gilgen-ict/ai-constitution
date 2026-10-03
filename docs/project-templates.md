@@ -17,6 +17,16 @@ The component library includes Next.js, Better Auth, PostgreSQL, Apache ECharts,
 
 Applying a template writes an architecture, blank environment examples, an agent handoff and optional text scaffold. It does **not** clone repositories, install packages, run shell hooks, start containers, send email or claim that an application is production-ready. Compatibility checks evaluate declared capabilities; they do not prove integration, security, licensing or repository availability.
 
+<!-- screenshots:editor:begin -->
+
+**In the dashboard · Customize a baseline.** Choose Explore baseline to edit its components and decisions. The selected web baseline includes authentication, charts, email and SQL services.
+
+![Customize a baseline — demonstration data, UI 0.3.0](assets/screenshots/template-editor.png)
+
+[Illustrated walkthrough](manual/architectures.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:editor:end -->
+
 ## What a project receives
 
 | File | Purpose |
@@ -50,6 +60,16 @@ Pass a path ending in `.json` instead of a bundled identifier to use an exported
 The versioned JSON format is illustrated by the [web baseline](../templates/architectures/web-product.json). Components are complete snapshots, so importing a template does not silently substitute newer component definitions. Unknown fields, unsafe paths and known credential patterns are rejected. Secret detection is a guardrail, not a complete guarantee: review exports before sharing.
 
 See [the file editor](constitution-studio.md) for editing the library and [project onboarding](../onboarding/project.md) for recording project context.
+
+<!-- screenshots:revisions:begin -->
+
+**In the dashboard · Versions and inheritance.** Open Versions & inheritance to inspect saved revisions or create a child of an immutable parent.
+
+![Versions and inheritance — demonstration data, UI 0.3.0](assets/screenshots/template-revisions.png)
+
+[Illustrated walkthrough](manual/architectures.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:revisions:end -->
 
 ## Revision policies and inheritance
 

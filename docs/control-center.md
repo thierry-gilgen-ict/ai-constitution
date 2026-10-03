@@ -12,6 +12,16 @@ Global client installations still use **Preview activation**. A project on anoth
 
 Configured local sessions already use the stable `constitution-local` gateway alias. Worker/model/route changes affect subsequent requests according to the gateway's tested routing policy; synchronization records a private runtime revision without writing credentials or machine inventories into project files. It does not migrate direct-provider sessions, select models inside Cursor Agent or reload instructions in an already running assistant. Verify instruction loading in a fresh client session.
 
+<!-- screenshots:projects:begin -->
+
+**In the dashboard · Projects.** Open Projects from the sidebar. The page below uses fictional documentation data.
+
+![Projects — demonstration data, UI 0.3.0](assets/screenshots/projects.png)
+
+[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:projects:end -->
+
 ## Applications, subscriptions and logins
 
 **Apps & subscriptions** holds multiple subscription records, each with a provider, login identifier, plan, application, machine and project assignments. These are private labels, not credentials. Edit them when an account or machine changes.
@@ -35,6 +45,16 @@ Cursor and other subscriptions support manual observations and a small portable 
 Supported units are tokens, requests, USD, EUR, CHF and percent. Optional `observed_at` is Unix seconds. Imported observations never masquerade as live provider readings. The UI does not sum account-wide quota windows across machines, currencies or unrelated billing periods. Missing values remain unknown.
 
 **Diagnostics & operation log** shows each machine's version, runtime state, active/session counts and bounded operation status. The collector log adds timestamps and fixed error categories. Subscription records have their own integration events. These are Local Control integration logs, not the clients' full internal logs. Support reports deliberately exclude prompt/response contents, credentials, raw provider errors, paths and account identifiers. No API serves arbitrary log files.
+
+<!-- screenshots:accounts:begin -->
+
+**In the dashboard · Apps & subscriptions.** Open Apps & subscriptions from the sidebar. The page below uses fictional documentation data.
+
+![Apps & subscriptions — demonstration data, UI 0.3.0](assets/screenshots/accounts.png)
+
+[Illustrated walkthrough](manual/accounts.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:accounts:end -->
 
 ## Storage and worker installation
 
@@ -60,6 +80,16 @@ python scripts/local_control.py packages add --file /path/to/worker.zip
 
 Native builds now produce this ZIP automatically. Preview artifacts are unsigned: checksums verify integrity, not publisher identity. Source packages come from the public application bundle, never the private Studio draft. Transfer the whole ZIP to the worker, extract into a new application folder and retain its original state directory when upgrading. Account diagnostics require this newer worker version; older workers remain usable for their existing inference capabilities.
 
+<!-- screenshots:storage:begin -->
+
+**In the dashboard · Review location changes.** Choose new locations and review verified copies before saving. Existing storage is preserved.
+
+![Review location changes — demonstration data, UI 0.3.0](assets/screenshots/storage-preview.png)
+
+[Illustrated walkthrough](manual/storage.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:storage:end -->
+
 ## Central private configuration and backups
 
 **Configs & backups** defaults the configuration root to `AI_CONSTITUTION_CONFIG_HOME` or `~/.config`. Existing project folders can contain environment files, deployment records and keys. Register each project explicitly, optionally linking its checkout. This adopts the mapping without moving existing files. Application settings alongside those projects are excluded unless separately selected. No configuration file values are served to the browser.
@@ -69,6 +99,16 @@ Choose a backup destination outside the configuration root and project repositor
 **Back up now** previews selected projects, file count, size and destination. **Scheduled backups** is off initially. Choose an interval of 1–720 hours. The running controller checks due work each minute, records attempts durably, and catches up after restart. A sleeping/offline computer cannot back up; enable the existing per-user Local Control startup if desired. Failures appear in Activity and on the backup page. No autonomous snapshot deletion is enabled; manage retention deliberately. The optional [restic backend and per-user OS scheduler](encrypted-backups.md) support encrypted remote repositories and backups while Local Control is stopped. Queue rejection now records a retry without consuming the daily interval.
 
 Restore selects a snapshot and project, verifies its inventory and hashes, previews the copy, and writes only to a **new directory**. Existing environment files are never overwritten. Review the restored configuration, then change the private project mapping explicitly. This staged restore prevents an old production credential from silently replacing a newer one.
+
+<!-- screenshots:vault:begin -->
+
+**In the dashboard · Configs & backups.** Open Configs & backups from the sidebar. The page below uses fictional documentation data.
+
+![Configs & backups — demonstration data, UI 0.3.0](assets/screenshots/vault.png)
+
+[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:vault:end -->
 
 ## Capture a reusable architecture
 

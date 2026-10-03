@@ -1,0 +1,35 @@
+name: Documentation screenshots
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify committed documentation
+        run: |
+          python scripts/check_screenshots.py
+          python scripts/check_docs.py
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - name: Capture every documented workflow without touching live state
+        run: node scripts/screenshots.cjs --output .local/screenshot-comparison
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: documentation-screenshot-review
+          path: |
+            .local/screenshot-comparison
+            docs/assets/screenshots
+          include-hidden-files: true
+          retention-days: 14

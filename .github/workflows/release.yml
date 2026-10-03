@@ -25,6 +25,7 @@ jobs:
       - run: python -m unittest discover -s tests -q
       - run: python scripts/constitution.py scan
       - run: python scripts/check_docs.py
+      - run: python scripts/check_screenshots.py
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '22'

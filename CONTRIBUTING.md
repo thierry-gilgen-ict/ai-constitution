@@ -10,6 +10,7 @@ python scripts/constitution.py check
 python -m unittest discover -s tests -v
 python scripts/constitution.py scan
 python scripts/check_docs.py
+python scripts/check_screenshots.py
 ```
 
 Use Python 3.11+ and the standard library. Keep network access out of unit tests. Use temporary homes and projects for installer tests; never modify a contributor's actual client configuration in CI.
@@ -35,3 +36,5 @@ Never commit local state, credentials, personal paths, account exports, or priva
 Maintainers should follow the [release guide](docs/releasing.md) for versioned archives, package checksums, smoke checks and upgrade documentation.
 
 For dashboard changes, run `npm ci --ignore-scripts`, `npx playwright install chromium`, and `npm run test:browser`. These tests use an isolated synthetic server on port 18766, never your real Local Control state. Keep node_modules and browser reports ignored. The optional restic, signing and physical acceptance workflows are described in the documentation; do not claim fixture success establishes physical hardware compatibility.
+
+Refresh the illustrated manual with `npm run screenshots` after dashboard or capture-source changes. Review the images before publication. The [screenshot maintenance guide](docs/screenshot-maintenance.md) explains fixtures, captions, CI comparisons, privacy review and explicitly pending external application captures.
