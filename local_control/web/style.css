@@ -616,11 +616,26 @@ textarea {
   font-size: 11px;
 }
 .machine-card {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 20px;
 }
+.machine-card > .button-row { grid-column: 1 / -1; margin: 0; }
+.driver-panel { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 20px; min-width: 0; }
+.driver-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.driver-heading h3 { margin: 0; font-size: 18px; }
+.driver-list { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.driver-row { display: flex; justify-content: space-between; gap: 20px; padding: 16px; font-size: 13px; }
+.driver-row + .driver-row { border-top: 1px solid var(--line); }
+.driver-row strong { display: block; overflow-wrap: anywhere; }
+.driver-row small, .driver-update-status small { display: block; color: var(--muted); font-size: 11px; margin-top: 5px; }
+.driver-version { text-align: right; font-variant-numeric: tabular-nums; }
+.driver-update-status { background: #edf0e7; border-radius: 7px; padding: 14px 16px; font-size: 12px; }
+.driver-update-status .caption { margin-bottom: 0; }
+.driver-alert, .driver-change { padding: 12px 15px; background: #f5ebda; border-radius: 6px; font-size: 12px; line-height: 1.6; }
+.driver-change { background: #e7ebdf; }
+@media (max-width: 600px) { .driver-row { flex-direction: column; gap: 10px; } .driver-version { text-align: left; } }
 .machine-icon {
   font-size: 35px;
   color: var(--green);

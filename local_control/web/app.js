@@ -16,6 +16,7 @@ let state = null,
   refreshing = false,
   lastJobState = "",
   selectedNode = "local";
+let driversRequested = false, driverTarget = null;
 function notice(message, error = false) {
   const el = $("notice");
   el.textContent = message;
@@ -66,6 +67,10 @@ function page(name) {
     }[name];
   if (name === "models") loadInventory();
   if (name === "setup") loadSetup();
+  if (name === "machines" && !driversRequested) {
+    driversRequested = true;
+    action({action: "driver-check-all"});
+  }
 }
 document
   .querySelectorAll(".nav")
@@ -134,7 +139,7 @@ function renderState() {
   $("machine-list").innerHTML = Object.entries(state.nodes)
     .map(
       ([id, n]) =>
-        `<article class="panel machine-card"><div class="machine-icon">${n.kind === "ollama" ? "▣" : "⌘"}</div><div><h2>${escapeHTML(n.name)}</h2><p class="muted">${escapeHTML(n.url)} · ${escapeHTML(state.health?.[id]?.status || "Health not checked")} ${escapeHTML(state.health?.[id]?.version || "")} · ${n.kind === "ollama" ? "Local Ollama" : "Paired HTTPS worker"}</p></div><div class="button-row"><button data-machine="${escapeHTML(id)}">Manage models ↗</button>${`<button data-maintenance="${escapeHTML(id)}">${state.maintenance.includes(id) ? "Leave maintenance" : "Drain for maintenance"}</button>`}${`<button data-eligible="${escapeHTML(id)}">${n.gaming_eligible === false ? "Allow for Gaming" : "Exclude from Gaming"}</button>`}${n.kind === "worker" ? `<button data-rotate="${escapeHTML(id)}">Rotate credentials</button><button data-remove="${escapeHTML(id)}">Revoke &amp; remove</button>` : ""}</div></article>`,
+        `<article class="panel machine-card"><div class="machine-icon">${n.kind === "ollama" ? "▣" : "⌘"}</div><div><h2>${escapeHTML(n.name)}</h2><p class="muted">${escapeHTML(n.url)} · ${escapeHTML(state.health?.[id]?.status || "Health not checked")} ${escapeHTML(state.health?.[id]?.version || "")} · ${n.kind === "ollama" ? "Local Ollama" : "Paired HTTPS worker"}</p></div><div class="button-row"><button data-machine="${escapeHTML(id)}">Manage models ↗</button>${`<button data-maintenance="${escapeHTML(id)}">${state.maintenance.includes(id) ? "Leave maintenance" : "Drain for maintenance"}</button>`}${`<button data-eligible="${escapeHTML(id)}">${n.gaming_eligible === false ? "Allow for Gaming" : "Exclude from Gaming"}</button>`}${n.kind === "worker" ? `<button data-rotate="${escapeHTML(id)}">Rotate credentials</button><button data-remove="${escapeHTML(id)}">Revoke &amp; remove</button>` : ""}</div>${driverPanel(id, n)}</article>`,
     )
     .join("");
   $("machine-list")
@@ -154,7 +159,47 @@ function renderState() {
   $("machine-list").querySelectorAll("[data-maintenance]").forEach(b => b.onclick = () => action({action:"maintenance",node:b.dataset.maintenance,enabled:!state.maintenance.includes(b.dataset.maintenance)}));
   $("machine-list").querySelectorAll("[data-rotate]").forEach(b => b.onclick = () => action({action:"rotate-node",node:b.dataset.rotate}));
   $("machine-list").querySelectorAll("[data-remove]").forEach(b => b.onclick = () => action({action:"remove-node",node:b.dataset.remove}));
+  $("machine-list").querySelectorAll("[data-driver-check]").forEach(b => b.onclick = () => action({action:"driver-check",node:b.dataset.driverCheck,updates:b.dataset.updates === "true"}));
+  $("machine-list").querySelectorAll("[data-driver-update]").forEach(b => b.onclick = () => openDriverDialog(b.dataset.driverUpdate));
+  $("machine-list").querySelectorAll("[data-driver-resume]").forEach(b => b.onclick = () => action({action:"driver-resume",node:b.dataset.driverResume}));
 }
+function driverPanel(id, node) {
+  if (id !== "local" && node.kind === "ollama") return '<div class="driver-panel"><p class="caption">Shares this computer’s display drivers. Driver maintenance pauses both GPU and CPU runtimes.</p></div>';
+  const d = state.drivers?.[id], e = escapeHTML, paused = (state.driver_paused || []).includes(id);
+  const busy = state.jobs.some(j => ["queued", "running"].includes(j.status) && j.operation?.startsWith("driver_"));
+  const labels = {ok:"Versions detected", unavailable:"Check unavailable", "worker-upgrade":"Worker update needed", empty:"No adapters reported", unsupported:"OS not supported"};
+  const u = d?.updates || {}, updateLabels = {"not-checked":"Update availability not checked", available:"Windows offers display-driver updates", "none-offered":"No display drivers offered by Windows Update", unavailable:"Update check unavailable", manual:"Check releases in the native updater"};
+  return `<div class="driver-panel"><div class="driver-heading"><h3>Display drivers</h3><span class="tag">${busy ? "Checking / preparing…" : e(labels[d?.status] || "Not checked yet")}</span></div>
+    ${d?.adapters?.length ? '<div class="driver-list">' + d.adapters.map(a => `<div class="driver-row"><div><strong>${e(a.name)}</strong><small>${e(a.vendor || "Provider unknown")}${a.virtual ? " · Virtual display" : ""}${a.component ? " · " + e(a.component) : ""}</small></div><div class="driver-version"><strong>${e(a.version || "Version unavailable")}</strong><small>${a.version_kind ? e(a.version_kind) + " version" : a.date ? "Driver date · " + e(a.date) : "Driver date unavailable"}</small></div></div>`).join("") + '</div>' : '<p class="muted">' + e(d?.note || "Read the installed display-driver versions without loading a model.") + '</p>'}
+    ${d?.checked_at ? `<p class="caption">Observed ${e(new Date(d.checked_at * 1000).toLocaleString())} · ${e(d.source || "Worker inventory")}${d.os_version ? " · " + e(d.platform) + " " + e(d.os_version) : ""}</p>` : ""}
+    ${d?.adapters?.length ? `<p class="caption">${e(d.note)}</p>` : ""}
+    ${d?.reboot_pending ? '<p class="driver-alert">Windows reports a pending restart. Review it on this computer before resuming model work.</p>' : ""}
+    ${(d?.changes || []).map(c => `<p class="driver-change">Version changed: ${e(c.name)} · ${e(c.before)} → ${e(c.after)}. Model stability still needs verification.</p>`).join("")}
+    ${d?.status === "ok" ? `<div class="driver-update-status"><strong>${e(updateLabels[u.status] || "Update status unknown")}</strong>${u.checked_at ? `<small>Checked ${e(new Date(u.checked_at * 1000).toLocaleString())}</small>` : ""}${(u.offers || []).map(o => `<p>${e(o.title)}</p>`).join("")}<p class="caption">${e(u.note || "A version or driver date alone cannot establish whether this GPU has a newer compatible release.")}</p></div>` : ""}
+    ${paused ? '<p class="driver-alert">Paused for driver maintenance. Finish on this computer’s desktop, then refresh and resume. Restarting Local Control keeps this pause.</p>' : ""}
+    ${d?.handoff && paused ? `<p class="caption">${e(d.handoff.note)}</p>` : ""}
+    <div class="button-row"><button data-driver-check="${e(id)}" ${busy ? "disabled" : ""}>Refresh versions</button>${d?.status === "ok" && d.platform === "Windows" ? `<button data-driver-check="${e(id)}" data-updates="true" ${busy ? "disabled" : ""}>Check Windows updates</button>` : ""}${d?.actions?.length ? `<button data-driver-update="${e(id)}" ${busy ? "disabled" : ""}>Update drivers ↗</button>` : ""}${paused ? `<button data-driver-resume="${e(id)}" ${busy ? "disabled" : ""}>Recheck &amp; resume model use</button>` : ""}</div>
+    ${d?.platform === "Linux" && !d.actions?.length ? '<p class="caption">No supported desktop updater found. Use this distribution’s package tools on the machine; automatic privileged installation is unavailable.</p>' : ""}
+  </div>`;
+}
+function openDriverDialog(id) {
+  driverTarget = id;
+  $("driver-target").textContent = "Update controls will open on " + state.nodes[id].name + ".";
+  $("driver-action").innerHTML = state.drivers[id].actions.map(a => `<option value="${escapeHTML(a.id)}">${escapeHTML(a.label)}</option>`).join("");
+  $("driver-action").onchange();
+  $("driver-ack").checked = false;
+  $("driver-dialog").showModal();
+}
+$("driver-action").onchange = () => {
+  $("driver-action-detail").textContent = state.drivers[driverTarget].actions.find(a => a.id === $("driver-action").value)?.detail || "";
+};
+$("driver-cancel").onclick = () => $("driver-dialog").close();
+$("driver-form").onsubmit = e => {
+  e.preventDefault();
+  $("driver-dialog").close();
+  action({action:"driver-update", node:driverTarget, target:$("driver-action").value, acknowledge_external:$("driver-ack").checked});
+};
+$("refresh-drivers").onclick = () => action({action:"driver-check-all"});
 async function refresh() {
   if (!authorized || refreshing) return;
   refreshing = true;

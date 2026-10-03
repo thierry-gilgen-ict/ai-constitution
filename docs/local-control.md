@@ -120,6 +120,7 @@ The cluster schedules **whole requests** to selected machines. It does not combi
 | New Hugging Face models for hardware matching | `python scripts/local_control.py refresh` |
 | Installed model weights | **Download / update** the same tag on the selected machine |
 | Ollama runtime | `python scripts/local_control.py setup --upgrade-ollama` |
+| Display drivers | **Your machines → Check Windows updates / Update drivers**; confirm installation on that computer, then **Recheck & resume model use** |
 | Reviewed llmfit binary | Update this checkout, then `python scripts/local_control.py setup --llmfit` |
 | Companion code | Close managed sessions, safely stop the controller, update source or portable package, run checks, restart |
 
@@ -144,6 +145,8 @@ Pairing codes expire and work once. **Your machines** provides credential rotati
 For login startup, tray controls and portable builds, see [Desktop preview](desktop-preview.md).
 
 ## Maintenance and measured results
+
+**Your machines → Display drivers** reads installed graphics and virtual-display drivers on the controller and each updated worker. The CPU runtime shares the main computer's drivers. Windows can query applicable display-driver offers; macOS reports its bundled OS version/build, and Linux reports bound kernel/module or NVIDIA versions. Driver update handoff uses fixed OS/vendor controls on the selected computer, with no arbitrary remote commands or automatic reboot. See [driver maintenance](driver-maintenance.md) for the workflow, platform limits, recovery and worker upgrades.
 
 **Your machines → Drain for maintenance** verifies another eligible route when needed, redirects new requests, waits for existing responses, and unloads only owned models. Maintenance exclusions persist across restarts. Leaving maintenance checks that the runtime responds; selecting it for work revalidates stale compatibility evidence. External clients can still load models and are reported separately.
 

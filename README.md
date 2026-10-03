@@ -104,6 +104,8 @@ python scripts/local_control.py start --open
 
 The **Get started** guide prepares your runtime, hardware helper, context budget and tested routes. **Gaming mode** checks the fallback, moves new requests, waits for active responses to finish, and verifies GPU memory was released. Open a project from the dashboard, compare small measured coding checks, or drain a machine for maintenance. A local Codex session can run directly or inside Cursor's terminal.
 
+**Your machines** also shows installed display-driver versions across the cluster. Check applicable Windows driver offers, prepare a computer for maintenance, and open its official update controls from one place. Refresh afterward to see version changes. [Driver checks and updates](docs/driver-maintenance.md).
+
 Prefer a desktop launcher? [Build or download the unsigned preview](docs/desktop-preview.md). It includes the Python runtime, optional tray controls and opt-in login startup on Windows/macOS. The core constitution remains independent of this companion.
 
 This does not replace Cursor's native Agent, migrate an in-progress generation, or pool GPU memory across PCs. Physical Mac and multi-computer validation remain preview milestones. [Setup, compatibility, switching and upgrades →](docs/local-control.md)

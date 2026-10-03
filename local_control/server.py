@@ -177,6 +177,12 @@ class Handler(BaseHTTPRequestHandler):
                     self.reply(hardware.run_fit(control.root, ["--json", "system"]))
                 elif target == "/recommendations" and not post:
                     self.reply(hardware.recommendations(control.root))
+                elif target == '/drivers/check' and post:
+                    self.reply(control.driver_check('local', body.get('updates', False)))
+                elif target == '/drivers/open' and post:
+                    self.reply(control.worker_driver_open(body.get('action')))
+                elif target == '/drivers/resume' and post:
+                    self.reply(control.worker_driver_resume())
                 elif target in (NODE_POST if post else NODE_GET):
                     self.proxy(target, body, direct=True)
                 else:
@@ -237,6 +243,14 @@ class Handler(BaseHTTPRequestHandler):
                     self.reply(control.routing_policy(body.get('preference'), body.get('node'), body.get('eligible')))
                 elif action == 'health':
                     self.reply(control.submit('Check machines', control.health_check))
+                elif action == 'driver-check':
+                    self.reply(control.submit('Check display drivers', control.driver_check, node, body.get('updates', False)))
+                elif action == 'driver-check-all':
+                    self.reply(control.submit('Refresh machine drivers', control.driver_check_all))
+                elif action == 'driver-update':
+                    self.reply(control.submit('Open driver update controls', control.driver_update, node, body.get('target'), body.get('acknowledge_external') is True))
+                elif action == 'driver-resume':
+                    self.reply(control.submit('Resume after driver maintenance', control.driver_resume, node))
                 elif action == 'maintenance':
                     self.reply(control.submit('Change machine maintenance', control.maintenance, node, body.get('enabled')))
                 elif action == 'upgrade-runtime':
@@ -292,6 +306,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def proxy(self, path, body, direct=False):
         control = self.server.control
+        unloading = (path == '/api/generate' and body and body.get('keep_alive') == 0
+                     and set(body) <= {'model', 'keep_alive', 'stream'})
+        if control.config.get('driver_hold') and path in NODE_POST and path != '/api/show' and not unloading:
+            raise ValueError('Worker is paused for driver maintenance; resume it from Your machines')
         if path.startswith("/v1/"):
             with control.lease(body, direct=direct) as (node, payload):
                 self.forward(node, path, payload)
@@ -307,6 +325,8 @@ class Handler(BaseHTTPRequestHandler):
             # Worker management waits behind lifecycle operations; reject unload while generating.
             with control.operation, (control.administer("local") if path in ("/api/create", "/api/generate") else nullcontext()):
                 with control.lock:
+                    if control.config.get('driver_hold') and not unloading:
+                        raise ValueError('Worker is paused for driver maintenance; resume it from Your machines')
                     if path in ("/api/create", "/api/generate") and sum(control.active.values()):
                         raise ValueError("Worker has active responses; retry after draining")
                 self.forward(control.node("local"), path, body)

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add per-machine display-driver inventory, Windows Update display-driver checks, version-change observations, and native OS/vendor update controls. Pause the whole physical host before update handoff, retain worker maintenance across restarts, and require an explicit recheck/resume. Existing workers need the updated package; installation and reboot remain OS-confirmed actions.
+
 - Add conservative hardware-based context advice, sampled model-residency peaks, explicit remote-first/Gaming eligibility policy, durable health history and cancellation before queued inference is sent.
 
 - Add guided local setup, durable jobs with interrupted-work recovery, bounded inference queues, process-identity/session tracking and graceful controller stop.

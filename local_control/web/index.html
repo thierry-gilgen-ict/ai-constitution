@@ -223,6 +223,8 @@
             Windows PCs, Macs and Linux machines. Give each a job and manage
             them here.
           </p>
+          <div class="button-row"><button id="refresh-drivers">Refresh all driver versions</button></div>
+          <p class="caption">Display drivers, including virtual adapters. Checks run on each computer; private hardware details stay in your cluster.</p>
         </div>
         <article class="panel"><h2>Local only, with a fallback you choose.</h2><p>Every route uses local model weights. No cloud fallback is enabled.</p><label>Gaming preference<select id="routing-policy"><option value="configured">Configured order</option><option value="remote-first">Remote computer first, then CPU</option></select></label><button id="save-routing-policy">Save preference</button><p id="fallback-order" class="caption"></p><p class="caption">The preference applies at the next Gaming transition. Ineligible, maintained or incompatible machines cannot be selected. An in-flight generation is never replayed.</p></article><div id="machine-list"></div><details class="panel"><summary>Recent machine health</summary><pre id="health-history"></pre></details><article class="panel"><h2>Update without breaking a session.</h2><p>Drain each runtime on this computer before updating Ollama. A tested remote fallback keeps new requests moving. Updates use the official package manager and may need your input.</p><button id="upgrade-runtime">Upgrade local Ollama</button><p class="caption">Leave maintenance after the updated runtime is running. Each remote computer updates its own runtime; there is no remote shell access.</p></article>
         <div class="panel">
@@ -378,6 +380,19 @@ python scripts/local_control.py cursor --project /path/to/project</pre
             Cancel</button
           ><button class="primary">Test and use model</button>
         </div>
+      </form>
+    </dialog>
+    <dialog id="driver-dialog" aria-labelledby="driver-title">
+      <form id="driver-form">
+        <span class="eyebrow">CARE FOR YOUR COMPUTE</span>
+        <h2 id="driver-title">Update display drivers</h2>
+        <p id="driver-target"></p>
+        <label>Update through<select id="driver-action"></select></label>
+        <p id="driver-action-detail" class="muted"></p>
+        <p>First, this whole computer enters maintenance. Existing responses finish; a tested fallback on another computer keeps managed tasks moving. Without one, close coding sessions first. An idle route will pause until you resume it.</p>
+        <label class="check"><input type="checkbox" id="driver-ack" required> Other model clients on this computer are idle. I’ll review the update and any restart on its desktop.</label>
+        <p class="caption">The button opens update controls on the selected machine, including remote PCs. Be signed in there. Installation may need administrator approval. Then refresh versions and resume model use here.</p>
+        <div class="dialog-actions"><button type="button" id="driver-cancel" class="quiet">Cancel</button><button class="primary">Prepare &amp; open updater</button></div>
       </form>
     </dialog>
   </body>

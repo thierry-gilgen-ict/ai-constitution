@@ -11,7 +11,7 @@ import uuid
 import shutil
 import os
 
-from . import hardware, operations, credentials, processes, compatibility, evaluation
+from . import hardware, operations, credentials, processes, compatibility, evaluation, drivers
 from .storage import atomic, load
 from .transport import connect, request, validate_url
 
@@ -40,6 +40,9 @@ class Control:
         self.health = {}
         history = root / 'health-history.json'
         self.health_history = json.loads(history.read_text(encoding='utf-8')) if history.exists() else []
+        driver_file = root / 'drivers.json'
+        self.drivers = json.loads(driver_file.read_text(encoding='utf-8')) if driver_file.exists() else {}
+        self.driver_lock = threading.Lock()
         self.waiting = {}
         self.cancelled_requests = set()
         self.queued = 0
@@ -77,6 +80,7 @@ class Control:
                     "routing_policy": self.config.get('routing_policy', 'configured'), "inference_policy": "local-only",
                     "sessions": self.sessions(), "stopping": self.stopping,
                     "maintenance": self.config.get('maintenance', []),
+                    "drivers": copy.deepcopy(self.drivers), "driver_paused": self.config.get('driver_paused', []),
                     "fallbacks": self.config.get('fallbacks', []),
                     "legacy_worker_credentials": self.config.get('legacy_worker_token', False)}
 
@@ -86,6 +90,165 @@ class Control:
         tags = self.rpc(node, "/api/tags", timeout=8)
         running = self.rpc(node, "/api/ps", timeout=8)
         return {"version": version["version"], "models": tags.get("models", []), "running": running.get("models", [])}
+
+    def driver_host(self, identity):
+        return 'local' if self.node(identity)['kind'] == 'ollama' else identity
+
+    def driver_check_all(self, progress=lambda _: None):
+        with self.lock:
+            hosts = list(dict.fromkeys(self.driver_host(n) for n in self.config['nodes']))
+        for identity in hosts:
+            progress('Reading drivers on ' + self.node(identity)['name'])
+            self.driver_check(identity)
+        return {'checked': len(hosts)}
+
+    def driver_check(self, identity, updates=False, progress=lambda _: None):
+        identity = self.driver_host(identity)
+        if type(updates) is not bool:
+            raise ValueError('Choose whether to check for updates')
+        if not self.driver_lock.acquire(blocking=False):
+            raise ValueError('A driver check is already running; its result will appear here')
+        try:
+            progress('Reading display drivers' + (' and checking applicable OS updates' if updates else ''))
+            previous = self.drivers.get(identity, {})
+            if identity == 'local':
+                report = drivers.inspect()
+                if updates:
+                    report['updates'] = drivers.check_updates(report)
+            else:
+                try:
+                    report = self.rpc(self.node(identity), '/drivers/check', {'updates': updates}, timeout=155 if updates else 40)
+                    if report.get('schema') != 1 or not isinstance(report.get('adapters'), list):
+                        raise ValueError('Unsupported driver response')
+                except (ValueError, OSError) as error:
+                    legacy = isinstance(error, ValueError) and str(error).endswith('HTTP 404')
+                    report = {**previous, 'status': 'worker-upgrade' if legacy else 'unavailable', 'attempted_at': time.time(),
+                              'note': 'Update this worker to enable driver checks. Keep its private state directory.' if legacy else
+                                      'Machine unavailable or driver query failed. Any versions shown are the last observation; retry after reconnecting.',
+                              'actions': []}
+            if report.get('status') == 'ok':
+                old = {a['id']: a for a in previous.get('adapters', [])}
+                report['changes'] = [{'name': a['name'], 'before': old[a['id']]['version'], 'after': a['version']}
+                                     for a in report['adapters'] if a['id'] in old and a['version'] != old[a['id']]['version']]
+                if not updates and previous.get('updates') and not report['changes']:
+                    report['updates'] = previous['updates']
+                if not report['changes']:
+                    report['changes'] = previous.get('changes', [])
+            if previous.get('handoff'):
+                report['handoff'] = previous['handoff']
+            with self.lock:
+                self.drivers[identity] = report
+                atomic(self.root / 'drivers.json', self.drivers)
+            return report
+        finally:
+            self.driver_lock.release()
+
+    def driver_update(self, identity, action, acknowledge_external=False, progress=lambda _: None):
+        """Drain the whole physical host, then hand installation to its OS/vendor UI."""
+        identity = self.driver_host(identity)
+        if acknowledge_external is not True:
+            raise ValueError('Confirm that external model clients on this machine are idle before opening its updater')
+        report = self.driver_check(identity)
+        if action not in [a['id'] for a in report.get('actions', [])]:
+            raise ValueError('Refresh driver information and choose an available update control')
+        with self.operation:
+            group = [n for n in self.config['nodes'] if self.driver_host(n) == identity]
+            current = self.config['fallback' if self.mode in ('gaming', 'draining') else 'primary']
+            replacement = None
+            if current and current['node'] in group:
+                progress('Checking a fallback on a different computer')
+                for candidate in self.fallback_candidates():
+                    if candidate['node'] in group or candidate['node'] in self.config['maintenance'] or not self.gaming_eligible(candidate):
+                        continue
+                    try:
+                        replacement = copy.deepcopy(candidate)
+                        replacement['contract'] = compatibility.qualify(self, replacement)
+                        break
+                    except (ValueError, OSError):
+                        replacement = None
+            with self.changed:
+                if (current and current['node'] in group and replacement is None
+                        and (sum(self.active.values()) or self.queued or any(s['status'] != 'stale' for s in self.sessions()))):
+                    raise ValueError('A driver update affects this whole computer, including its CPU fallback. Configure a tested fallback on another computer, or close local coding sessions first.')
+                previous = copy.deepcopy(self.config)
+                self.config['maintenance'] = list(dict.fromkeys([*self.config['maintenance'], *group]))
+                self.config['driver_paused'] = list(dict.fromkeys([*self.config.get('driver_paused', []), *group]))
+                if replacement:
+                    self.config.update(fallback=replacement, mode='gaming')
+                try:
+                    self.save()
+                except Exception:
+                    self.config = previous
+                    raise
+                if replacement:
+                    self.mode = 'gaming'
+                self.changed.notify_all()
+                progress('Machine paused for driver maintenance; waiting for existing responses')
+                while any(n in group and count for (n, _), count in self.active.items()):
+                    self.changed.wait(timeout=1)
+            for n in group:
+                for model in self.config['managed'].get(n, []):
+                    self.rpc(self.node(n), '/api/generate', {'model': model, 'keep_alive': 0, 'stream': False})
+                if any(m.get('size_vram') != 0 for m in self.rpc(self.node(n), '/api/ps', timeout=8).get('models', [])):
+                    raise ValueError('GPU models remain on this machine. Close external model clients and unload their models before retrying. Machine remains in maintenance.')
+            progress('Opening update controls on the selected computer; installation needs your input there')
+            result = drivers.open_updater(action) if identity == 'local' else self.rpc(self.node(identity), '/drivers/open', {'action': action}, timeout=75)
+            with self.lock:
+                self.drivers[identity]['handoff'] = result
+                atomic(self.root / 'drivers.json', self.drivers)
+            return result
+
+    def worker_driver_open(self, action):
+        # A worker may have several paired controllers. Hold direct inference at
+        # the worker itself, not only at the requesting controller's gateway.
+        with self.operation, self.administer('local'):
+            report = drivers.inspect()
+            if action not in [a['id'] for a in report['actions']]:
+                raise ValueError('Unsupported driver update control')
+            with self.changed:
+                self.config['driver_hold'] = True
+                self.save()
+                self.changed.notify_all()
+            if any(m.get('size_vram') != 0 for m in self.rpc(self.node('local'), '/api/ps', timeout=8).get('models', [])):
+                raise ValueError('Worker GPU models remain; close other clients before retrying. Driver maintenance remains active.')
+            return drivers.open_updater(action)
+
+    def worker_driver_resume(self):
+        with self.operation, self.changed:
+            self.rpc(self.node('local'), '/api/version', timeout=5)
+            previous = self.config.get('driver_hold', False)
+            self.config['driver_hold'] = False
+            try:
+                self.save()
+            except Exception:
+                self.config['driver_hold'] = previous
+                raise
+            self.changed.notify_all()
+        return {'status': 'available'}
+
+    def driver_resume(self, identity, progress=lambda _: None):
+        identity = self.driver_host(identity)
+        with self.operation:
+            progress('Rechecking versions and runtime before leaving driver maintenance')
+            report = self.driver_check(identity)
+            if report.get('status') not in ('ok', 'empty'):
+                raise ValueError('Driver inventory is unavailable; check the machine and refresh before resuming')
+            group = [n for n in self.config['nodes'] if self.driver_host(n) == identity]
+            for n in group:
+                self.rpc(self.node(n), '/api/version', timeout=5)
+            if identity != 'local':
+                self.rpc(self.node(identity), '/drivers/resume', {}, timeout=10)
+            with self.changed:
+                old = copy.deepcopy(self.config)
+                self.config['maintenance'] = [n for n in self.config['maintenance'] if n not in group]
+                self.config['driver_paused'] = [n for n in self.config.get('driver_paused', []) if n not in group]
+                try:
+                    self.save()
+                except Exception:
+                    self.config = old
+                    raise
+                self.changed.notify_all()
+            return {'status': 'available', 'note': 'Driver versions refreshed. Route selection and Gaming eligibility are unchanged; qualify the model before using this machine again.'}
 
     def setup_status(self):
         try:
@@ -295,6 +458,8 @@ class Control:
         if type(enabled) is not bool:
             raise ValueError('Choose enter or leave maintenance')
         self.node(identity)
+        if not enabled and identity in self.config.get('driver_paused', []):
+            return self.driver_resume(identity, progress)
         with self.operation:
             if not enabled:
                 self.rpc(self.node(identity), '/api/version', timeout=5)
@@ -505,6 +670,8 @@ class Control:
                         raise ValueError('Queued request cancelled before inference; no generation was sent')
                     endpoint = {'node': 'local', 'model': model_name(payload.get('model'))} if direct else self.route()
                     node_id = endpoint['node']
+                    if self.config.get('driver_hold') or node_id in self.config['maintenance']:
+                        raise ValueError('Machine is paused for maintenance; resume it before sending model requests')
                     health = self.health.get(node_id, {})
                     if health.get('status') == 'offline' and 0 <= time.time() - health.get('checked_at', 0) < 15:
                         raise ValueError('Selected machine is offline; check machine health or select another route after its cooldown')
@@ -684,6 +851,8 @@ class Control:
             raise ValueError("Unknown model action")
         with self.operation, self.administer(identity):
             with self.lock:
+                if action == 'load' and (identity in self.config['maintenance'] or self.config.get('driver_hold')):
+                    raise ValueError('Machine is paused for maintenance; resume it before loading models')
                 if any(n == identity and count for (n, _), count in self.active.items()):
                     raise ValueError("This machine has active responses; use Gaming mode to drain them first")
                 active_role = "fallback" if self.mode in ("gaming", "draining") else "primary"
