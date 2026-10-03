@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import base64
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 import datetime as dt
 import difflib
 import hashlib
@@ -17,14 +18,47 @@ import subprocess
 import sys
 import uuid
 import zipfile
-
-from catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
-                     json_bytes, refresh, utc_now, validate_providers)
+if __package__:
+    from .adoption import project_record
+    from . import policy, releases, source_review, architecture, catalog
+    from .catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
+                          json_bytes, refresh, utc_now, validate_providers)
+else:
+    from adoption import project_record
+    import policy, releases, source_review, architecture, catalog
+    from catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
+                         json_bytes, refresh, utc_now, validate_providers)
 
 ROOT = Path(__file__).resolve().parents[1]
 BEGIN = "<!-- ai-constitution:begin -->"
 END = "<!-- ai-constitution:end -->"
 MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "VERSION")
+
+
+@contextmanager
+def state_lock(state):
+    """Serialize read/modify/write operations across CLI processes; OS releases on exit."""
+    no_links(state)
+    lock_path = state.parent / (".constitution-" + digest(str(state.absolute()).encode())[:16] + ".lock")
+    no_links(lock_path)
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    stream = open(lock_path, "a+b")
+    try:
+        stream.write(b"\0")
+        stream.flush()
+        stream.seek(0)
+        try:
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            raise ValueError("Another installation or rollback is running; retry after it finishes") from None
+        yield
+    finally:
+        stream.close()
 
 
 def read_json(path):
@@ -68,7 +102,7 @@ def managed(existing, content):
 
 def managed_hash(body):
     value = body.decode("utf-8")
-    if value.count(BEGIN) != 1 or value.count(END) != 1:
+    if value.count(BEGIN) != 1 or value.count(END) != 1 or value.index(BEGIN) > value.index(END):
         return None
     start, stop = value.index(BEGIN), value.index(END) + len(END)
     return digest(value[start:stop].replace("\r\n", "\n").encode())
@@ -84,6 +118,8 @@ def state_load(state):
 
 def validate(root):
     errors = []
+    for path in (root / 'templates/architectures').glob('*.json'):
+        architecture.validate(read_json(path))
     version = text(root / "VERSION").strip()
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         errors.append("VERSION must be a three-part numeric release")
@@ -124,12 +160,15 @@ def validate(root):
         raise ValueError("; ".join(errors))
 
 
-def render(root):
+def render(root, preferences=None):
     version = text(root / "VERSION").strip()
     core = text(root / "constitution.md").strip()
     models = {m["key"]: m for m in read_json(root / "registry/models.json")["models"]}
     sources = {s["id"]: s for s in read_json(root / "registry/sources.json")["sources"]}
     routes = read_json(root / "registry/routes.json")["routes"]
+    if preferences:
+        core = preferences["instructions"]["constitution.md"].strip()
+        routes = preferences["routes"]["routes"]
     lines = ["# Routing", "", f"Generated for v{version}. Edit `registry/models.json` and `registry/routes.json`, then run `build`.", "",
              "These are provisional starting points, not measured rankings. Respect an explicit model choice. Confirm account access and required tools before selecting a model. Reasoning levels and model identifiers can differ between clients.", "",
              "| Platform | Task | Preferred | Fallback |", "| --- | --- | --- | --- |"]
@@ -148,6 +187,7 @@ def render(root):
         lines.append(f"- **{model['name']}** ({model['surface']}): {model['status']}; checked {model['verified_at']}. {model['evidence']} [Source]({source['url']}).")
     common = f"AI Constitution v{version}\n\n{core}\n\n"
     common += ("For an onboarded project, use its `.ai/shared/` bundle and `.ai/project.md`; its scoped defaults refine the global baseline. "
+               "Read `.ai/architecture.md` when present for the selected project baseline. "
                "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, or `routing.md` only when relevant. "
                "If the library is inaccessible, use this embedded core and report any task-relevant missing guidance.\n")
     bot_description = (f"Use AI Constitution v{version} from BUNDLE_ROOT. Read its constitution.md when starting substantive work, and specialized modules only as needed. "
@@ -156,6 +196,7 @@ def render(root):
     bot_skill = ("---\nname: ai-constitution\ndescription: Load the shared AI Constitution for a Grok Bot's project work and verify its installed version.\n---\n\n"
                  "# Load the shared constitution\n\nLocate BUNDLE_ROOT from this Bot's description. Read VERSION and constitution.md there. "
                  "If working in an onboarded project, prefer its .ai/shared bundle and .ai/project.md for scoped defaults. "
+                 "Read .ai/architecture.md when present for the selected baseline and its implementation handoff. "
                  "Read engineering.md for code work, research.md for source verification, and routing.md when selecting tools or recommending a handoff. "
                  "Report missing files precisely. Do not assume a cloud Bot can read a local Windows path. "
                  "Never claim to change the platform-managed underlying model.\n")
@@ -208,6 +249,8 @@ def transaction(state, writes, *, dry_run=False):
         for item in prepared:
             atomic_bytes(Path(item["path"]), item["data"])
             completed.append(item)
+        record["state"] = "applied"
+        atomic_bytes(journal, json_bytes(record))
     except Exception:
         for item in reversed(completed):
             path = Path(item["path"])
@@ -218,21 +261,53 @@ def transaction(state, writes, *, dry_run=False):
         record["state"] = "reverted-on-error"
         atomic_bytes(journal, json_bytes(record))
         raise
-    record["state"] = "applied"
-    atomic_bytes(journal, json_bytes(record))
     return {"status": "installed", "snapshot": snapshot, "files": [p["path"] for p in prepared]}
 
 
-def install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=False):
+def install(root, state, **kwargs):
+    if kwargs.get("dry_run"):
+        return _install(root, state, **kwargs)
+    with state_lock(state):
+        return _install(root, state, **kwargs)
+
+
+def adopt(state, project, dry_run=False):
+    project = project.absolute()
+    def apply():
+        record = project_record(project, modules=MODULES, safe_path=safe_path,
+                                managed_hash=managed_hash, digest=digest)
+        override = safe_path(project, "AGENTS.override.md")
+        if override.exists() and override.stat().st_size:
+            raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
+        db = state_load(state)
+        identity = "project:" + str(project)
+        if identity in db["targets"] and db["targets"][identity] != record:
+            raise ValueError("Project already enrolled with different evidence; run doctor")
+        db["targets"][identity] = record
+        result = transaction(state, {state / "installations.json": json_bytes(db)}, dry_run=dry_run)
+        return {**result, "version": record["version"], "pinned": record["pinned"],
+                "evidence": "portable-lock-consistency; publisher authenticity not established",
+                "next": "Use sync --all --dry-run to preview an upgrade; pinned projects stay pinned."}
+    if dry_run:
+        return apply()
+    with state_lock(state):
+        return apply()
+
+
+def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=None, planned=None, database=None, source_reference=None):
     validate(root)
     build(root, check=True)
-    db = state_load(state)
+    db = database if database is not None else state_load(state)
     target_root = (project or home or Path.home()).absolute()
     no_links(target_root)
     if project and not target_root.is_dir():
         raise ValueError("Project directory must already exist")
     identity = ("project:" if project else platform + ":") + str(target_root)
     previous = db["targets"].get(identity, {})
+    if project and not previous and safe_path(target_root, ".ai/constitution.lock.json").exists():
+        raise ValueError("Existing project lock: run onboard --adopt to verify and enroll this bundle first")
+    if pin is None:
+        pin = previous.get("pinned", False)
     if platform == "cursor":
         cursor_dir = cursor_dir or (Path(previous["cursor_dir"]) if previous.get("cursor_dir") else None)
         if cursor_dir is not None:
@@ -245,6 +320,15 @@ def install(root, state, *, platform=None, project=None, home=None, cursor_dir=N
     else:
         cursor_dir = None
     writes, tracked = {}, {}
+    preferences = policy.resolve(root, state, project, portable=True)
+    outputs = render(root, preferences)
+
+    def module_bytes(name):
+        if name in preferences["instructions"]:
+            return preferences["instructions"][name].encode("utf-8")
+        if name == "routing.md":
+            return outputs["routing.md"].encode("utf-8")
+        return (root / name).read_bytes()
 
     def add(relative, data, block=False, create_only=False):
         path = installed_path(target_root, relative, cursor_dir)
@@ -267,11 +351,11 @@ def install(root, state, *, platform=None, project=None, home=None, cursor_dir=N
     if project:
         if (target_root / "AGENTS.override.md").exists() and (target_root / "AGENTS.override.md").stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile the override before onboarding")
-        core = text(root / "constitution.md").strip()
-        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, and `.ai/shared/routing.md`, loaded when relevant.\n"
+        core = preferences["instructions"]["constitution.md"].strip()
+        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, and `.ai/shared/routing.md`, loaded when relevant.\n"
         add("AGENTS.md", body.encode(), block=True)
         for name in MODULES:
-            add(".ai/shared/" + name, (root / name).read_bytes())
+            add(".ai/shared/" + name, module_bytes(name))
         add(".ai/project.md", (root / "templates/project.md").read_bytes(), create_only=True)
         # Project context belongs to the user, not to the managed bundle.
         tracked.pop(".ai/project.md", None)
@@ -280,14 +364,14 @@ def install(root, state, *, platform=None, project=None, home=None, cursor_dir=N
                 "files": {k: v for k, v in tracked.items()}}
         add(".ai/constitution.lock.json", json_bytes(lock))
     else:
-        outputs = render(root)
         source = "adapters/codex/AGENTS.md" if platform == "codex" else "adapters/cursor/ai-constitution.mdc"
+        source_reference = source_reference or root
         library = target_root / ".config/ai-constitution/libraries" / platform
-        content = outputs[source] + f"\nInstalled shared library: `{library.as_posix()}`. Source checkout: `{root.as_posix()}`.\n"
+        content = outputs[source] + f"\nInstalled shared library: `{library.as_posix()}`. Source checkout: `{source_reference.as_posix()}`.\n"
         for name in MODULES:
-            add(f".config/ai-constitution/libraries/{platform}/{name}", (root / name).read_bytes())
+            add(f".config/ai-constitution/libraries/{platform}/{name}", module_bytes(name))
         add(f".config/ai-constitution/libraries/{platform}/installation.json", json_bytes({
-            "schema_version": 1, "source_root": str(root), "version": version, "platform": platform,
+            "schema_version": 1, "source_root": str(source_reference), "version": version, "platform": platform,
         }))
         if platform == "codex":
             # Respect CODEX_HOME only for the actual default home, not fixture homes.
@@ -300,13 +384,16 @@ def install(root, state, *, platform=None, project=None, home=None, cursor_dir=N
         else:
             add(".cursor/rules/ai-constitution.mdc", content.encode())
         for name in ("constitution-onboarding", "constitution-maintenance"):
-            skill = text(root / f"skills/{name}/SKILL.md") + f"\nInstalled source checkout: `{root.as_posix()}`.\n"
+            skill = text(root / f"skills/{name}/SKILL.md") + f"\nInstalled source checkout: `{source_reference.as_posix()}`.\n"
             add(f".{platform}/skills/{name}/SKILL.md", skill.encode())
     db["targets"][identity] = {"kind": "project" if project else platform, "root": str(target_root),
                                "version": version, "pinned": pin, "files": tracked}
     if cursor_dir is not None:
         db["targets"][identity]["cursor_dir"] = str(cursor_dir)
     writes[state / "installations.json"] = json_bytes(db)
+    if planned is not None:
+        planned.update(writes)
+        return {"status": "planned", "target": str(target_root)}
     return transaction(state, writes, dry_run=dry_run)
 
 
@@ -325,21 +412,31 @@ def sync(root, state, include_pinned=False, dry_run=False):
 
 
 def rollback(state, snapshot):
+    with state_lock(state):
+        return _rollback(state, snapshot)
+
+
+def _rollback(state, snapshot):
     if not re.fullmatch(r"\d{8}T\d{6}Z-[a-f0-9]{8}", snapshot):
         raise ValueError("Invalid snapshot identifier")
     path = state / "transactions" / (snapshot + ".json")
     record = read_json(path)
-    if record["state"] != "applied":
+    if record["state"] not in ("applied", "prepared", "rolling-back"):
         raise ValueError("Snapshot is not an applied transaction")
     for item in record["files"]:
         target = Path(item["path"])
         no_links(target)
-        if not target.exists() or digest(target.read_bytes()) != item["after_sha256"]:
+        actual = target.read_bytes() if target.exists() else None
+        before = base64.b64decode(item["before"]) if item["before"] is not None else None
+        already_restored = record["state"] in ("prepared", "rolling-back") and actual == before
+        if not already_restored and (actual is None or digest(actual) != item["after_sha256"]):
             raise ValueError("A target changed since this snapshot; rollback refused to preserve later edits")
+    record["state"] = "rolling-back"
+    atomic_bytes(path, json_bytes(record))
     for item in reversed(record["files"]):
         target = Path(item["path"])
         if item["before"] is None:
-            target.unlink()
+            target.unlink(missing_ok=True)
         else:
             atomic_bytes(target, base64.b64decode(item["before"]))
     record["state"] = "rolled-back"
@@ -376,23 +473,68 @@ def doctor(root, state, project=None):
 
 
 def source_check(root, state):
-    sources = read_json(root / "registry/sources.json")["sources"]
-    old_path = state / "source-observations.json"
-    old = read_json(old_path).get("sources", {}) if old_path.exists() else {}
-    def inspect(source):
-        try:
-            body = fetch_public(source["url"])
-            new_hash = digest(body)
-            previous = old.get(source["id"], {}).get("sha256")
-            return source["id"], {"status": "first-check" if previous is None else "unchanged" if new_hash == previous else "changed",
-                                  "sha256": new_hash, "checked_at": utc_now(), "url": source["url"]}
-        except Exception as error:
-            return source["id"], {**old.get(source["id"], {}), "status": "unavailable", "attempted_at": utc_now(),
-                                  "error_type": type(error).__name__, "url": source["url"]}
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        results = dict(pool.map(inspect, sources))
-    atomic_bytes(old_path, json_bytes({"sources": results}))
-    return results
+    return source_review.check(root, state, state_lock)
+
+
+def upgrade(source, state, dry_run=False, payload=None, expected_plan=None):
+    """Stage an immutable library and update eligible targets in one transaction."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as folder:
+        candidate = Path(folder).resolve()
+        payload = releases.files(source) if payload is None else payload
+        for name, data in payload.items():
+            if not releases.allowed(name):
+                raise ValueError("Unsafe release source path")
+            atomic_bytes(candidate / name, data)
+        validate(candidate)
+        build(candidate, check=True)
+        def apply():
+            identity, destination = releases.prepare(payload, state, preview=True)
+            db = state_load(state)
+            enrollment = digest(json_bytes(db))
+            writes, targets = {}, []
+            for target in list(db["targets"].values()):
+                if target["pinned"]:
+                    targets.append({"target": target["root"], "status": "skipped-pinned"})
+                    continue
+                kwargs = {"project": Path(target["root"])} if target["kind"] == "project" else {
+                    "platform": target["kind"], "home": Path(target["root"]),
+                    "cursor_dir": Path(target["cursor_dir"]) if target.get("cursor_dir") else None}
+                targets.append(_install(candidate, state, **kwargs, source_reference=destination,
+                                        pin=target["pinned"], planned=writes, database=db))
+            active = state / "active-release.json"
+            previous = read_json(active).get("identity") if active.exists() else None
+            record = {"schema_version": 1, "identity": identity, "previous": previous}
+            if previous == identity:
+                record = read_json(active)
+            writes[active] = json_bytes(record)
+            signature = {}
+            for path, after in writes.items():
+                no_links(path)
+                signature[str(path)] = [digest(path.read_bytes()) if path.exists() else None, digest(after)]
+            plan = digest(json_bytes({'release': identity, 'enrollment': enrollment, 'writes': signature}))
+            if expected_plan is not None and expected_plan != plan:
+                raise ValueError('Library or installed targets changed since preview. Preview activation again.')
+            if not dry_run:
+                releases.prepare(payload, state)
+            result = transaction(state, writes, dry_run=dry_run)
+            return {**result, "plan": plan, "release": identity, "targets": targets, "source_checkout_changed": False,
+                    "scope": "instruction library; invoke the installed scripts for this release's CLI features"}
+        if dry_run:
+            return apply()
+        with state_lock(state):
+            return apply()
+
+
+def explain(root, state, project=None):
+    selected = policy.resolve(root, state, project)
+    return {"release": text(root / "VERSION").strip(),
+            "catalog": str(catalog.catalog_path(root, state)),
+            "effective_sha256": selected["effective_sha256"], "layers": selected["layer_hashes"],
+            "route_sources": selected["provenance"], "routes": selected["routes"]["routes"],
+            "installation": doctor(root, state, project),
+            "portable_bundle": "Personal prose and routes stay private; project policy is rendered into project bundles.",
+            "host_loading": "unverified; file ownership checks do not establish client instruction loading"}
 
 
 def scan(root):
@@ -461,12 +603,27 @@ def main(argv=None):
     parser.add_argument("--root", type=Path, default=ROOT, help=argparse.SUPPRESS)
     parser.add_argument("--state-dir", type=Path, help="Private state (default: ~/.config/ai-constitution/state)")
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("build", "check", "scan", "upgrade"):
+    for name in ("build", "check", "scan"):
         sub.add_parser(name)
+    upgrading = sub.add_parser("upgrade", help="Activate a verified library without changing the source checkout")
+    upgrading.add_argument("--source", type=Path, help="Reviewed local checkout")
+    upgrading.add_argument("--archive", type=Path)
+    upgrading.add_argument("--sha256")
+    upgrading.add_argument("--dry-run", action="store_true")
+    release = sub.add_parser("release", help="Export a managed-upgrade archive")
+    release.add_argument("--output", type=Path, required=True)
+    explaining = sub.add_parser("explain")
+    explaining.add_argument("--project", type=Path)
+    explaining.add_argument("--json", action="store_true", help="JSON output (also the default)")
+    sources = sub.add_parser("sources", help="Inspect durable pending source changes or acknowledge an exact revision")
+    sources.add_argument("--check", action="store_true")
+    sources.add_argument("--review")
+    sources.add_argument("--revision")
     update = sub.add_parser("update", help="Refresh every provider/model definition from models.dev")
     update.add_argument("--dry-run", action="store_true")
     update.add_argument("--allow-removals", action="store_true")
     update.add_argument("--sources", action="store_true", help="Also check curated official documentation for changes")
+    update.add_argument("--source-checkout", action="store_true", help="Contributor mode: refresh the tracked snapshot instead of private cache")
     setup = sub.add_parser("install", help="Install global Codex/Cursor instructions and skills")
     setup.add_argument("--platform", choices=["codex", "cursor", "all"], default="all")
     setup.add_argument("--home", type=Path)
@@ -474,8 +631,9 @@ def main(argv=None):
     setup.add_argument("--dry-run", action="store_true")
     onboard = sub.add_parser("onboard", help="Adopt a project without replacing its own guidance")
     onboard.add_argument("--project", type=Path, required=True)
-    onboard.add_argument("--pin", action="store_true")
+    onboard.add_argument("--pin", action="store_true", default=None)
     onboard.add_argument("--dry-run", action="store_true")
+    onboard.add_argument("--adopt", action="store_true", help="Verify an existing portable bundle and enroll it without upgrading")
     sync_parser = sub.add_parser("sync")
     sync_parser.add_argument("--all", action="store_true", required=True)
     sync_parser.add_argument("--include-pinned", action="store_true")
@@ -496,6 +654,7 @@ def main(argv=None):
     route_parser.add_argument("--platform", choices=["codex", "cursor", "grok-bot"], required=True)
     route_parser.add_argument("--task", choices=["small", "implementation", "deep", "review", "research"], default="implementation")
     route_parser.add_argument("--available", action="append", help="Eligible registry key; repeat to supply account-verified availability")
+    route_parser.add_argument("--project", type=Path)
     local = sub.add_parser("local", help="Discover models on an explicitly selected local server")
     local.add_argument("--kind", choices=["ollama", "openai-compatible"], default="ollama")
     local.add_argument("--url")
@@ -503,9 +662,17 @@ def main(argv=None):
     local.add_argument("--api-key-env")
     export = sub.add_parser("export")
     export.add_argument("--output", type=Path, required=True)
+    architectures = sub.add_parser('architecture', help='List, inspect or apply portable project baselines')
+    architectures.add_argument('operation', choices=['list','show','plan','apply'])
+    architectures.add_argument('--template', help='Bundled template ID or path to an exported JSON template')
+    architectures.add_argument('--project', type=Path)
+    architectures.add_argument('--name', help='Project slug used in scaffold files')
+    architectures.add_argument('--plan', help='Exact preview hash required for apply')
     args = parser.parse_args(argv)
     root = args.root.absolute()
     state = (args.state_dir or Path(os.environ.get("AI_CONSTITUTION_STATE_DIR", str(Path.home() / ".config/ai-constitution/state")))).absolute()
+    if args.command not in {"build", "check", "scan", "release", "upgrade", "architecture"} and not getattr(args, "source_checkout", False):
+        root = releases.selected(state, root)
     if args.command not in {"build", "check", "scan", "models", "providers", "route", "export"}:
         no_links(state)
     result, exit_code = None, 0
@@ -515,11 +682,29 @@ def main(argv=None):
         validate(root)
         build(root, check=True)
         result = {"status": "passed", "version": text(root / "VERSION").strip()}
+    elif args.command == 'architecture':
+        directory = root / 'templates/architectures'
+        if args.operation == 'list':
+            result = [architecture.validate(read_json(p)) for p in sorted(directory.glob('*.json'))]
+        else:
+            if not args.template:
+                raise ValueError('Choose --template ID or a JSON file')
+            path = Path(args.template) if args.template.endswith('.json') else directory / (architecture.identifier(args.template) + '.json')
+            value = architecture.validate(read_json(path))
+            if args.operation == 'show':
+                result = {'template': value, 'review': architecture.review(value)}
+            else:
+                if not args.project or not args.name:
+                    raise ValueError('Choose --project and --name')
+                kit = sys.modules[__name__]
+                result = (architecture.plan(kit, root, state, args.project, value, args.name)[0] if args.operation == 'plan' else
+                          architecture.apply(kit, root, state, args.project, value, args.name, args.plan))
     elif args.command == "update":
-        result = refresh(root, state, preview=args.dry_run, allow_removals=args.allow_removals)
+        with state_lock(state):
+            result = refresh(root, state, preview=args.dry_run, allow_removals=args.allow_removals, source_checkout=args.source_checkout)
         if result["status"] == "review-required":
             exit_code = 2
-        elif not args.dry_run:
+        elif not args.dry_run and args.source_checkout:
             build(root)
         if args.sources:
             result["sources"] = source_check(root, state)
@@ -534,7 +719,9 @@ def main(argv=None):
             raise ValueError("--cursor-dir applies to Cursor installation")
         result = [install(root, state, platform=p, home=args.home, cursor_dir=args.cursor_dir, dry_run=args.dry_run) for p in platforms]
     elif args.command == "onboard":
-        result = install(root, state, project=args.project, pin=args.pin, dry_run=args.dry_run)
+        if args.adopt and args.pin is not None:
+            raise ValueError("Adoption preserves the existing pin; omit --pin")
+        result = adopt(state, args.project, args.dry_run) if args.adopt else install(root, state, project=args.project, pin=args.pin, dry_run=args.dry_run)
     elif args.command == "sync":
         result = sync(root, state, args.include_pinned, args.dry_run)
         exit_code = 2 if any(r["status"] == "error" for r in result) else 0
@@ -547,7 +734,7 @@ def main(argv=None):
         result = scan(root)
         exit_code = 2 if result["findings"] else 0
     elif args.command in ("models", "providers"):
-        providers = effective_providers(root)
+        providers = effective_providers(root, state)
         if args.command == "providers":
             result = [{"id": key, "name": p["name"], "models": len(p["models"])} for key, p in providers.items()]
         else:
@@ -570,7 +757,8 @@ def main(argv=None):
                                 {"provider": provider, "id": model_id, "name": model["name"], "context": model.get("limit", {}).get("context"), "tools": model.get("tool_call")})
             result = {"matches": len(rows), "showing": min(len(rows), args.limit), "models": rows[:args.limit]}
     elif args.command == "route":
-        routes = read_json(root / "registry/routes.json")["routes"]
+        preferences = policy.resolve(root, state, args.project)
+        routes = preferences["routes"]["routes"]
         models = {m["key"]: m for m in read_json(root / "registry/models.json")["models"]}
         route = next(r for r in routes if r["platform"] == args.platform and r["task"] == args.task)
         candidates = [route["preferred"], *route["fallbacks"]]
@@ -580,6 +768,7 @@ def main(argv=None):
         selected = models[candidates[0]]
         age = (dt.datetime.now(dt.timezone.utc).date() - dt.date.fromisoformat(selected["verified_at"])).days
         result = {"recommendation": selected, "note": route["note"], "account_verified": args.available is not None,
+                  "preference_source": preferences["provenance"][args.platform + "/" + args.task],
                   "stale": age > read_json(root / "registry/models.json")["max_age_days"], "applied": False}
     elif args.command == "local":
         url = args.url or ("http://127.0.0.1:11434" if args.kind == "ollama" else "http://127.0.0.1:1234/v1")
@@ -590,13 +779,20 @@ def main(argv=None):
     elif args.command == "export":
         result = export_bundle(root, args.output)
     elif args.command == "upgrade":
-        dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=root, text=True)
-        if dirty.strip():
-            raise ValueError("Commit or preserve local source changes before upgrading")
-        subprocess.run(["git", "fetch", "origin", "main", "--tags"], cwd=root, check=True)
-        subprocess.run(["git", "merge", "--ff-only", "origin/main"], cwd=root, check=True)
-        subprocess.run([sys.executable, str(root / "scripts/constitution.py"), "check"], check=True)
-        return subprocess.call([sys.executable, str(root / "scripts/constitution.py"), "--state-dir", str(state), "sync", "--all"])
+        if args.source and args.archive or bool(args.archive) != bool(args.sha256):
+            raise ValueError("Use --source or --archive with --sha256")
+        payload = releases.unpack(args.archive.read_bytes(), args.sha256) if args.archive else None if args.source else releases.latest()
+        result = upgrade(args.source or root, state, args.dry_run, payload)
+    elif args.command == "release":
+        validate(root)
+        build(root, check=True)
+        result = releases.export(root, args.output)
+    elif args.command == "sources":
+        if args.check and args.review or bool(args.review) != bool(args.revision):
+            raise ValueError("Use --check or --review SOURCE --revision SHA256")
+        result = source_check(root, state) if args.check else source_review.acknowledge(state, args.review, args.revision, state_lock) if args.review else source_review.read(state)
+    elif args.command == "explain":
+        result = explain(root, state, args.project)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return exit_code
 

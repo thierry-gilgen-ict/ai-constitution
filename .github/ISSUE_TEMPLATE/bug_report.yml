@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a reproducible problem with instructions, templates or Local Control.
+title: "Bug: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use synthetic data. Do not attach environment files, passwords, account exports, private paths or unreviewed logs.
+        Report security vulnerabilities privately: https://github.com/thierry-gilgen-ict/ai-constitution/security/advisories/new
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected workflow
+      options:
+        - Installation, onboarding or synchronization
+        - Model catalog or routing
+        - Architecture templates or constitution editor
+        - Local inference, Gaming mode or workers
+        - Account monitoring or diagnostics
+        - Storage, configuration backup or restore
+        - Documentation or another workflow
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Include the release tag or Git commit, and source versus portable installation.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, Python version if applicable, and client/runtime versions relevant to the issue.
+      placeholder: Windows 11 x64, portable controller, Ollama version…
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include minimal commands or dashboard actions using example projects.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include a sanitized error or fixture screenshot where useful; remove login identifiers and personal paths.
+    validations:
+      required: true

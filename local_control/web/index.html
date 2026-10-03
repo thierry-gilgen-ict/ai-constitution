@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Local Control · AI Constitution</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/app.js"></script>
+    <script defer src="/studio.js"></script>
+    <script defer src="/center.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Local Control home"
+        ><span class="mark">木</span
+        ><span>AI Constitution<small>LOCAL CONTROL</small></span></a
+      >
+      <nav aria-label="Main navigation">
+        <button class="nav" data-page="setup"><span>✦</span> Get started</button>
+        <button class="nav active" data-page="overview">
+          <span>◉</span> Overview</button
+        ><button class="nav" data-page="models">
+          <span>▦</span> Model library</button
+        ><button class="nav" data-page="machines">
+          <span>⌘</span> Your machines</button
+        ><button class="nav" data-page="connect">
+          <span>↗</span> Connect a project
+        </button>
+        <button class="nav" data-page="architectures"><span>◇</span> Project templates</button>
+        <button class="nav" data-page="constitution"><span>≡</span> Constitution files</button>
+        <button class="nav" data-page="projects"><span>⇄</span> Project sync</button>
+        <button class="nav" data-page="accounts"><span>◎</span> Apps &amp; subscriptions</button>
+        <button class="nav" data-page="workers"><span>＋</span> Set up a worker</button>
+        <button class="nav" data-page="storage"><span>▤</span> Storage &amp; locations</button>
+        <button class="nav" data-page="vault"><span>▣</span> Configs &amp; backups</button>
+      </nav>
+      <div class="sidebar-note">
+        <span class="dot"></span> Private by default
+        <p>On your hardware.<br />Under your control.</p>
+        <small>PREVIEW · v0.2</small>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <span id="breadcrumb">Workspace / Overview</span>
+        <div>
+          <span id="connection" class="pill">Connecting</span
+          ><button class="quiet" id="refresh">↻ Refresh</button>
+        </div>
+      </header>
+      <div id="notice" role="status" aria-live="polite" hidden></div>
+      <section id="setup" class="page">
+        <div class="page-heading"><span class="eyebrow">A FEW STEPS. YOUR OWN WORKSPACE.</span><h1>Make yourself at home.</h1><p>Use what is already installed. Add only what you need.</p></div>
+        <div id="setup-summary" class="panel" role="status">Checking this computer…</div>
+        <div class="setup-grid">
+          <article class="panel"><span class="step">01 / PREPARE</span><h2>Meet your hardware.</h2><p>Ollama runs the models. The hardware helper estimates which ones fit. Installation may show an operating-system prompt.</p><div class="button-row"><button id="setup-ollama">Install Ollama</button><button id="setup-fit">Install hardware helper</button></div><p class="caption">After installing Ollama, start its application and refresh this page.</p></article>
+          <article class="panel"><span class="step">02 / CHOOSE</span><h2>A model that fits.</h2><p>Choose the session context before configuring models. Larger contexts need more memory.</p><label>Context budget<select id="setup-context"><option value="4096">4K · small tasks</option><option value="8192">8K</option><option value="16384">16K</option><option value="32768">32K</option><option value="65536" selected>64K · larger projects</option><option value="131072">128K</option></select></label><div class="button-row"><button id="suggest-context">Suggest a starting context</button><button id="save-context">Save context</button><button id="setup-find">Find models for me ↗</button></div><p class="caption">Review download size, model card and license in the model library. Estimates are separate from measured results.</p></article>
+          <article class="panel"><span class="step">03 / VERIFY</span><h2>Prepare both routes.</h2><label>Installed model<select id="setup-model"></select></label><div class="button-row"><button id="setup-primary">Test as primary</button><button id="setup-fallback">Test as CPU fallback</button></div><p class="caption">Tests a real function call and its result, context capacity and CPU placement. This can take longer on CPU.</p><button id="setup-machines">Use another computer instead ↗</button></article>
+          <article class="panel"><span class="step">04 / WORK</span><h2>Bring a project.</h2><p>Open a supported local session with your project instructions and normal approval settings.</p><button id="setup-project" class="primary">Connect a project ↗</button><p class="caption">Your GPU can be released once a compatible fallback is ready. Existing direct-provider sessions keep their original connection.</p></article>
+        </div>
+      </section>
+      <section id="overview" class="page active">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">A LITTLE MORE ROOM TO THINK</div>
+            <h1>Local intelligence.<br /><em>Room for everything else.</em></h1>
+            <p>
+              One place for your models and machines.<br />Work here. Play here.
+              Keep your projects moving.
+            </p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="sun"></div>
+            <div class="slat s1"></div>
+            <div class="slat s2"></div>
+            <div class="slat s3"></div>
+            <div class="slat s4"></div>
+            <div class="arch"></div>
+            <span>YOUR OWN CORNER OF THE CLOUD</span>
+          </div>
+        </div>
+        <div class="metrics">
+          <article>
+            <span>GPU MEMORY</span><strong id="gpu-memory">—</strong
+            ><small id="gpu-name">Detecting your hardware</small>
+          </article>
+          <article>
+            <span>SYSTEM MEMORY</span><strong id="ram-memory">—</strong
+            ><small id="cpu-name">Hardware helper required</small>
+          </article>
+          <article>
+            <span>MODELS ON DISK</span><strong id="model-count">—</strong
+            ><small>Weights stay on your machine</small>
+          </article>
+          <article>
+            <span>ACTIVE RESPONSES</span><strong id="active-count">0</strong
+            ><small id="phase">Ready when you are</small>
+          </article>
+        </div>
+        <div class="section-title">
+          <div>
+            <span class="eyebrow">MAKE SPACE</span>
+            <h2>How are you using this computer?</h2>
+          </div>
+          <span id="mode-badge" class="pill">Work mode</span>
+        </div>
+        <div class="mode-grid">
+          <button id="work-mode" class="mode-card selected">
+            <span class="mode-icon">✳</span>
+            <div>
+              <h3>Let's work</h3>
+              <p>
+                Use your primary coding model.<br />Keep the GPU ready for the
+                next request.
+              </p>
+            </div>
+            <span class="mode-arrow">↗</span></button
+          ><button id="gaming-mode" class="mode-card">
+            <span class="mode-icon">◒</span>
+            <div>
+              <h3>Make room to play</h3>
+              <p>
+                Move new requests to your fallback.<br />Finish active
+                responses, then free the GPU.
+              </p>
+            </div>
+            <span class="mode-arrow">↗</span>
+          </button>
+        </div>
+        <p class="caption">
+          Switching works for sessions connected through Local Control. CPU
+          fallback also uses CPU and RAM. Other apps can still use the GPU.
+        </p>
+        <div class="two-column">
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Your coding route</h2>
+              <span class="tiny">ONE STABLE ENDPOINT</span>
+            </div>
+            <div id="route"></div>
+            <div class="endpoint">
+              <span>Model alias</span><code>constitution-local</code>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Activity</h2>
+              <span class="tiny">NO PROMPTS LOGGED</span>
+            </div>
+            <div id="activity" class="activity">
+              <p class="muted">Your next action will appear here.</p>
+            </div>
+          </article>
+        </div>
+        <article class="panel service-panel"><h2>Service &amp; recovery</h2><p id="session-status" class="muted">Checking managed sessions…</p><div class="button-row"><button id="check-machines">Check machines</button><button id="support-export">Preview support report</button><button id="stop-controller">Stop controller</button></div><p class="caption">Stopping the controller is different from freeing the GPU. Open managed sessions block a normal stop.</p><div class="button-row"><button id="enable-startup">Start at login</button><button id="disable-startup">Disable login startup</button></div><pre id="support-preview" hidden></pre><button id="download-support" hidden>Download this report</button></article>
+      </section>
+      <section id="models" class="page">
+        <div class="page-heading">
+          <span class="eyebrow">CHOOSE WITH CONFIDENCE</span>
+          <h1>A model that fits.</h1>
+          <p>
+            Start with what you have. Find what your hardware can comfortably
+            run.
+          </p>
+        </div>
+        <div class="toolbar">
+          <label
+            >Machine
+            <select id="model-node">
+              <option value="local">This computer</option>
+            </select></label
+          ><button id="suggest" class="primary">
+            Find models for my hardware ↗
+          </button>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Installed models</h2>
+            <span class="tiny">LOAD · UNLOAD · USE</span>
+          </div>
+          <div id="installed-models"><p>Loading inventory…</p></div>
+        </div>
+        <div id="recommendations" class="panel" hidden></div>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Explore Hugging Face</h2>
+              <p class="muted">
+                GGUF files, with model cards and licenses close at hand.
+              </p>
+            </div>
+            <span class="tiny">EXPLICIT DOWNLOADS ONLY</span>
+          </div>
+          <form id="hf-form" class="search-row">
+            <label class="sr-only" for="hf-query">Find GGUF models</label
+            ><input
+              id="hf-query"
+              placeholder="e.g. Qwen coder GGUF"
+              required
+              maxlength="150"
+            /><button class="primary">Search</button>
+          </form>
+          <div id="hf-results"></div>
+          <div id="hf-files"></div>
+        </div>
+        <div class="panel">
+          <h2>Have an Ollama tag?</h2>
+          <p class="muted">
+            Download or update a tag. Re-running a pull resumes incomplete
+            downloads and checks for newer weights.
+          </p>
+          <form id="pull-form" class="search-row">
+            <label class="sr-only" for="pull-model">Ollama model tag</label
+            ><input
+              id="pull-model"
+              placeholder="model:tag or hf.co/owner/repository:filename.gguf"
+              required
+            /><button class="primary">Download / update</button>
+          </form>
+          <p class="caption">
+            Review the model's license and disk requirements first. Downloads
+            can be large. A GGUF file alone does not establish agent
+            compatibility.
+          </p>
+        </div>
+      </section>
+      <section id="machines" class="page">
+        <div class="page-heading">
+          <span class="eyebrow">A HOME FOR YOUR COMPUTE</span>
+          <h1>Better together.</h1>
+          <p>
+            Windows PCs, Macs and Linux machines. Give each a job and manage
+            them here.
+          </p>
+          <div class="button-row"><button id="refresh-drivers">Refresh all driver versions</button></div>
+          <p class="caption">Display drivers, including virtual adapters. Checks run on each computer; private hardware details stay in your cluster.</p>
+        </div>
+        <article class="panel"><h2>Local only, with a fallback you choose.</h2><p>Every route uses local model weights. No cloud fallback is enabled.</p><label>Gaming preference<select id="routing-policy"><option value="configured">Configured order</option><option value="remote-first">Remote computer first, then CPU</option></select></label><button id="save-routing-policy">Save preference</button><p id="fallback-order" class="caption"></p><p class="caption">The preference applies at the next Gaming transition. Ineligible, maintained or incompatible machines cannot be selected. An in-flight generation is never replayed.</p></article><div id="machine-list"></div><details class="panel"><summary>Recent machine health</summary><pre id="health-history"></pre></details><article class="panel"><h2>Update without breaking a session.</h2><p>Drain each runtime on this computer before updating Ollama. A tested remote fallback keeps new requests moving. Updates use the official package manager and may need your input.</p><button id="upgrade-runtime">Upgrade local Ollama</button><p class="caption">Leave maintenance after the updated runtime is running. Each remote computer updates its own runtime; there is no remote shell access.</p></article>
+        <div class="panel">
+          <h2>Add a machine</h2>
+          <p class="muted">
+            On the other computer, install Ollama and this checkout, then start
+            a private HTTPS worker. Copy its pairing record over a trusted
+            channel.
+          </p>
+          <pre>
+python -m pip install -r requirements-local-node.txt
+python scripts/local_control.py node --address PRIVATE_IP
+# In another terminal:
+python scripts/local_control.py pairing --address PRIVATE_IP</pre
+          >
+          <form id="pair-form">
+            <label
+              >Machine name<input
+                id="pair-name"
+                placeholder="Studio Mac"
+                maxlength="60"
+                required /></label
+            ><label
+              >Private pairing record<textarea
+                id="pair-code"
+                placeholder="Paste the pairing JSON here"
+                rows="3"
+                required
+                autocomplete="off"
+                spellcheck="false"
+              ></textarea></label
+            ><button class="primary">Pair machine</button>
+          </form>
+          <p class="caption">
+            Encrypted connections, pinned certificates, no network scanning.
+            Pairing records are secrets. This cluster routes whole requests; it
+            does not pool GPU memory.
+          </p>
+        </div>
+      </section>
+      <section id="connect" class="page">
+        <div class="page-heading">
+          <span class="eyebrow">FROM SETUP TO GETTING THINGS DONE</span>
+          <h1>Bring your project.</h1>
+          <p>A fresh local session, with the same shared constitution.</p>
+        </div>
+        <form id="launch-form" class="panel"><h2>Open your project</h2><label>Project directory<input id="launch-project" required placeholder="Full path to your project" autocomplete="off"></label><label>Client<select id="launch-client"><option value="cursor">Cursor · Local Codex terminal task</option><option value="codex">Codex · new terminal session</option></select></label><button class="primary">Open project ↗</button><p class="caption">Codex CLI must be installed. Launching the client is separate from verifying a successful model request.</p></form>
+        <article class="panel"><h2>Know what your models can do.</h2><p>Run a bounded function-call and coding fixture on a configured route. Close managed coding sessions first. Results stay on this computer.</p><div class="button-row"><button id="evaluate-primary">Evaluate primary</button><button id="evaluate-fallback">Evaluate fallback</button><button id="show-evaluations">Compare results</button></div><div id="evaluation-results"></div><p class="caption">Hardware-fit predictions are estimates. Passing this small fixture is useful evidence, not a general coding benchmark.</p></article>
+        <div class="connect-grid">
+          <article class="panel">
+            <span class="step">01 / CODEX CLI</span>
+            <h2>One command to start.</h2>
+            <p>
+              Run from your AI Constitution checkout. Your usual Codex
+              configuration stays intact.
+            </p>
+            <pre>
+python scripts/local_control.py codex --project /path/to/project</pre
+            >
+            <p class="caption">
+              Uses the Responses API, your configured context budget and the stable model
+              alias. Start new sessions through this launcher to use switching.
+            </p>
+          </article>
+          <article class="panel">
+            <span class="step">02 / CURSOR</span>
+            <h2>Stay in your editor.</h2>
+            <p>Open a workspace with a ready-made Local Codex terminal task.</p>
+            <pre>
+python scripts/local_control.py cursor --project /path/to/project</pre
+            >
+            <p>
+              Then choose
+              <strong>Terminal → Run Task → AI Constitution: Local Codex</strong
+              >.
+            </p>
+            <p class="caption">
+              This runs Codex inside Cursor. Cursor's native Agent and Tab keep
+              their own providers; localhost is not a native fully local Agent
+              backend.
+            </p>
+          </article>
+        </div>
+        <div class="panel">
+          <h2>What continues when you switch?</h2>
+          <div class="explain-grid">
+            <div>
+              <span class="step">FINISH</span>
+              <h3>The current response</h3>
+              <p>
+                It stays on the machine where it started. Nothing is replayed
+                midstream.
+              </p>
+            </div>
+            <div>
+              <span class="step">ROUTE</span>
+              <h3>The next request</h3>
+              <p>
+                It carries the conversation history to the chosen fallback. A
+                healthy fallback is required.
+              </p>
+            </div>
+            <div>
+              <span class="step">RELEASE</span>
+              <h3>The local GPU</h3>
+              <p>
+                Managed GPU models unload after their active responses finish.
+                Live memory is checked afterward.
+              </p>
+            </div>
+          </div>
+          <p class="caption">
+            Existing direct-provider sessions cannot be migrated in place. Tool
+            behavior and speed can vary by model. The desktop app's running
+            assistant is not switched by this dashboard.
+          </p>
+        </div>
+      </section>
+      <section id="architectures" class="page">
+        <div class="page-heading"><span class="eyebrow">YOUR NEXT PROJECT, ALREADY THOUGHT THROUGH</span><h1>A good place to start.</h1><p>Keep the choices that work. Bring them to every new project.</p></div>
+        <div class="studio-intro"><span class="step">01 / CHOOSE A BASELINE</span><span class="step">02 / MAKE IT YOURS</span><span class="step">03 / PREVIEW &amp; APPLY</span></div>
+        <div class="section-title"><h2>Your project baselines</h2><div class="button-row"><button id="template-capture">From existing project</button><button id="template-import">Import JSON</button><input id="template-import-file" type="file" accept=".json,application/json" hidden><button id="template-new" class="primary">+ New baseline</button></div></div>
+        <p class="caption">These templates define choices and agent handoffs. Dependencies are reviewed during implementation; applying a baseline does not install or run them.</p>
+        <div id="template-gallery" class="template-gallery" aria-live="polite">Loading your library…</div>
+        <article id="template-workbench" class="panel studio-workbench" hidden>
+          <div class="section-title"><div><span class="eyebrow">MAKE IT YOURS</span><h2 id="template-heading">Edit baseline</h2></div><span id="template-status" class="pill"></span></div>
+          <div class="studio-fields"><label>Name<input id="template-name" maxlength="120"></label><label>Identifier<input id="template-id" maxlength="64" placeholder="my-web-baseline"></label><label>Version<input id="template-version" placeholder="1.0.0"></label></div>
+          <label>Description<textarea id="template-description" rows="2" maxlength="2000"></textarea></label>
+          <div class="section-title"><h3>The building blocks</h3><button id="component-new">+ Custom component</button></div>
+          <div class="search-row"><label class="grow">Add from the library<select id="component-catalog"></select></label><button id="component-add">Add component</button></div>
+          <div id="template-components" class="component-list"></div>
+          <label>Architecture decisions · one per line<textarea id="template-decisions" rows="3" placeholder="Use Docker for local services. Keep email calls on the server."></textarea></label>
+          <details class="studio-details"><summary>Scaffold files &amp; portable JSON</summary><p class="caption">Optional text files. Use {{project_name}} for the project slug. Existing files are preserved unless this template owns their unmodified contents.</p><label>Scaffold files · JSON object of paths and text<textarea id="template-files" rows="8" class="code-editor" spellcheck="false"></textarea></label><button id="template-export">Export this baseline ↓</button><p class="caption">Export includes your component guidance. Review it for private information before sharing.</p></details>
+          <div class="button-row"><button id="template-save" class="primary">Review &amp; save baseline</button><button id="template-clone">Duplicate</button></div>
+          <div class="studio-apply"><span class="eyebrow">TAKE IT TO A PROJECT</span><h3>Start with a reviewed plan.</h3><div class="studio-fields project-fields"><label>Existing project directory<input id="template-project" placeholder="Full path on this computer" autocomplete="off"></label><label>Project slug<input id="template-project-name" placeholder="my-project"></label></div><button id="template-apply-preview" class="primary">Preview project files →</button><p class="caption">Onboards the project and writes the architecture, blank environment examples and selected scaffold. Then open the generated handoff in your coding agent.</p><div id="template-result" role="status"></div></div>
+        </article>
+      </section>
+      <section id="constitution" class="page">
+        <div class="page-heading"><span class="eyebrow">GOOD DEFAULTS. YOUR OWN VOICE.</span><h1>Make the constitution yours.</h1><p>Read the library, refine its instructions, and decide when your projects receive the changes.</p></div>
+        <div class="studio-intro"><div><strong>Private draft</strong><p class="caption">Saves stay on this computer. Your public checkout stays separate.</p></div><div class="button-row"><button id="library-refresh">Review library update</button><button id="library-history">Draft history</button><button id="library-activate" class="primary">Preview activation →</button></div></div>
+        <div class="file-workspace">
+          <aside class="file-browser"><label>Find a library file<input id="library-filter" type="search" placeholder="routing, engineering, templates…"></label><label class="check"><input id="library-modified" type="checkbox"> Customized files only</label><p id="library-count" class="caption"></p><div id="library-files" role="navigation" aria-label="Constitution library files"></div></aside>
+          <article class="panel file-panel"><div class="section-title"><h2 id="library-path">Choose a file</h2><span id="library-file-status" class="pill">Library</span></div><p id="library-file-note" class="caption">Start with constitution.md for working defaults, or registry/routes.json for model routing.</p><img id="library-image" alt="Selected library image" hidden><label id="library-editor-label">File contents<textarea id="library-editor" class="code-editor library-editor" spellcheck="false" readonly></textarea></label><div class="button-row"><button id="library-save" class="primary" disabled>Review &amp; save draft</button><button id="library-reload" disabled>Reload file</button><button id="library-previous" hidden>Previous page</button><button id="library-next" hidden>Next page</button></div><p id="library-result" role="status" class="caption"></p></article>
+        </div>
+      </section>
+      <section id="projects" class="page"><div class="page-heading"><span class="eyebrow">GOOD CHANGES, EVERYWHERE THEY BELONG</span><h1>Projects that keep up.</h1><p>Shared instructions and matching templates flow to enrolled projects. Your local edits stay protected.</p></div><div id="sync-content" aria-live="polite"></div></section>
+      <section id="accounts" class="page"><div class="page-heading"><span class="eyebrow">YOUR WHOLE WORKSPACE, IN VIEW</span><h1>Know what is running.<br><em>And what is left.</em></h1><p>Connect machines, applications, account logins and projects. Every usage figure carries its source and observation time.</p></div><div id="accounts-content" aria-live="polite"></div></section>
+      <section id="workers" class="page"><div class="page-heading"><span class="eyebrow">ANOTHER COMPUTER. ONE WORKSPACE.</span><h1>Bring a worker along.</h1><p>Download a package, start it on your other computer, then pair it here.</p></div><div id="workers-content"></div></section>
+      <section id="storage" class="page"><div class="page-heading"><span class="eyebrow">A PLACE FOR EVERYTHING</span><h1>Room to grow.</h1><p>Choose where your weights, private library and managed downloads live. Existing data stays recoverable.</p></div><div id="storage-content"></div></section>
+      <section id="vault" class="page"><div class="page-heading"><span class="eyebrow">PRIVATE CONFIGURATION, TAKEN CARE OF</span><h1>The keys to your projects.</h1><p>One private folder per project. Verified backups. A restore you can review before putting it to work.</p></div><div id="vault-content" aria-live="polite"></div></section>
+      <footer>
+        <span>AI Constitution / Local Control</span
+        ><span>Built for your workflow. Kept on your machines.</span>
+      </footer>
+    </main>
+    <dialog id="login">
+      <div class="eyebrow">YOUR PRIVATE WORKSPACE</div>
+      <h2>Welcome to Local Control.</h2>
+      <p>Open the authenticated dashboard from your terminal:</p>
+      <pre>python scripts/local_control.py open</pre>
+      <p class="muted">
+        The launch link signs you in locally. No cloud account is needed.
+      </p>
+    </dialog>
+    <dialog id="configure-dialog">
+      <form id="configure-form">
+        <span class="eyebrow">SET YOUR ROUTE</span>
+        <h2 id="configure-title">Use this model</h2>
+        <input type="hidden" id="configure-model" /><label
+          >Role<select id="configure-role">
+            <option value="primary">Primary — coding on this GPU</option>
+            <option value="fallback">Fallback — CPU or another machine</option>
+          </select></label
+        ><label class="check"
+          ><input type="checkbox" id="configure-cpu" /> Run on CPU, leave the
+          GPU free</label
+        >
+        <p class="caption">
+          Creates an alias with your configured context using existing weights and runs a
+          function-call and full-history compatibility check. CPU placement is checked, not
+          assumed.
+        </p>
+        <div class="dialog-actions">
+          <button type="button" id="configure-cancel" class="quiet">
+            Cancel</button
+          ><button class="primary">Test and use model</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="driver-dialog" aria-labelledby="driver-title">
+      <form id="driver-form">
+        <span class="eyebrow">CARE FOR YOUR COMPUTE</span>
+        <h2 id="driver-title">Update display drivers</h2>
+        <p id="driver-target"></p>
+        <label>Update through<select id="driver-action"></select></label>
+        <p id="driver-action-detail" class="muted"></p>
+        <p>First, this whole computer enters maintenance. Existing responses finish; a tested fallback on another computer keeps managed tasks moving. Without one, close coding sessions first. An idle route will pause until you resume it.</p>
+        <label class="check"><input type="checkbox" id="driver-ack" required> Other model clients on this computer are idle. I’ll review the update and any restart on its desktop.</label>
+        <p class="caption">The button opens update controls on the selected machine, including remote PCs. Be signed in there. Installation may need administrator approval. Then refresh versions and resume model use here.</p>
+        <div class="dialog-actions"><button type="button" id="driver-cancel" class="quiet">Cancel</button><button class="primary">Prepare &amp; open updater</button></div>
+      </form>
+    </dialog>
+    <dialog id="studio-preview" class="studio-modal" aria-labelledby="studio-preview-title"><span class="eyebrow">A MOMENT TO REVIEW</span><h2 id="studio-preview-title">Review changes</h2><div id="studio-preview-body"></div><div class="dialog-actions"><button id="studio-preview-cancel">Close</button><button id="studio-preview-confirm" class="primary">Apply reviewed changes</button></div></dialog>
+    <dialog id="center-dialog" class="studio-modal" aria-labelledby="center-dialog-title"><span class="eyebrow">YOUR WORKSPACE, YOUR CHOICES</span><h2 id="center-dialog-title"></h2><div id="center-dialog-body"></div><p id="center-dialog-error" class="review-error" role="alert"></p><div class="dialog-actions"><button id="center-dialog-close">Close</button><button id="center-dialog-apply" class="primary">Apply</button></div></dialog>
+    <dialog id="component-dialog" class="studio-modal" aria-labelledby="component-title"><form id="component-form"><span class="eyebrow">ONE PIECE OF YOUR ARCHITECTURE</span><h2 id="component-title">Component details</h2><div class="studio-fields"><label>Name<input id="component-name" required maxlength="120"></label><label>Identifier<input id="component-id" required pattern="[a-z][a-z0-9-]{0,63}"></label><label>Role<select id="component-role"></select></label></div><label>Repository URL<input id="component-repository" type="url" placeholder="https://github.com/owner/repository"></label><div class="studio-fields"><label>Release tag or commit<input id="component-reference" placeholder="Choose a reviewed version"></label><label>Documentation URL<input id="component-docs" type="url" placeholder="https://…"></label></div><label>Implementation guidance<textarea id="component-instructions" rows="4"></textarea></label><div class="studio-fields"><label>Provides · comma separated<input id="component-provides" placeholder="typescript, server"></label><label>Requires<input id="component-requires" placeholder="sql"></label><label>Conflicts with<input id="component-conflicts"></label></div><label>Acceptance checks · one per line<textarea id="component-checks" rows="3"></textarea></label><label>Environment variables · NAME | secret or public | purpose<textarea id="component-env" rows="3" placeholder="RESEND_API_KEY | secret | Server-side email API credential" spellcheck="false"></textarea></label><p class="caption">Store names and purpose here. Keep credential values in your project’s secret store.</p><div class="dialog-actions"><button type="button" id="component-cancel">Cancel</button><button class="primary">Use component</button></div></form></dialog>
+  </body>
+</html>

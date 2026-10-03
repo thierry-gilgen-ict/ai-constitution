@@ -3,7 +3,7 @@ description: Shared AI Constitution working defaults
 alwaysApply: true
 ---
 
-AI Constitution v0.1.0
+AI Constitution v0.2.0
 
 # Shared constitution
 
@@ -35,6 +35,8 @@ These are working defaults. Follow the host's instruction hierarchy and the user
 - Existing authorization persists. Avoid asking repeatedly for actions already requested.
 - Before an action outside the agreed scope, make the proposed result concrete and explain the specific decision needed.
 - Protect existing edits and credentials. Keep private material out of public artifacts, logs, and generated examples.
+- Keep real environment files, deployment configuration and keys in the project's registered private configuration folder, outside its checkout. Use the configured root or `AI_CONSTITUTION_CONFIG_HOME` (default `~/.config`) and a distinct folder per project. Inspect existing mappings before creating duplicate files; publish only variable names, empty examples and portable setup guidance.
+- Before changing or migrating private configuration, preserve a verified backup. Restore into a separate directory for review, then explicitly switch the project mapping. Backups contain secrets; use private storage and respect the user's backup schedule and retention choices.
 - Use the current platform and model unless selection is requested or an authorized workflow supports switching. Never imply that Markdown can change a running model.
 - Delegate only when authorized by the user or applicable project instructions, and when it improves the outcome.
 
@@ -44,4 +46,4 @@ These are working defaults. Follow the host's instruction hierarchy and the user
 - If something fails, diagnose it and continue useful independent work. State a real blocker precisely rather than implying success.
 - Prefer the smallest maintainable solution that satisfies the task. Remove obsolete instructions when evidence shows they no longer help.
 
-For an onboarded project, use its `.ai/shared/` bundle and `.ai/project.md`; its scoped defaults refine the global baseline. Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, or `routing.md` only when relevant. If the library is inaccessible, use this embedded core and report any task-relevant missing guidance.
+For an onboarded project, use its `.ai/shared/` bundle and `.ai/project.md`; its scoped defaults refine the global baseline. Read `.ai/architecture.md` when present for the selected project baseline. Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, or `routing.md` only when relevant. If the library is inaccessible, use this embedded core and report any task-relevant missing guidance.

@@ -10,6 +10,7 @@ import copy
 import hashlib
 import ipaddress
 import json
+import math
 import os
 from pathlib import Path
 import tempfile
@@ -35,6 +36,9 @@ def digest(data: bytes) -> str:
 
 
 def atomic_bytes(path: Path, data: bytes):
+    for part in (path, *path.parents):
+        if part.is_symlink() or (hasattr(part, "is_junction") and part.is_junction()):
+            raise ValueError("Refusing to write through a symbolic link or junction")
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.is_symlink():
         raise ValueError("Refusing to replace a symbolic link")
@@ -42,6 +46,8 @@ def atomic_bytes(path: Path, data: bytes):
     try:
         with os.fdopen(fd, "wb") as stream:
             stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
         os.replace(temp, path)
     finally:
         if os.path.exists(temp):
@@ -124,6 +130,27 @@ def validate_providers(providers):
             for field in ("cost", "limit", "modalities"):
                 if field in model and not isinstance(model[field], dict):
                     raise ValueError(f"Invalid model {field} object")
+            for field in ("attachment", "open_weights", "reasoning", "structured_output", "temperature", "tool_call"):
+                if model.get(field) is not None and type(model[field]) is not bool:
+                    raise ValueError(f"Model {field} must be boolean or null (unknown)")
+            for field in ("context", "input", "output"):
+                value = model.get("limit", {}).get(field)
+                if value is not None and (type(value) is not int or value < 0):
+                    raise ValueError(f"Model limit.{field} must be a nonnegative integer or null")
+            def prices(record):
+                for field in ("input", "output", "cache_read", "cache_write", "input_audio", "output_audio", "reasoning"):
+                    value = record.get(field)
+                    if value is not None and (type(value) not in (int, float) or not math.isfinite(value) or value < 0):
+                        raise ValueError(f"Model cost.{field} must be finite and nonnegative or null")
+                if "context_over_200k" in record:
+                    if not isinstance(record["context_over_200k"], dict):
+                        raise ValueError("Invalid context price object")
+                    prices(record["context_over_200k"])
+            prices(model.get("cost", {}))
+            for field in ("input", "output"):
+                value = model.get("modalities", {}).get(field)
+                if value is not None and (not isinstance(value, list) or not all(isinstance(v, str) and v for v in value)):
+                    raise ValueError(f"Model modalities.{field} must be a string list or null")
     return providers
 
 
@@ -146,9 +173,22 @@ def catalog_diff(old, new):
     }
 
 
-def effective_providers(root: Path):
+def catalog_path(root, state=None):
+    pointer = state / "catalog-active.json" if state else None
+    if pointer and pointer.exists():
+        identity = json.loads(pointer.read_text(encoding="utf-8"))["sha256"]
+        if not isinstance(identity, str) or len(identity) != 64 or any(c not in "0123456789abcdef" for c in identity):
+            raise ValueError("Invalid catalog snapshot identity")
+        path = state.parent / "catalogs" / (identity + ".json")
+        if digest(path.read_bytes()) != identity:
+            raise ValueError("Catalog snapshot checksum mismatch")
+        return path
+    return root / "registry/catalog.json"
+
+
+def effective_providers(root: Path, state=None):
     """Merge reviewed, source-linked overrides without editing the imported snapshot."""
-    document = json.loads((root / "registry/catalog.json").read_text(encoding="utf-8"))
+    document = json.loads(catalog_path(root, state).read_text(encoding="utf-8"))
     providers = copy.deepcopy(validate_providers(document["providers"]))
     path = root / "registry/overrides.json"
     overrides = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"schema_version": 1, "models": []}
@@ -175,10 +215,10 @@ def effective_providers(root: Path):
     return validate_providers(providers)
 
 
-def refresh(root: Path, state: Path, *, preview=False, allow_removals=False, raw=None):
+def refresh(root: Path, state: Path, *, preview=False, allow_removals=False, raw=None, source_checkout=False):
     body = fetch_public(CATALOG_URL) if raw is None else raw
     providers = validate_providers(json.loads(body))
-    path = root / "registry/catalog.json"
+    path = root / "registry/catalog.json" if source_checkout else catalog_path(root, state)
     old_document = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     old = old_document.get("providers", {})
     changes = catalog_diff(old, providers)
@@ -203,7 +243,13 @@ def refresh(root: Path, state: Path, *, preview=False, allow_removals=False, raw
         "provenance": "Community catalog snapshot, not independent verification or account availability.",
         "provider_count": len(providers), "model_count": count, "providers": providers,
     }
-    atomic_bytes(path, catalog_bytes(document))
+    data = catalog_bytes(document)
+    if source_checkout:
+        atomic_bytes(path, data)
+    else:
+        identity = digest(data)
+        atomic_bytes(state.parent / "catalogs" / (identity + ".json"), data)
+        atomic_bytes(state / "catalog-active.json", json_bytes({"schema_version": 1, "sha256": identity}))
     report["status"] = "updated"
     return report
 

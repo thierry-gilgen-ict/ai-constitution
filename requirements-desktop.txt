@@ -1,0 +1,3 @@
+# Optional tray/menu bar only. The browser dashboard and core need neither.
+pystray==0.19.5
+Pillow==12.3.0

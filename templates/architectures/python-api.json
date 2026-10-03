@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "python-api",
+  "name": "Python service",
+  "version": "1.0.0",
+  "description": "A typed HTTP API with migrations and a local SQL dependency. Add the appropriate authentication and client integration for your product.",
+  "components": [
+    {
+      "id": "fastapi",
+      "role": "framework",
+      "name": "FastAPI",
+      "repository": "https://github.com/fastapi/fastapi",
+      "docs": "https://fastapi.tiangolo.com/",
+      "reference": "",
+      "provides": [
+        "python",
+        "server",
+        "http-api"
+      ],
+      "requires": [],
+      "conflicts": [],
+      "instructions": "Use typed request/response models and dependency injection. Keep business logic separate from HTTP handlers. Choose and lock supported Python dependencies.",
+      "env": [],
+      "checks": [
+        "Test validation errors, exception handling and API contracts."
+      ]
+    },
+    {
+      "id": "postgres",
+      "role": "database",
+      "name": "PostgreSQL",
+      "repository": "https://github.com/postgres/postgres",
+      "docs": "https://www.postgresql.org/docs/",
+      "reference": "",
+      "provides": [
+        "sql"
+      ],
+      "requires": [],
+      "conflicts": [],
+      "instructions": "Use migrations and a connection pool. Select a supported release and pin the deployment image digest. Document backup and restoration; do not expose the database to the public network. The supplied Compose volume layout targets PostgreSQL 17; choose a reviewed 17.x image tag or digest. Review data-directory and migration changes before using another major.",
+      "env": [
+        {
+          "name": "DATABASE_URL",
+          "purpose": "Server-side database connection string.",
+          "secret": true
+        },
+        {
+          "name": "POSTGRES_IMAGE",
+          "purpose": "Reviewed PostgreSQL 17 image tag or digest, compatible with the supplied volume layout.",
+          "secret": false
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "purpose": "Local database password supplied outside the template.",
+          "secret": true
+        }
+      ],
+      "checks": [
+        "Migrate a fresh database and test backup restoration."
+      ]
+    },
+    {
+      "id": "docker",
+      "role": "deployment",
+      "name": "Docker Compose",
+      "repository": "https://github.com/docker/compose",
+      "docs": "https://docs.docker.com/compose/gettingstarted/",
+      "reference": "",
+      "provides": [
+        "containers"
+      ],
+      "requires": [],
+      "conflicts": [],
+      "instructions": "Use Compose for local dependencies, with health checks, named volumes and loopback-only port publishing. The included database Compose file is optional scaffolding; review image and secret references before starting it.",
+      "env": [],
+      "checks": [
+        "Validate docker compose config after supplying required environment variables.",
+        "Document startup, migration, shutdown and volume/backup behavior."
+      ]
+    }
+  ],
+  "decisions": [
+    "Use existing conventions where they do not conflict with the chosen baseline.",
+    "Review exact dependency versions and licenses before installation.",
+    "Treat these as design starting points, not audited production deployments."
+  ],
+  "files": {
+    "compose.yaml": "# Optional local database baseline. Supply values in an ignored environment file.\nservices:\n  db:\n    image: ${POSTGRES_IMAGE:?Choose a reviewed PostgreSQL 17 image tag or digest}\n    environment:\n      POSTGRES_DB: {{project_name}}\n      POSTGRES_USER: app\n      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a private local database password}\n    ports:\n      - \"127.0.0.1:5432:5432\"\n    volumes:\n      - db-data:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U app -d {{project_name}}\"]\n      interval: 5s\n      timeout: 3s\n      retries: 10\nvolumes:\n  db-data:\n"
+  }
+}

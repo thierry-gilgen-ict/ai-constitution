@@ -158,6 +158,49 @@ class Workspace(unittest.TestCase):
                 kit.transaction(self.state, {first: b"after", second: b"new"})
         self.assertEqual(first.read_bytes(), b"before")
 
+    def test_final_journal_failure_reverts_installed_bytes(self):
+        target = self.base / "target"
+        target.write_bytes(b"before")
+        real = kit.atomic_bytes
+        def fail(path, data):
+            if path.parent.name == "transactions" and json.loads(data).get("state") == "applied":
+                raise OSError("final journal failure")
+            real(path, data)
+        with mock.patch.object(kit, "atomic_bytes", side_effect=fail):
+            with self.assertRaises(OSError):
+                kit.transaction(self.state, {target: b"after"})
+        self.assertEqual(target.read_bytes(), b"before")
+
+    def test_interrupted_rollback_can_resume_without_overwriting_new_edits(self):
+        first, second = self.base / "first", self.base / "second"
+        first.write_bytes(b"old-first")
+        second.write_bytes(b"old-second")
+        result = kit.transaction(self.state, {first: b"new-first", second: b"new-second"})
+        real = kit.atomic_bytes
+        def fail(path, data):
+            if path == first:
+                raise OSError("restore failure")
+            real(path, data)
+        with mock.patch.object(kit, "atomic_bytes", side_effect=fail):
+            with self.assertRaises(OSError):
+                kit.rollback(self.state, result["snapshot"])
+        self.assertEqual(second.read_bytes(), b"old-second")
+        kit.rollback(self.state, result["snapshot"])
+        self.assertEqual(first.read_bytes(), b"old-first")
+
+    def test_other_process_lock_prevents_lost_enrollment(self):
+        # A competing operation fails before reading stale enrollment state.
+        with kit.state_lock(self.state):
+            with self.assertRaisesRegex(ValueError, "Another installation"):
+                self.onboard()
+        self.onboard()
+        self.assertEqual(len(kit.state_load(self.state)["targets"]), 1)
+
+    def test_onboarding_again_preserves_pin(self):
+        self.onboard(pin=True)
+        self.onboard()
+        self.assertTrue(kit.read_json(self.project / ".ai/constitution.lock.json")["pinned"])
+
     def test_pinned_projects_are_skipped(self):
         self.onboard(pin=True)
         result = kit.sync(self.root, self.state)
@@ -212,7 +255,7 @@ class Catalog(unittest.TestCase):
             "name": "Model One", "tool_call": True, "limit": {"context": 4096}, "new_upstream_field": [1, 2]}}}}
 
     def refresh(self, payload=None, **kwargs):
-        return catalog.refresh(self.root, self.state, raw=catalog.json_bytes(payload if payload is not None else self.payload), **kwargs)
+        return catalog.refresh(self.root, self.state, raw=catalog.json_bytes(payload if payload is not None else self.payload), source_checkout=True, **kwargs)
 
     def test_preserves_provider_scoped_ids_and_unknown_fields(self):
         self.refresh()

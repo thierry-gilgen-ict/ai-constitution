@@ -9,6 +9,8 @@
 *.p12
 *.pfx
 credentials*
+# Credential-management source code contains no credential values.
+!local_control/credentials.py
 __pycache__/
 *.py[cod]
 .venv/

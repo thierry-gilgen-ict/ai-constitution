@@ -9,9 +9,14 @@ python scripts/constitution.py build
 python scripts/constitution.py check
 python -m unittest discover -s tests -v
 python scripts/constitution.py scan
+python scripts/check_docs.py
 ```
 
 Use Python 3.11+ and the standard library. Keep network access out of unit tests. Use temporary homes and projects for installer tests; never modify a contributor's actual client configuration in CI.
+
+For worker TLS coverage, install `requirements-local-node.txt` in an isolated environment; CI tests Python 3.11 and 3.13 on Windows, macOS and Linux. Desktop/tray/build dependencies are optional and listed separately. The [architecture guide](docs/architecture.md) maps modules to responsibilities; [Local Control](docs/local-control.md) describes the inference and lifecycle invariants.
+
+Use the issue forms for reproducible bugs and workflow proposals. Include the application version, OS and relevant sanitized evidence, never account exports, private configuration files or raw logs. Security reports belong in [private vulnerability reporting](https://github.com/thierry-gilgen-ict/ai-constitution/security/advisories/new).
 
 ## Model updates
 
@@ -26,3 +31,5 @@ Explain the recurring problem the instruction solves. Keep the core small and mo
 Describe the problem, resulting behavior, validation, and relevant limitations. For a new adapter, include a native loading reference and a reproducible activation check. For installation changes, test preservation, drift, failure recovery, and rollback.
 
 Never commit local state, credentials, personal paths, account exports, or private project facts. Review the staged diff and run the scanner before publishing. A clean heuristic scan does not replace that review.
+
+Maintainers should follow the [release guide](docs/releasing.md) for versioned archives, package checksums, smoke checks and upgrade documentation.

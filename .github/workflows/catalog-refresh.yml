@@ -12,7 +12,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Fetch definitions without changing preferred routes
-        run: python scripts/constitution.py --state-dir .local update
+        run: python scripts/constitution.py --state-dir .local update --source-checkout
       - name: Validate the updated snapshot
         run: python scripts/constitution.py check
       - name: Produce reviewable patch

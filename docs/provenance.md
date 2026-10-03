@@ -6,7 +6,11 @@ The model snapshot records the source URL, retrieval timestamp, SHA-256, and cou
 
 The community snapshot is source data, not an independent audit of every field. Account inventories and local endpoints are excluded from public data.
 
-## Banner
+## Dashboard screenshot
+
+The `control-center-preview.jpg` release asset is a screenshot of the project's own dashboard captured on October 3, 2026 with isolated fixture data. Its example login, usage figures, subscription and machine labels are demonstrations, not a user's account export. It is used in the README to illustrate the current preview.
+
+## Banner artwork
 
 `docs/assets/constitution-hero.png` was created with the built-in image generation tool on October 2, 2026. It is original artwork inspired by the calm timber-and-garden presentation of the public Engawa repository. The Engawa reference image is not redistributed here.
 

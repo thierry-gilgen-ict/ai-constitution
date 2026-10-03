@@ -4,7 +4,7 @@ The toolkit uses Python's standard library. `scripts/constitution.py` owns rende
 
 ## Public source and private state
 
-The checkout holds authored policy, curated routes, generated adapters, and the community catalog snapshot. Private state defaults to `~/.config/ai-constitution/state/`, outside the checkout. Tests use isolated temporary roots. `.local/` is reserved and ignored for contributor scratch state.
+The checkout holds authored policy, curated routes, generated adapters, and the bundled community catalog snapshot. Private state defaults to `~/.config/ai-constitution/state/`, outside the checkout. Routine refreshes write immutable snapshots under `catalogs/`; private preferences live in `overrides/policy.json`; managed library upgrades use `releases/` and a journaled active-release pointer. Tests use isolated temporary roots. `.local/` is reserved and ignored for contributor scratch state.
 
 Global installs render module copies into `~/.config/ai-constitution/libraries/<client>/`. Their installation metadata points back to the source checkout. Project copies use relative paths and a lock file with no local absolute paths.
 
@@ -20,17 +20,25 @@ For a relocated Cursor profile, `--cursor-dir` selects its real configuration di
 
 ## Deterministic generation
 
+`scripts/architecture.py` validates portable component snapshots and plans project baselines using the existing installer transaction. Ownership fingerprints live in private `state/architectures.json`; project snapshots contain no controller paths. `local_control/studio.py` stages private library edits, uses trusted imported render/validation functions, and exposes preview hashes for saves, activation and application. The controller serializes studio requests; workers and inference tokens have no access to this API. Preview hashes include pre-existing target fingerprints, so stale browser plans cannot silently replace newer work.
+
 `build` produces `routing.md` and native adapters from the authored core and small route registry. `check` recomputes those artifacts and fails on drift. Source URLs and evidence are retained. The large catalog never enters every agent prompt.
 
 ## Product boundaries
 
 File verification is deterministic. Model compliance, client instruction discovery, model availability, and workflow improvement are separate acceptance checks. The program does not claim a universal precedence hierarchy, force model switches, or change host approval controls.
 
-## Intentional first-release limits
+## Workspace services
+
+The optional controller keeps its state separately from the core enrollment database. `services.py` schedules project reconciliation, enabled account collection and due configuration backups as visible jobs. `synchronization.py` applies shared-library/template changes through per-project transactions, respecting pins, pauses and local drift. Worker pairing grants inference/administration access, not arbitrary access to remote project files.
+
+`monitoring.py` stores bounded subscription observations and reads only allowlisted Codex account methods. `project_vault.py` manages explicit private configuration mappings, verified snapshots and restore into new directories. `locations.py` plans verified copies and stopped-service relocation. `distribution.py` packages reviewed application files, while `project_capture.py` proposes architecture components and variable names without copying secret values or executable setup content. See [the control center guide](control-center.md) for permissions, schedules and operational limits.
+
+## Current limits
 
 - Codex and Cursor have native file installers; actual Grok Bots have an explicit cloud onboarding/export path.
 - Arbitrary semantic conflicts between existing instructions require agent or human review.
 - Custom `CODEX_HOME` layouts use manual adapter installation in this release.
-- Local discovery lists metadata; it does not benchmark or invoke inference.
+- Core `local` discovery lists metadata. The optional Local Control companion separately performs explicitly requested model downloads, inference probes and gateway routing; see [Local Control](local-control.md).
 - Route recommendations are provisional and small; the broad catalog has community provenance.
-- Refreshes and installations are explicit. There is no daemon or silent self-update.
+- Core refreshes and installations are explicit. The optional controller runs background project synchronization and opt-in monitoring/backups while it is running; it does not silently replace its executable or update model weights.
