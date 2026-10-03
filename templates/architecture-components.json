@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "id": "nextjs",
+      "role": "framework",
+      "name": "Next.js + TypeScript",
+      "repository": "https://github.com/vercel/next.js",
+      "docs": "https://nextjs.org/docs",
+      "reference": "",
+      "provides": [
+        "typescript",
+        "react",
+        "browser-js",
+        "server",
+        "node-server"
+      ],
+      "requires": [],
+      "conflicts": [],
+      "instructions": "Use the App Router and TypeScript. Keep credentials and service SDK calls on the server. Match the existing package manager; select compatible releases and commit the lockfile.",
+      "env": [],
+      "checks": [
+        "Type checking, production build and a page smoke test pass."
+      ]
+    },
+    {
+      "id": "better-auth",
+      "role": "authentication",
+      "name": "Better Auth",
+      "repository": "https://github.com/better-auth/better-auth",
+      "docs": "https://better-auth.com/docs/integrations/next",
+      "reference": "",
+      "provides": [
+        "authentication"
+      ],
+      "requires": [
+        "typescript",
+        "node-server",
+        "sql"
+      ],
+      "conflicts": [],
+      "instructions": "Use the official Next.js integration. Choose a supported SQL adapter and migrations. Define session, origin, verification and password-reset policies explicitly.",
+      "env": [
+        {
+          "name": "BETTER_AUTH_SECRET",
+          "purpose": "Generate a deployment-specific authentication secret.",
+          "secret": true
+        },
+        {
+          "name": "BETTER_AUTH_URL",
+          "purpose": "Canonical application origin.",
+          "secret": false
+        }
+      ],
+      "checks": [
+        "Test sign-in, sign-out, expired sessions and authorization boundaries.",
+        "Test verification/reset flows using a fake email sender."
+      ]
+    },
+    {
+      "id": "postgres",
+      "role": "database",
+      "name": "PostgreSQL",
+      "repository": "https://github.com/postgres/postgres",
+      "docs": "https://www.postgresql.org/docs/",
+      "reference": "",
+      "provides": [
+        "sql"
+      ],
+      "requires": [],
+      "conflicts": [],
+      "instructions": "Use migrations and a connection pool. Select a supported release and pin the deployment image digest. Document backup and restoration; do not expose the database to the public network. The supplied Compose volume layout targets PostgreSQL 17; choose a reviewed 17.x image tag or digest. Review data-directory and migration changes before using another major.",
+      "env": [
+        {
+          "name": "DATABASE_URL",
+          "purpose": "Server-side database connection string.",
+          "secret": true
+        },
+        {
+          "name": "POSTGRES_IMAGE",
+          "purpose": "Reviewed PostgreSQL 17 image tag or digest, compatible with the supplied volume layout.",
+          "secret": false
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "purpose": "Local database password supplied outside the template.",
+          "secret": true
+        }
+      ],
+      "checks": [
+        "Migrate a fresh database and test backup restoration."
+      ]
+    },
+    {
+      "id": "echarts",
+      "role": "charts",
+      "name": "Apache ECharts",
+      "repository": "https://github.com/apache/echarts",
+      "docs": "https://echarts.apache.org/handbook/en/get-started/",
+      "reference": "",
+      "provides": [
+        "charts"
+      ],
+      "requires": [
+        "browser-js"
+      ],
+      "conflicts": [],
+      "instructions": "Use ECharts for charts; load browser-dependent code on the client. Provide accessible labels or a tabular alternative, responsive sizing and empty/loading/error states.",
+      "env": [],
+      "checks": [
+        "Charts resize correctly and handle empty, large and invalid data."
+      ]
+    },
+    {
+      "id": "resend",
+      "role": "email",
+      "name": "Resend",
+      "repository": "https://github.com/resend/resend-node",
+      "docs": "https://resend.com/docs/send-with-nextjs",
+      "reference": "",
+      "provides": [
+        "transactional-email"
+      ],
+      "requires": [
+        "node-server"
+      ],
+      "conflicts": [],
+      "instructions": "Use the official server-side SDK through a small application email adapter. Verify the sending domain, handle API errors and retries, and keep real sends outside automated tests.",
+      "env": [
+        {
+          "name": "RESEND_API_KEY",
+          "purpose": "Server-only Resend API key; never place it in browser code.",
+          "secret": true
+        },
+        {
+          "name": "EMAIL_FROM",
+          "purpose": "Verified sender address.",
+          "secret": false
+        }
+      ],
+      "checks": [
+        "Test adapter behavior with mocked delivery, including failure and duplicate requests."
+      ]
+    },
+    {
+      "id": "docker",
+      "role": "deployment",
+      "name": "Docker Compose",
+      "repository": "https://github.com/docker/compose",
+      "docs": "https://docs.docker.com/compose/gettingstarted/",
+      "reference": "",
+      "provides": [
+        "containers"
+      ],
+      "requires": [],
+      "conflicts": [],
+      "instructions": "Use Compose for local dependencies, with health checks, named volumes and loopback-only port publishing. The included database Compose file is optional scaffolding; review image and secret references before starting it.",
+      "env": [],
+      "checks": [
+        "Validate docker compose config after supplying required environment variables.",
+        "Document startup, migration, shutdown and volume/backup behavior."
+      ]
+    },
+    {
+      "id": "fastapi",
+      "role": "framework",
+      "name": "FastAPI",
+      "repository": "https://github.com/fastapi/fastapi",
+      "docs": "https://fastapi.tiangolo.com/",
+      "reference": "",
+      "provides": [
+        "python",
+        "server",
+        "http-api"
+      ],
+      "requires": [],
+      "conflicts": [],
+      "instructions": "Use typed request/response models and dependency injection. Keep business logic separate from HTTP handlers. Choose and lock supported Python dependencies.",
+      "env": [],
+      "checks": [
+        "Test validation errors, exception handling and API contracts."
+      ]
+    }
+  ]
+}

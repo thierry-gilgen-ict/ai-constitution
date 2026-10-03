@@ -27,10 +27,17 @@ def main():
             if '.dist-info' in str(file) and ('license' in file.name.lower() or 'copying' in file.name.lower()):
                 (licenses/(name+'-'+file.name)).write_bytes(dist.locate_file(file).read_bytes())
     (output/'dependencies.json').write_text(json.dumps(inventory,indent=2),encoding='utf-8')
+    from releases import files
+    library = output / 'library'
+    for name, data in files(ROOT).items():
+        path = library / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
     command=[sys.executable,'-m','PyInstaller','--noconfirm','--onedir','--noupx','--name','ai-constitution-local',
              '--distpath',str(output/'app'),'--workpath',str(output/'build'),'--specpath',str(output),
              '--paths',str(ROOT),'--collect-submodules','local_control','--collect-submodules','pystray',
-             '--hidden-import','cryptography','--add-data',str(ROOT/'local_control/web')+':local_control/web']
+             '--hidden-import','cryptography','--add-data',str(ROOT/'local_control/web')+':local_control/web',
+             '--add-data',str(library)+':library']
     if platform.system()=='Windows':command+=['--hide-console','hide-early']
     command+=[str(ROOT/'packaging/entrypoint.py')]
     subprocess.run(command,cwd=ROOT,check=True)
@@ -38,10 +45,12 @@ def main():
     smoke = subprocess.run([str(executable),'--help'],capture_output=True,text=True)
     if smoke.returncode:
         raise RuntimeError('Packaged entry point failed: ' + smoke.stderr[-4000:])
+    from smoke_local_package import smoke as check_package
+    smoke_result = check_package(executable)
     checks={p.relative_to(output/'app').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in (output/'app').rglob('*') if p.is_file()}
     (output/'manifest.json').write_text(json.dumps({'schema':1,'platform':platform.system(),'architecture':platform.machine(),
         'signing':'unsigned preview; no publisher identity certification','files':checks},indent=2),encoding='utf-8')
-    print(json.dumps({'status':'built','executable':str(executable),'files':len(checks),'signing':'unsigned-preview'}))
+    print(json.dumps({'status':'built','executable':str(executable),'files':len(checks),'signing':'unsigned-preview','smoke':smoke_result}))
 
 
 if __name__=='__main__':main()

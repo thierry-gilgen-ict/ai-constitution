@@ -2,7 +2,10 @@
 import copy
 import json
 from pathlib import Path
-from catalog import digest, json_bytes
+if __package__:
+    from .catalog import digest, json_bytes
+else:
+    from catalog import digest, json_bytes
 
 MODULES = {"constitution.md", "engineering.md", "research.md", "maintenance.md"}
 

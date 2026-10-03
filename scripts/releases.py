@@ -7,9 +7,12 @@ import stat
 import urllib.request
 import urllib.parse
 import zipfile
-from catalog import atomic_bytes, digest, json_bytes
+if __package__:
+    from .catalog import atomic_bytes, digest, json_bytes
+else:
+    from catalog import atomic_bytes, digest, json_bytes
 
-TOP = {"VERSION", "LICENSE", "README.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "requirements-local-node.txt", "requirements-desktop.txt", "requirements-build.txt", "THIRD_PARTY_NOTICES.md"}
+TOP = {"VERSION", "LICENSE", "README.md", "AGENTS.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "requirements-local-node.txt", "requirements-desktop.txt", "requirements-build.txt", "THIRD_PARTY_NOTICES.md"}
 DIRS = {"scripts", "registry", "adapters", "skills", "templates", "onboarding", "checks", "docs", "local_control", "packaging"}
 SUFFIXES = {".py", ".ps1", ".json", ".md", ".mdc", ".html", ".js", ".css", ".txt", ".png"}
 
@@ -25,7 +28,15 @@ def allowed(name):
 
 def files(root):
     result = {}
-    for path in sorted(root.rglob('*')):
+    # Never traverse unrelated trees such as Git, local build outputs or private
+    # state merely to discard their names later.
+    candidates = [root / name for name in TOP]
+    for directory in sorted(DIRS):
+        path = root / directory
+        if path.is_symlink() or (hasattr(path, 'is_junction') and path.is_junction()):
+            raise ValueError('Release sources must not traverse links')
+        if path.is_dir(): candidates.extend(path.rglob('*'))
+    for path in sorted(candidates):
         name = path.relative_to(root).as_posix()
         if allowed(name) and path.is_file():
             if path.is_symlink() or any(p.is_symlink() or (hasattr(p, 'is_junction') and p.is_junction()) for p in (path, *path.parents)):

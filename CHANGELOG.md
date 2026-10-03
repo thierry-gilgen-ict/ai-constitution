@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add portable architecture baselines with component repositories, declared compatibility, setup guidance, environment-variable names, bounded scaffold files and agent handoffs. Dashboard and CLI previews protect existing files and apply onboarding with reversible transactions.
+- Add a private constitution-library editor with search, generated-source previews, stale-edit checks, draft history, reviewed activation and conservative merging from newer controller bundles. Include the library in portable packages; existing workers need no upgrade for these controller features.
+
 - Add per-machine display-driver inventory, Windows Update display-driver checks, version-change observations, and native OS/vendor update controls. Pause the whole physical host before update handoff, retain worker maintenance across restarts, and require an explicit recheck/resume. Existing workers need the updated package; installation and reboot remain OS-confirmed actions.
 
 - Add conservative hardware-based context advice, sampled model-residency peaks, explicit remote-first/Gaming eligibility policy, durable health history and cancellation before queued inference is sent.

@@ -7,6 +7,10 @@ on:
       - 'packaging/**'
       - 'scripts/local_control.py'
       - 'scripts/package_local.py'
+      - 'scripts/constitution.py'
+      - 'scripts/architecture.py'
+      - 'scripts/releases.py'
+      - 'templates/**'
       - 'requirements-*.txt'
       - '.github/workflows/package-preview.yml'
 permissions:

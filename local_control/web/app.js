@@ -50,6 +50,7 @@ async function action(body) {
   }
 }
 function page(name) {
+  window.scrollTo({top: 0, behavior: 'instant'});
   document
     .querySelectorAll(".page")
     .forEach((e) => e.classList.toggle("active", e.id === name));
@@ -64,9 +65,12 @@ function page(name) {
       machines: "Your machines",
       connect: "Connect a project",
       setup: "Get started",
+      architectures: "Project templates",
+      constitution: "Constitution files",
     }[name];
   if (name === "models") loadInventory();
   if (name === "setup") loadSetup();
+  if (window.studioPage) window.studioPage(name);
   if (name === "machines" && !driversRequested) {
     driversRequested = true;
     action({action: "driver-check-all"});

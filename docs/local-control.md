@@ -4,6 +4,8 @@
 
 Local Control is a **preview**. The controller, dashboard and gateway use Python's standard library. Remote HTTPS workers additionally use `cryptography`. You can continue using the constitution alone without running any services.
 
+The dashboard also includes [Project templates](project-templates.md) for reusable architecture baselines and [Constitution files](constitution-studio.md) for private instruction editing. These pages work without a running model. Draft saves and project applications are explicit; visiting the pages does not activate changes.
+
 ## Start here
 
 From this checkout, with Python 3.11+ installed:

@@ -11,6 +11,10 @@ Run from the source checkout. Prefix every command below with `python scripts/co
 | `onboard --project /path/to/project` | Preserve existing instructions and add portable project guidance |
 | `onboard --project /path/to/project --pin` | Enroll a project while excluding it from ordinary synchronization |
 | `onboard --project /path/to/clone --adopt` | Verify an existing portable lock and enroll without changing project files |
+| `architecture list` | List portable project baselines from the selected checkout |
+| `architecture show --template web-product` | Inspect a baseline and its declared compatibility |
+| `architecture plan --template web-product --project /path/to/project --name my-project` | Preview onboarding, architecture and scaffold diffs |
+| `architecture apply --template web-product --project /path/to/project --name my-project --plan HASH` | Apply exactly the reviewed plan with rollback |
 | `explain --project /path/to/project --json` | Explain preference layers, routes, installed files and unverified host loading |
 | `doctor` | Check enrolled files for drift and instruction shadowing |
 | `sync --all --dry-run` | Preview updates to enrolled, unpinned targets |

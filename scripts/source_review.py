@@ -2,7 +2,10 @@
 from concurrent.futures import ThreadPoolExecutor
 import json
 import re
-from catalog import atomic_bytes, digest, fetch_public, json_bytes, utc_now
+if __package__:
+    from .catalog import atomic_bytes, digest, fetch_public, json_bytes, utc_now
+else:
+    from catalog import atomic_bytes, digest, fetch_public, json_bytes, utc_now
 
 
 def read(state):

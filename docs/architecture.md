@@ -20,6 +20,8 @@ For a relocated Cursor profile, `--cursor-dir` selects its real configuration di
 
 ## Deterministic generation
 
+`scripts/architecture.py` validates portable component snapshots and plans project baselines using the existing installer transaction. Ownership fingerprints live in private `state/architectures.json`; project snapshots contain no controller paths. `local_control/studio.py` stages private library edits, uses trusted imported render/validation functions, and exposes preview hashes for saves, activation and application. The controller serializes studio requests; workers and inference tokens have no access to this API. Preview hashes include pre-existing target fingerprints, so stale browser plans cannot silently replace newer work.
+
 `build` produces `routing.md` and native adapters from the authored core and small route registry. `check` recomputes those artifacts and fails on drift. Source URLs and evidence are retained. The large catalog never enters every agent prompt.
 
 ## Product boundaries

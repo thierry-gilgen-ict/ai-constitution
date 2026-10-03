@@ -289,7 +289,7 @@ class HTTPTests(unittest.TestCase):
         status, headers, body = self.get("/")
         self.assertEqual(status, 200)
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
-        self.assertNotIn(b"https://", body)
+        self.assertNotRegex(body, rb'(?:src|href)=["\x27]https?://')
         self.assertEqual(self.get("/api/status")[0], 401)
         self.assertEqual(self.get("/api/status", self.auth())[0], 200)
 

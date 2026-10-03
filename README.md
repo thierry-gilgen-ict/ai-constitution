@@ -15,13 +15,15 @@ Shared instructions, a refreshable model catalog, and project onboarding for **C
 
 Switching agents should not mean explaining your working style again. A new model release should not mean finding every stale model name in every project. And a shared configuration should never turn your home directory into a public repository.
 
-AI Constitution connects three jobs that are often maintained separately:
+AI Constitution connects the setup and maintenance jobs that are often kept separately:
 
 | What you need | What you get |
 | --- | --- |
 | Consistent behavior | A compact constitution, focused modules, and native client adapters |
 | Current model definitions | An offline snapshot of **225 providers and 8,371 provider-scoped models**, fetched October 2, 2026; one-command refresh |
 | Easy project setup | A copy-paste onboarding prompt and an installer that preserves existing guidance |
+| Reusable architecture | Visual baseline builder, component repositories, capability checks, scaffold previews and agent handoffs |
+| Personal instruction editing | Searchable library, private drafts, generated-file rebuilds, reviewed activation and rollback |
 | Predictable maintenance | Generated routing, checksums, drift detection, private backups, and rollback |
 | Local model support | Hardware-aware Ollama onboarding, model management, a private dashboard and GPU release with an optional companion |
 | Honest compatibility | Separate statements for files installed, instructions loaded, model access, and measured results |
@@ -54,6 +56,12 @@ python scripts/constitution.py onboard --project /path/to/project
 Then give your agent the [onboarding prompt](onboarding/project.md). It fills the project context from evidence. **Installing the template is only the first step.**
 
 For the actual xAI Grok Bot product, follow the [Bot onboarding guide](onboarding/bot.md). It uses the Bot description, shared private skills, and a bundle on the Bot's cloud computer. The local installer does not pretend to configure a remote Bot.
+
+## Your next project, already thought through
+
+Open **Project templates** in [Local Control](docs/local-control.md). Start with a web product, data dashboard or Python service. Choose repositories for authentication, charts, email and deployment, record your setup decisions, then preview the files before applying them to a project. Export the baseline to reuse or share it. [Template guide](docs/project-templates.md).
+
+Open **Constitution files** to browse the library and tailor its instructions in a private draft. Saving validates your changes and rebuilds generated routing/adapters; a separate activation preview updates enrolled projects while preserving pins and private overrides. [Editor and upgrade guide](docs/constitution-studio.md).
 
 ## New models? One command.
 

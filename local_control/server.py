@@ -14,7 +14,7 @@ from .core import ALIAS, model_name
 from .transport import connect
 
 WEB = Path(__file__).parent / "web"
-ASSETS = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
+ASSETS = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
 NODE_GET = {"/api/version", "/api/tags", "/api/ps"}
 NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions"}
 
@@ -25,6 +25,9 @@ class Server(ThreadingHTTPServer):
 
     def __init__(self, address, control, *, worker=False, advertised=None):
         self.control, self.worker = control, worker
+        if not worker:
+            from .studio import Studio
+            self.studio = Studio(control.root)
         self.slots = threading.BoundedSemaphore(32)
         super().__init__(address, Handler)
         host, port = self.server_address[:2]
@@ -195,6 +198,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply({"authenticated": True}, cookie=True)
             elif path == "/api/status" and not post:
                 self.reply(control.status())
+            elif path.startswith('/api/studio/'):
+                self.reply(self.server.studio.dispatch(path.removeprefix('/api/studio/'), body, query))
             elif path == '/api/setup' and not post:
                 self.reply(control.setup_status())
             elif path == '/api/diagnostics' and not post:

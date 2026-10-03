@@ -18,13 +18,16 @@ import subprocess
 import sys
 import uuid
 import zipfile
-from adoption import project_record
-import policy
-import releases
-import source_review
-
-from catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
-                     json_bytes, refresh, utc_now, validate_providers)
+if __package__:
+    from .adoption import project_record
+    from . import policy, releases, source_review, architecture, catalog
+    from .catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
+                          json_bytes, refresh, utc_now, validate_providers)
+else:
+    from adoption import project_record
+    import policy, releases, source_review, architecture, catalog
+    from catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
+                         json_bytes, refresh, utc_now, validate_providers)
 
 ROOT = Path(__file__).resolve().parents[1]
 BEGIN = "<!-- ai-constitution:begin -->"
@@ -115,6 +118,8 @@ def state_load(state):
 
 def validate(root):
     errors = []
+    for path in (root / 'templates/architectures').glob('*.json'):
+        architecture.validate(read_json(path))
     version = text(root / "VERSION").strip()
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         errors.append("VERSION must be a three-part numeric release")
@@ -182,6 +187,7 @@ def render(root, preferences=None):
         lines.append(f"- **{model['name']}** ({model['surface']}): {model['status']}; checked {model['verified_at']}. {model['evidence']} [Source]({source['url']}).")
     common = f"AI Constitution v{version}\n\n{core}\n\n"
     common += ("For an onboarded project, use its `.ai/shared/` bundle and `.ai/project.md`; its scoped defaults refine the global baseline. "
+               "Read `.ai/architecture.md` when present for the selected project baseline. "
                "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, or `routing.md` only when relevant. "
                "If the library is inaccessible, use this embedded core and report any task-relevant missing guidance.\n")
     bot_description = (f"Use AI Constitution v{version} from BUNDLE_ROOT. Read its constitution.md when starting substantive work, and specialized modules only as needed. "
@@ -190,6 +196,7 @@ def render(root, preferences=None):
     bot_skill = ("---\nname: ai-constitution\ndescription: Load the shared AI Constitution for a Grok Bot's project work and verify its installed version.\n---\n\n"
                  "# Load the shared constitution\n\nLocate BUNDLE_ROOT from this Bot's description. Read VERSION and constitution.md there. "
                  "If working in an onboarded project, prefer its .ai/shared bundle and .ai/project.md for scoped defaults. "
+                 "Read .ai/architecture.md when present for the selected baseline and its implementation handoff. "
                  "Read engineering.md for code work, research.md for source verification, and routing.md when selecting tools or recommending a handoff. "
                  "Report missing files precisely. Do not assume a cloud Bot can read a local Windows path. "
                  "Never claim to change the platform-managed underlying model.\n")
@@ -287,7 +294,7 @@ def adopt(state, project, dry_run=False):
         return apply()
 
 
-def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=None, planned=None, database=None):
+def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=None, planned=None, database=None, source_reference=None):
     validate(root)
     build(root, check=True)
     db = database if database is not None else state_load(state)
@@ -345,7 +352,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         if (target_root / "AGENTS.override.md").exists() and (target_root / "AGENTS.override.md").stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile the override before onboarding")
         core = preferences["instructions"]["constitution.md"].strip()
-        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, and `.ai/shared/routing.md`, loaded when relevant.\n"
+        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, and `.ai/shared/routing.md`, loaded when relevant.\n"
         add("AGENTS.md", body.encode(), block=True)
         for name in MODULES:
             add(".ai/shared/" + name, module_bytes(name))
@@ -358,12 +365,13 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         add(".ai/constitution.lock.json", json_bytes(lock))
     else:
         source = "adapters/codex/AGENTS.md" if platform == "codex" else "adapters/cursor/ai-constitution.mdc"
+        source_reference = source_reference or root
         library = target_root / ".config/ai-constitution/libraries" / platform
-        content = outputs[source] + f"\nInstalled shared library: `{library.as_posix()}`. Source checkout: `{root.as_posix()}`.\n"
+        content = outputs[source] + f"\nInstalled shared library: `{library.as_posix()}`. Source checkout: `{source_reference.as_posix()}`.\n"
         for name in MODULES:
             add(f".config/ai-constitution/libraries/{platform}/{name}", module_bytes(name))
         add(f".config/ai-constitution/libraries/{platform}/installation.json", json_bytes({
-            "schema_version": 1, "source_root": str(root), "version": version, "platform": platform,
+            "schema_version": 1, "source_root": str(source_reference), "version": version, "platform": platform,
         }))
         if platform == "codex":
             # Respect CODEX_HOME only for the actual default home, not fixture homes.
@@ -376,7 +384,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         else:
             add(".cursor/rules/ai-constitution.mdc", content.encode())
         for name in ("constitution-onboarding", "constitution-maintenance"):
-            skill = text(root / f"skills/{name}/SKILL.md") + f"\nInstalled source checkout: `{root.as_posix()}`.\n"
+            skill = text(root / f"skills/{name}/SKILL.md") + f"\nInstalled source checkout: `{source_reference.as_posix()}`.\n"
             add(f".{platform}/skills/{name}/SKILL.md", skill.encode())
     db["targets"][identity] = {"kind": "project" if project else platform, "root": str(target_root),
                                "version": version, "pinned": pin, "files": tracked}
@@ -468,7 +476,7 @@ def source_check(root, state):
     return source_review.check(root, state, state_lock)
 
 
-def upgrade(source, state, dry_run=False, payload=None):
+def upgrade(source, state, dry_run=False, payload=None, expected_plan=None):
     """Stage an immutable library and update eligible targets in one transaction."""
     import tempfile
     with tempfile.TemporaryDirectory() as folder:
@@ -481,8 +489,9 @@ def upgrade(source, state, dry_run=False, payload=None):
         validate(candidate)
         build(candidate, check=True)
         def apply():
-            identity, destination = releases.prepare(payload, state, preview=dry_run)
+            identity, destination = releases.prepare(payload, state, preview=True)
             db = state_load(state)
+            enrollment = digest(json_bytes(db))
             writes, targets = {}, []
             for target in list(db["targets"].values()):
                 if target["pinned"]:
@@ -491,7 +500,7 @@ def upgrade(source, state, dry_run=False, payload=None):
                 kwargs = {"project": Path(target["root"])} if target["kind"] == "project" else {
                     "platform": target["kind"], "home": Path(target["root"]),
                     "cursor_dir": Path(target["cursor_dir"]) if target.get("cursor_dir") else None}
-                targets.append(_install(candidate if dry_run else destination, state, **kwargs,
+                targets.append(_install(candidate, state, **kwargs, source_reference=destination,
                                         pin=target["pinned"], planned=writes, database=db))
             active = state / "active-release.json"
             previous = read_json(active).get("identity") if active.exists() else None
@@ -499,8 +508,17 @@ def upgrade(source, state, dry_run=False, payload=None):
             if previous == identity:
                 record = read_json(active)
             writes[active] = json_bytes(record)
+            signature = {}
+            for path, after in writes.items():
+                no_links(path)
+                signature[str(path)] = [digest(path.read_bytes()) if path.exists() else None, digest(after)]
+            plan = digest(json_bytes({'release': identity, 'enrollment': enrollment, 'writes': signature}))
+            if expected_plan is not None and expected_plan != plan:
+                raise ValueError('Library or installed targets changed since preview. Preview activation again.')
+            if not dry_run:
+                releases.prepare(payload, state)
             result = transaction(state, writes, dry_run=dry_run)
-            return {**result, "release": identity, "targets": targets, "source_checkout_changed": False,
+            return {**result, "plan": plan, "release": identity, "targets": targets, "source_checkout_changed": False,
                     "scope": "instruction library; invoke the installed scripts for this release's CLI features"}
         if dry_run:
             return apply()
@@ -511,7 +529,7 @@ def upgrade(source, state, dry_run=False, payload=None):
 def explain(root, state, project=None):
     selected = policy.resolve(root, state, project)
     return {"release": text(root / "VERSION").strip(),
-            "catalog": str(__import__('catalog').catalog_path(root, state)),
+            "catalog": str(catalog.catalog_path(root, state)),
             "effective_sha256": selected["effective_sha256"], "layers": selected["layer_hashes"],
             "route_sources": selected["provenance"], "routes": selected["routes"]["routes"],
             "installation": doctor(root, state, project),
@@ -644,10 +662,16 @@ def main(argv=None):
     local.add_argument("--api-key-env")
     export = sub.add_parser("export")
     export.add_argument("--output", type=Path, required=True)
+    architectures = sub.add_parser('architecture', help='List, inspect or apply portable project baselines')
+    architectures.add_argument('operation', choices=['list','show','plan','apply'])
+    architectures.add_argument('--template', help='Bundled template ID or path to an exported JSON template')
+    architectures.add_argument('--project', type=Path)
+    architectures.add_argument('--name', help='Project slug used in scaffold files')
+    architectures.add_argument('--plan', help='Exact preview hash required for apply')
     args = parser.parse_args(argv)
     root = args.root.absolute()
     state = (args.state_dir or Path(os.environ.get("AI_CONSTITUTION_STATE_DIR", str(Path.home() / ".config/ai-constitution/state")))).absolute()
-    if args.command not in {"build", "check", "scan", "release", "upgrade"} and not getattr(args, "source_checkout", False):
+    if args.command not in {"build", "check", "scan", "release", "upgrade", "architecture"} and not getattr(args, "source_checkout", False):
         root = releases.selected(state, root)
     if args.command not in {"build", "check", "scan", "models", "providers", "route", "export"}:
         no_links(state)
@@ -658,6 +682,23 @@ def main(argv=None):
         validate(root)
         build(root, check=True)
         result = {"status": "passed", "version": text(root / "VERSION").strip()}
+    elif args.command == 'architecture':
+        directory = root / 'templates/architectures'
+        if args.operation == 'list':
+            result = [architecture.validate(read_json(p)) for p in sorted(directory.glob('*.json'))]
+        else:
+            if not args.template:
+                raise ValueError('Choose --template ID or a JSON file')
+            path = Path(args.template) if args.template.endswith('.json') else directory / (architecture.identifier(args.template) + '.json')
+            value = architecture.validate(read_json(path))
+            if args.operation == 'show':
+                result = {'template': value, 'review': architecture.review(value)}
+            else:
+                if not args.project or not args.name:
+                    raise ValueError('Choose --project and --name')
+                kit = sys.modules[__name__]
+                result = (architecture.plan(kit, root, state, args.project, value, args.name)[0] if args.operation == 'plan' else
+                          architecture.apply(kit, root, state, args.project, value, args.name, args.plan))
     elif args.command == "update":
         with state_lock(state):
             result = refresh(root, state, preview=args.dry_run, allow_removals=args.allow_removals, source_checkout=args.source_checkout)
