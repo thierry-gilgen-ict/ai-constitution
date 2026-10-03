@@ -30,7 +30,7 @@ File verification is deterministic. Model compliance, client instruction discove
 
 ## Workspace services
 
-The optional controller keeps its state separately from the core enrollment database. `services.py` schedules project reconciliation, enabled account collection and due configuration backups as visible jobs. `synchronization.py` applies shared-library/template changes through per-project transactions, respecting pins, pauses and local drift. Worker pairing grants inference/administration access, not arbitrary access to remote project files.
+The optional controller keeps its state separately from the core enrollment database. `services.py` schedules project reconciliation, enabled account collection and due configuration backups with durable failures; no-change maintenance is kept out of user Activity. `synchronization.py` applies shared-library/template changes through per-project transactions, respecting pins, pauses and local drift. Worker pairing grants inference/administration access, not arbitrary access to remote project files.
 
 `monitoring.py` stores bounded subscription observations and reads only allowlisted Codex account methods. `project_vault.py` manages explicit private configuration mappings, verified snapshots and restore into new directories. `locations.py` plans verified copies and stopped-service relocation. `distribution.py` packages reviewed application files, while `project_capture.py` proposes architecture components and variable names without copying secret values or executable setup content. See [the control center guide](control-center.md) for permissions, schedules and operational limits.
 
@@ -42,3 +42,5 @@ The optional controller keeps its state separately from the core enrollment data
 - Core `local` discovery lists metadata. The optional Local Control companion separately performs explicitly requested model downloads, inference probes and gateway routing; see [Local Control](local-control.md).
 - Route recommendations are provisional and small; the broad catalog has community provenance.
 - Core refreshes and installations are explicit. The optional controller runs background project synchronization and opt-in monitoring/backups while it is running; it does not silently replace its executable or update model weights.
+
+The 0.3 companion separates project discovery (`workspace.py`), application updates (`updates.py`), optional encrypted repositories (`encrypted_backup.py`), OS schedules (`schedules.py`), API cost connectors (`connectors.py`), catalog review (`model_inbox.py`) and measured evidence (`insights.py`). Release staging never mutates the Git checkout. `routing.py` selects an eligible route before dispatch; streaming remains single-attempt under the original lease. Private-state ACLs and a shared Python 3.11-compatible reparse-point guard protect filesystem boundaries.

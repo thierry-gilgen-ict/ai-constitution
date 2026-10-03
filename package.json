@@ -1,0 +1,6 @@
+{
+  "name": "ai-constitution-browser-tests",
+  "private": true,
+  "scripts": {"test:browser": "playwright test", "demo": "playwright test --project=chromium --grep demonstration"},
+  "devDependencies": {"@playwright/test": "1.63.0", "@axe-core/playwright": "4.13.0"}
+}

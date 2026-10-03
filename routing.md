@@ -1,6 +1,6 @@
 # Routing
 
-Generated for v0.2.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
+Generated for v0.3.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
 
 These are provisional starting points, not measured rankings. Respect an explicit model choice. Confirm account access and required tools before selecting a model. Reasoning levels and model identifiers can differ between clients.
 

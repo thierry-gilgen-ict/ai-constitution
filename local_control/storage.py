@@ -5,6 +5,8 @@ from pathlib import Path
 import secrets
 import time
 from contextlib import contextmanager
+from scripts.paths import no_links
+from .permissions import directory, protect
 
 
 def private_root():
@@ -30,10 +32,8 @@ def wait_lock(path, timeout=10):
 
 def atomic(path, value):
     path = Path(path)
-    for parent in (path, *path.parents):
-        if parent.is_symlink() or (hasattr(parent, "is_junction") and parent.is_junction()):
-            raise ValueError("Private state must not traverse symbolic links or junctions")
-    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    no_links(path)
+    directory(path.parent)
     temp = path.with_name(path.name + "." + secrets.token_hex(6) + ".tmp")
     try:
         with open(temp, "x", encoding="utf-8") as stream:
@@ -50,7 +50,9 @@ def atomic(path, value):
 class ProcessLock:
     """OS releases ownership after a crash; no stale PID deletion is needed."""
     def __init__(self, path):
-        path.parent.mkdir(parents=True, exist_ok=True)
+        no_links(path)
+        directory(path.parent)
+        if path.exists(): protect(path)
         self.file = open(path, "a+b")
         self.file.write(b"\0")
         self.file.flush()
@@ -81,6 +83,7 @@ def load(root, *, migrate=False):
 def _load(root, *, migrate=False):
     path = root / "config.json"
     if path.exists():
+        no_links(path); protect(path)
         value = json.loads(path.read_text(encoding="utf-8"))
         if value.get("schema") not in (1, 2):
             raise ValueError("Unsupported Local Control state version; preserve it before upgrading")

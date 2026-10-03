@@ -105,7 +105,10 @@ def main():
     serve = sub.add_parser("serve", help="Run the loopback dashboard and inference gateway")
     serve.add_argument("--port", type=int, default=8766)
     serve.add_argument("--open", action="store_true")
+    serve.add_argument("--no-background-services", action="store_true", help="Run the dashboard without periodic maintenance, for isolated acceptance testing")
     sub.add_parser("open", help="Open the existing dashboard using a private login link")
+    updater = sub.add_parser('finish-update', help=argparse.SUPPRESS)
+    updater.add_argument('--ticket', required=True)
     sub.add_parser('status', help='Show route, sessions and durable operation status')
     packages = sub.add_parser('packages', help='Register reviewed worker packages for dashboard downloads')
     packages.add_argument('action', choices=['add','list','source'])
@@ -118,6 +121,7 @@ def main():
     relocate.add_argument('--plan', help='Apply the fingerprint returned by a fresh stopped-service preview')
     backup = sub.add_parser('backup', help='Back up explicitly registered project configuration folders')
     backup.add_argument('--plan', help='Apply the fingerprint returned by the backup preview')
+    backup.add_argument('--due', action='store_true', help='Run a due scheduled backup, with durable retry and locking')
     start = sub.add_parser('start', help='Start a hidden, per-user controller if none owns its state')
     start.add_argument('--port', type=int, default=8766)
     start.add_argument('--open', action='store_true')
@@ -126,6 +130,8 @@ def main():
     sub.add_parser('tray', help='Show optional Windows tray/macOS menu-bar controls for the running service')
     startup = sub.add_parser('autostart', help='Opt in or out of per-user login startup')
     startup.add_argument('action', choices=['enable','disable'])
+    startup.add_argument('--worker-address', help='Opt in to worker autostart on this private IPv4 address')
+    startup.add_argument('--port', type=int, default=8767)
     node = sub.add_parser("node", help="Run a paired HTTPS worker on an explicit private-network address")
     node.add_argument("--address", required=True)
     node.add_argument("--port", type=int, default=8767)
@@ -144,6 +150,13 @@ def main():
     cursor.add_argument("--project", type=Path, required=True)
     args = parser.parse_args(sys.argv[1:] or ['start', '--open'])
     root = locations.resolve_root(args.state_dir)
+    if args.command == 'finish-update':
+        from .updates import finish
+        finish(root, args.ticket); return 0
+    if args.command in ('start', 'serve', 'node') and not os.environ.pop('AI_CONSTITUTION_UPDATE_BOOT', None):
+        from .updates import redirect
+        forwarded = redirect(root, sys.argv[1:] or ['start', '--open'])
+        if forwarded is not None: return forwarded
     if args.command == 'relocate':
         result = locations.relocate(root, args.destination, args.plan) if args.plan else locations.relocation_plan(root, args.destination)[0]
         print(json.dumps(result, indent=2)); return 0
@@ -156,7 +169,15 @@ def main():
             'codex_enabled': args.action == 'enable', 'share_with_controllers': args.action == 'enable' and args.share})
         print(json.dumps({'status':'refreshed'} if args.action == 'refresh' else result)); return 0
     if args.command == 'backup':
-        print(json.dumps(project_vault.backup(root, args.plan) if args.plan else project_vault.plan(root), indent=2)); return 0
+        if args.due:
+            from .storage import wait_lock
+            with wait_lock(root / 'scheduled-backup', timeout=1):
+                result = project_vault.scheduled(root) if project_vault.claim_due(root) else {'status': 'not-due'}
+        else:
+            from .encrypted_backup import settings, backup as encrypted
+            run = encrypted if settings(root)['enabled'] else project_vault.backup
+            result = run(root, args.plan) if args.plan else project_vault.plan(root)
+        print(json.dumps(result, indent=2)); return 0
     if args.command == "setup":
         results = {}
         if args.upgrade_ollama and (root / 'runtime.json').exists():
@@ -188,7 +209,7 @@ def main():
         return 0
     if args.command == 'autostart':
         from local_control.desktop import startup
-        print(json.dumps(startup(root, args.action == 'enable'), indent=2))
+        print(json.dumps(startup(root, args.action == 'enable', address=args.worker_address, port=args.port), indent=2))
         return 0
     if args.command == 'status':
         print(json.dumps(request(endpoint, '/api/status', timeout=5), indent=2))
@@ -285,6 +306,7 @@ def main():
     if "local-cpu" in control.config["nodes"]:
         cpu_runtime(root)
     server = Server(address, control, worker=args.command == "node", advertised=url)
+    server.no_background_services = getattr(args, "no_background_services", False)
     if args.command == "node":
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.minimum_version = ssl.TLSVersion.TLSv1_2
@@ -292,9 +314,10 @@ def main():
         server.socket = context.wrap_socket(server.socket, server_side=True, do_handshake_on_connect=False)
     else:
         atomic(runtime_path, {"url": url, "pid": os.getpid(), 'process': processes.identity(os.getpid())})
-        from .services import Services
-        server.services = Services(control)
-        server.services.start()
+        if not args.no_background_services:
+            from .services import Services
+            server.services = Services(control)
+            server.services.start()
         if args.open:
             webbrowser.open(url + "/#" + config["token"])
     print("Local Control listening at " + url + ". Use the open command for authenticated dashboard access.", flush=True)

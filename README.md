@@ -23,15 +23,23 @@ AI Constitution connects the setup and maintenance jobs that are often kept sepa
 | Consistent behavior | A compact constitution, focused modules, and native client adapters |
 | Current model definitions | An offline snapshot of **225 providers and 8,371 provider-scoped models**, fetched October 2, 2026; one-command refresh |
 | Easy project setup | A copy-paste onboarding prompt and an installer that preserves existing guidance |
-| Reusable architecture | Visual baseline builder, component repositories, capability checks, scaffold previews and agent handoffs |
+| Reusable architecture | Versioned baselines, immutable inheritance, dependency constraints, scaffold previews and agent handoffs |
 | Personal instruction editing | Searchable library, private drafts, generated-file rebuilds, reviewed activation and rollback |
 | Predictable maintenance | Generated routing, checksums, drift detection, private backups, and rollback |
 | Local model support | Hardware-aware Ollama onboarding, model management, a private dashboard and GPU release with an optional companion |
-| Workspace visibility | Application/account labels, supported Codex usage readings, worker health and integration logs |
-| Private configuration | Central project folders, configurable storage, verified backups and opt-in backup schedules |
+| Workspace visibility | Project/account overview, supported usage/cost collectors, worker health and actionable failures |
+| Private configuration | Central project folders, optional encrypted restic backups, restore drills and per-user OS schedules |
 | Honest compatibility | Separate statements for files installed, instructions loaded, model access, and measured results |
 
 Catalog counts describe the bundled [models.dev](https://models.dev) snapshot, not independently verified access to every model. Aliases and provider-specific offerings are counted separately. [Coverage and provenance](docs/models.md).
+
+## A control center that keeps up
+
+**[What’s new in 0.3](docs/workspace-upgrades.md)** · **[Try the synthetic demo](docs/demonstration.md)**
+
+Bring existing repositories through a conflict-aware onboarding wizard. Follow or pin architecture revisions. Keep private configuration encrypted with optional restic backups. Review new model definitions and measured local performance. When GitHub has a new release, the dashboard shows **Update available**, stages a verified package and guards the restart against active work.
+
+[Encrypted backups](docs/encrypted-backups.md) · [Worker updates](docs/workspace-upgrades.md#update-available) · [Compatibility and acceptance](docs/compatibility-matrix.md)
 
 ## Five-minute start
 
@@ -185,7 +193,7 @@ The source repository can live anywhere, including a development drive. Runtime 
 
 ## Status
 
-**v0.2.0** brings the shared toolkit and workspace control center together. Automated checks cover installation, catalogs, templates, private configuration, synchronization and recovery on Windows, macOS and Linux. Each live client still needs an instruction-loading check. Initial route recommendations are provisional, not a published performance benchmark.
+**v0.3.0** adds reviewed application updates, workspace onboarding, template revisions, encrypted backups and recovery controls to the shared toolkit and workspace control center. Automated checks cover installation, catalogs, templates, private configuration, synchronization and recovery on Windows, macOS and Linux. Each live client still needs an instruction-loading check. Initial route recommendations are provisional, not a published performance benchmark.
 
 The optional **Local Control preview** adds a separately operated inference service. Its Windows reference setup has live Codex and GPU-to-CPU handoff checks; the [review and roadmap](docs/review-and-roadmap.md) distinguishes current evidence from work still needed.
 

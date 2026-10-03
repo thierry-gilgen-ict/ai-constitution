@@ -50,3 +50,7 @@ Pass a path ending in `.json` instead of a bundled identifier to use an exported
 The versioned JSON format is illustrated by the [web baseline](../templates/architectures/web-product.json). Components are complete snapshots, so importing a template does not silently substitute newer component definitions. Unknown fields, unsafe paths and known credential patterns are rejected. Secret detection is a guardrail, not a complete guarantee: review exports before sharing.
 
 See [the file editor](constitution-studio.md) for editing the library and [project onboarding](../onboarding/project.md) for recording project context.
+
+## Revision policies and inheritance
+
+Version 0.3 adds saved revision history, follow-latest or exact-revision pins, embedded immutable parents and numeric component constraints. Unsaved templates are pinned automatically instead of reverting on the next synchronization. Applying any revision previews project changes and protects local edits. See [the complete workflow](workspace-upgrades.md#templates-that-evolve-safely).

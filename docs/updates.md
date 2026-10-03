@@ -103,4 +103,8 @@ Version 0.2.0 keeps existing enrollment and private configuration mappings. Conf
 
 ## Optional background work
 
-The installed onboarding and maintenance skills work from Codex or Cursor. A manual GitHub Actions catalog-refresh workflow produces a reviewable artifact. Installing the core enables no scheduler or paid evaluation. The separately started Local Control companion reconciles enrolled projects and runs enabled account collection and configuration-backup schedules. Its work stops when the controller is stopped; schedules do not update models or charge for inference.
+The installed onboarding and maintenance skills work from Codex or Cursor. A manual GitHub Actions catalog-refresh workflow produces a reviewable artifact. Installing the core enables no scheduler or paid evaluation. The separately started Local Control companion reconciles enrolled projects and runs enabled account collection and configuration-backup schedules. Its normal work stops with the controller; explicitly installed per-user OS backup tasks can run separately. Schedules do not charge for inference.
+
+## Application and worker updates in 0.3
+
+The dashboard now provides an **Update available** notification, public release notes, verified staging, guarded restart and retained application rollback. The instruction-library updater above remains separate. See [the application update flow](workspace-upgrades.md#update-available), including idle-client checks, source environment requirements and worker maintenance.

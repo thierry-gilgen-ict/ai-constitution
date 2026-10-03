@@ -2,7 +2,7 @@
   --paper: #f5f3ed;
   --panel: #fffefa;
   --ink: #26332d;
-  --muted: #788075;
+  --muted: #646e61;
   --line: #e0e2d8;
   --green: #617255;
   --soft: #e7ebdf;
@@ -959,3 +959,14 @@ summary { cursor:pointer; line-height:1.6; }
 .history-row strong { font-size:12px; }
 @media(max-width:1150px) { .template-gallery { grid-template-columns:1fr; } .template-card { display:block; } .file-workspace { grid-template-columns:220px minmax(0,1fr); } }
 @media(max-width:760px) { .studio-intro { flex-direction:column; align-items:flex-start; gap:12px; } .studio-fields,.project-fields,.file-workspace { grid-template-columns:1fr; } #library-files { max-height:220px; } .component-item { align-items:flex-start; flex-direction:column; } .studio-workbench .section-title { flex-wrap:wrap; } .studio-modal { padding:22px; } .studio-modal .dialog-actions { bottom:-22px; } .file-panel { padding:18px; } .library-editor { min-height:370px; } }
+.update-badge { background:var(--soft); border:1px solid #526c45; color:var(--ink); font-weight:600; }
+.project-facts { display:grid; grid-template-columns:minmax(100px,1fr) 3fr; gap:10px 18px; font-size:12px; margin:22px 0; }
+.project-facts dt { color:var(--muted); } .project-facts dd { margin:0; overflow-wrap:anywhere; }
+.notification-card,.discovery-row { padding:18px 0; border-bottom:1px solid var(--line); }
+.operation-strip { position:fixed; bottom:20px; right:24px; width:min(420px,calc(100vw - 48px)); background:var(--panel); border:1px solid var(--line); padding:18px 22px; border-radius:12px; box-shadow:0 8px 30px #25332522; z-index:20; }
+.operation-strip .section-title { margin:0; } .operation-strip p { margin:8px 0; font-size:12px; }
+.operation-strip progress { width:100%; accent-color:#526c45; }
+.release-notes { white-space:pre-wrap; font:inherit; font-size:13px; max-height:300px; overflow:auto; }
+#model-diff-list { max-height:480px; overflow:auto; margin:16px 0; }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible { outline:3px solid #526c45; outline-offset:3px; }
+@media(max-width:760px) { .topbar { flex-wrap:wrap; gap:10px; } .project-facts { grid-template-columns:1fr; gap:5px; } .project-facts dd { margin-bottom:10px; } }

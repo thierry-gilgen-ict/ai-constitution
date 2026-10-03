@@ -11,6 +11,8 @@ from scripts import constitution as kit
 from scripts.catalog import digest, json_bytes
 from . import locations
 from .storage import atomic
+from scripts.paths import is_link
+from .permissions import protect
 
 
 def read(root):
@@ -33,12 +35,14 @@ def separate(a, b):
 def validate(root, value):
     base = locations.destination(value['config_root'])
     backup = locations.destination(value['backup_root'])
+    value['config_root'], value['backup_root'] = str(base), str(backup)
     if not separate(base, backup) or not separate(Path(root), backup):
         raise ValueError('Backups must be outside the configuration root and Local Control state')
     paths = []
     for identity, entry in value['projects'].items():
         slug(identity)
         path = locations.destination(entry['folder'])
+        entry['folder'] = str(path)
         if not path.is_relative_to(base) or path == base:
             raise ValueError('Each project needs its own folder under the private configuration root')
         if not separate(path, Path(root)) or any(not separate(path, old) for old in paths):
@@ -83,7 +87,7 @@ def overview(root):
         children = []; warnings.append('The configuration root is unavailable. Choose an accessible private directory below.')
     for path in children:
         try:
-            if path.is_symlink() or getattr(path, 'is_junction', lambda: False)(): continue
+            if is_link(path): continue
             if path.is_dir() and separate(path, Path(root)): folders.append({'name': path.name, 'path': str(path)})
         except OSError: continue
     snapshots = []
@@ -101,9 +105,11 @@ def overview(root):
                 snapshots.append({'id': path.name, 'created': record['created'], 'projects': record['projects'],
                                   'files': len(record['files']), 'bytes': record['bytes']})
         except (OSError, ValueError, KeyError): continue
+    from .encrypted_backup import settings
+    encrypted = settings(root)['enabled']
     return {**value, 'available_folders': folders, 'snapshots': snapshots, 'warnings': warnings,
-            'next_due': (value['last_attempt'] + value['schedule']['hours'] * 3600 if value['last_attempt'] else time.time()) if value['schedule']['enabled'] else None,
-            'note': 'Backups contain secrets and are not encrypted by this application. Choose a private, encrypted drive. Originals and snapshots are retained until you remove them yourself. Schedules run while Local Control is running and catch up after restart.'}
+            'next_due': (value.get('pending_until') or value.get('retry_after') or ((value.get('last_success') or 0) + value['schedule']['hours'] * 3600)) if value['schedule']['enabled'] else None,
+            'note': ('New backups use the configured encrypted restic repository. Existing local snapshots remain available below. ' if encrypted else 'Local snapshots contain secrets; choose private encrypted storage or enable restic below. ') + 'Schedules run in Local Control or through an optional OS task. Originals are preserved; retention requires review.'}
 
 
 def plan(root):
@@ -118,29 +124,21 @@ def plan(root):
         total += sum(v[0] for v in inventory.values())
         if total > 5 * 1024**3: raise ValueError('Configuration backup exceeds 5 GiB; use a dedicated backup tool for large artifacts')
         inventories[identity] = inventory
-    if locations.space(value['backup_root'])['free_bytes'] < total + 16 * 1024**2: raise ValueError('Not enough backup space')
-    return {'plan': digest(json_bytes({'settings': value, 'files': inventories})), 'projects': list(value['projects']),
-            'files': sum(len(v) for v in inventories.values()), 'bytes': total, 'destination': value['backup_root']}
-
-
-def protect(path):
-    """Snapshots inherit only the current Windows user's access; POSIX uses 0700."""
-    if os.name == 'nt':
-        import subprocess
-        import csv
-        user = subprocess.run(['whoami', '/user', '/fo', 'csv', '/nh'], capture_output=True, text=True, check=True, timeout=10)
-        sid = next(csv.reader(user.stdout.splitlines()))[1]
-        if not re.fullmatch(r'S-1-[0-9-]+', sid): raise ValueError('Cannot identify private backup owner')
-        subprocess.run(['icacls', str(path), '/inheritance:r', '/grant:r', '*' + sid + ':(OI)(CI)F'],
-                       capture_output=True, check=True, timeout=10, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
-    else: path.chmod(0o700)
+    from .encrypted_backup import settings
+    encryption = settings(root)
+    backend = encryption if encryption['enabled'] else {'enabled': False}
+    destination = encryption['repository'] if encryption['enabled'] else value['backup_root']
+    if not encryption['enabled'] and locations.space(destination)['free_bytes'] < total + 16 * 1024**2: raise ValueError('Not enough backup space')
+    return {'plan': digest(json_bytes({'settings': value, 'files': inventories, 'backend': backend})), 'backend': 'restic' if encryption['enabled'] else 'local', 'projects': list(value['projects']),
+            'files': sum(len(v) for v in inventories.values()), 'bytes': total, 'destination': destination}
 
 
 def backup(root, expected=None, progress=lambda _: None):
     with kit.state_lock(Path(root) / 'vault-operations'):
         preview = plan(root)
+        if preview['backend'] != 'local': raise ValueError('Backup backend changed; preview again')
         if expected is not None and expected != preview['plan']: raise ValueError('Configuration files changed. Preview backup again.')
-        value = read(root); parent = Path(value['backup_root'])
+        value = validate(root, read(root)); parent = Path(value['backup_root'])
         parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         identity = 'snapshot-' + dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '-' + uuid.uuid4().hex[:8]
         final = parent / identity
@@ -160,6 +158,7 @@ def backup(root, expected=None, progress=lambda _: None):
             if staging.parent != parent.resolve() or final.exists(): raise ValueError('Backup destination changed')
             staging.rename(final)
         value['last_success'] = time.time(); value['last_attempt'] = value['last_success']; value['last_error'] = None
+        value.update(schedule_status='succeeded', pending_until=None, retry_after=None, schedule_failures=0)
         atomic(Path(root) / 'project-vault.json', value)
         return {'status': 'verified', 'snapshot': identity, 'files': len(files), 'bytes': preview['bytes']}
 
@@ -167,7 +166,7 @@ def backup(root, expected=None, progress=lambda _: None):
 def restore_plan(root, identity, project, destination):
     if not isinstance(identity, str) or not re.fullmatch(r'snapshot-\d{8}T\d{6}Z-[a-f0-9]{8}', identity): raise ValueError('Choose a listed snapshot')
     slug(project)
-    source = Path(read(root)['backup_root']) / identity; kit.no_links(source)
+    source = locations.destination(read(root)['backup_root']) / identity; kit.no_links(source)
     kit.no_links(source / 'manifest.json')
     document = kit.read_json(source / 'manifest.json')
     if document.get('schema') != 1 or project not in document['projects']: raise ValueError('Project is absent from this snapshot')
@@ -191,25 +190,47 @@ def restore(root, identity, project, target, expected, progress=lambda _: None):
         preview = restore_plan(root, identity, project, target)
         if preview['plan'] != expected: raise ValueError('Restore source changed. Preview again.')
         # Parent exists only for the selected new destination; private permissions follow below.
-        result = locations.copy_verified(Path(preview['source']), Path(target), preview['fingerprint'], progress=progress, prepare=protect)
+        result = locations.copy_verified(Path(preview['source']), Path(preview['destination']), preview['fingerprint'], progress=progress, prepare=protect)
         return {**result, 'status': 'restored', 'note': 'Verified restoration is ready. Update the project mapping explicitly when you want to use it.'}
 
 
 def scheduled(root, progress=lambda _: None):
-    try: return backup(root, progress=progress)
+    schedule_state(root, 'started')
+    try:
+        from . import encrypted_backup
+        return (encrypted_backup.backup if encrypted_backup.settings(root)['enabled'] else backup)(root, progress=progress)
     except Exception:
-        with kit.state_lock(Path(root) / 'vault-operations'):
-            value = read(root); value['last_error'] = 'Scheduled backup failed; check selected folders, permissions and disk space. Retry from the backup page.'
-            atomic(Path(root) / 'project-vault.json', value)
+        schedule_state(root, 'failed')
         raise
+
+
+def schedule_state(root, status, now=None):
+    now = time.time() if now is None else now
+    with kit.state_lock(Path(root) / 'vault-operations'):
+        value = read(root)
+        value['schedule_status'] = status
+        value['pending_until'] = None
+        if status == 'started':
+            value['last_attempt'] = now
+            value['pending_until'] = now + 7200
+        elif status in ('rejected', 'failed'):
+            failures = min(value.get('schedule_failures', 0) + 1, 7)
+            value.update(schedule_failures=failures, retry_after=now + min(3600, 60 * 2**(failures-1)),
+                last_error='Backup could not start or finish. Check Activity and backup settings. An automatic retry is scheduled.')
+        atomic(Path(root) / 'project-vault.json', value)
 
 
 def claim_due(root, now=None):
     now = time.time() if now is None else now
+    # Read a durable lease before contending with a long-running backup lock.
+    if now < (read(root).get('pending_until') or 0): return False
     with kit.state_lock(Path(root) / 'vault-operations'):
         value = read(root)
         if not value['schedule']['enabled'] or not value['projects']: return False
-        if now - (value['last_attempt'] or 0) < value['schedule']['hours'] * 3600: return False
-        value['last_attempt'] = now
+        if now < (value.get('pending_until') or 0) or now < (value.get('retry_after') or 0): return False
+        if now - (value.get('last_success') or 0) < value['schedule']['hours'] * 3600: return False
+        # Durable, short reservation. A rejected queue or interrupted process never
+        # advances the backup interval. A stale reservation recovers after 5 minutes.
+        value.update(pending_until=now + 300, schedule_status='pending')
         atomic(Path(root) / 'project-vault.json', value)
         return True

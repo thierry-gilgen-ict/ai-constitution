@@ -19,6 +19,11 @@ import sys
 import uuid
 import zipfile
 if __package__:
+    from .paths import is_link
+else:
+    from paths import is_link
+
+if __package__:
     from .adoption import project_record
     from . import policy, releases, source_review, architecture, catalog
     from .catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
@@ -71,7 +76,7 @@ def text(path):
 
 def no_links(path):
     for part in (path, *path.parents):
-        if part.is_symlink() or (hasattr(part, "is_junction") and part.is_junction()):
+        if is_link(part):
             raise ValueError("Refusing to write through a symbolic link or junction")
 
 

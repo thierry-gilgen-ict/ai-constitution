@@ -15,7 +15,7 @@ def bounded(path):
     return path.read_text(encoding='utf-8-sig')
 
 
-def capture(studio, root, body):
+def capture(studio, root, body, *, nested=False):
     project = Path(body.get('project', ''))
     if not project.is_absolute() or not project.is_dir(): raise ValueError('Choose an existing absolute project directory')
     kit.no_links(project)
@@ -56,6 +56,23 @@ def capture(studio, root, body):
             match = re.match(r'^\s*(?:export\s+)?([A-Z][A-Z0-9_]{0,79})\s*=', line)
             if match: env.add(match[1])
     if len(env) > 40: raise ValueError('More than 40 environment keys found; split this baseline into smaller components')
+    if not nested:
+        scopes = []
+        for directory in ('apps', 'packages', 'services'):
+            parent = project / directory; kit.no_links(parent)
+            if parent.is_dir():
+                for child in sorted(parent.iterdir()):
+                    kit.no_links(child)
+                    if child.is_dir(): scopes.append(child)
+        if len(scopes) > 50: raise ValueError('More than 50 workspace packages; capture a smaller project scope')
+        for child in scopes:
+            result = capture(studio, root, {**body, 'project': str(child), 'configuration': None}, nested=True)
+            for component in result['template']['components']:
+                if component['id'] == 'project-config':
+                    env.update(v['name'] for v in component.get('env', []))
+                else: found.setdefault(component['id'], component)
+            evidence.extend({**v, 'file': child.relative_to(project).as_posix() + '/' + v['file']} for v in result['evidence'])
+        if len(env) > 40: raise ValueError('More than 40 environment keys across workspaces; split the baseline')
     for component in found.values():
         # Detection shows presence, not compatibility; do not infer deployment credentials or pins.
         component['reference'] = ''

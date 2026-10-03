@@ -111,7 +111,8 @@ def cpu_runtime(root, source_model=None):
     environment = dict(os.environ, OLLAMA_HOST="127.0.0.1:11435", OLLAMA_NUM_PARALLEL="1", OLLAMA_MODELS=model_store,
                        OLLAMA_MAX_LOADED_MODELS="1", OLLAMA_CONTEXT_LENGTH="65536", OLLAMA_NO_CLOUD="1",
                        CUDA_VISIBLE_DEVICES="-1", ROCR_VISIBLE_DEVICES="-1", GGML_VK_VISIBLE_DEVICES="-1")
-    root.mkdir(parents=True, exist_ok=True)
+    from .permissions import directory
+    directory(root)
     with open(root / "cpu-runtime.log", "ab") as log:
         child = subprocess.Popen([binary, "serve"], env=environment, stdout=log, stderr=log,
                                  creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
@@ -145,7 +146,8 @@ def certificate(root, address):
         raise ValueError("Remote worker TLS needs the optional dependency: python -m pip install -r requirements-local-node.txt") from None
     ipaddress.ip_address(address)
     cert_path, key_path = root / "node-cert.pem", root / "node-key.pem"
-    root.mkdir(parents=True, exist_ok=True)
+    from .permissions import directory
+    directory(root)
     if not cert_path.exists() and not key_path.exists():
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "AI Constitution private node")])
@@ -159,5 +161,7 @@ def certificate(root, address):
         if os.name != "nt":
             key_path.chmod(0o600)
         cert_path.write_bytes(cert.public_bytes(serialization.Encoding.PEM))
+    from .permissions import protect
+    protect(key_path)
     cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
     return cert_path, key_path, cert.fingerprint(hashes.SHA256()).hex()

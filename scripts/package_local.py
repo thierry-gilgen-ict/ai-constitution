@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build an unsigned preview on its target OS, in an isolated build environment."""
+"""Build a portable preview on its target OS, in an isolated build environment."""
 import argparse
 import hashlib
 import importlib.metadata
@@ -43,14 +43,16 @@ def main():
     command+=[str(ROOT/'packaging/entrypoint.py')]
     subprocess.run(command,cwd=ROOT,check=True)
     executable=output/'app/ai-constitution-local'/('ai-constitution-local.exe' if platform.system()=='Windows' else 'ai-constitution-local')
+    from sign_package import sign, notarize
+    signing = sign(output/'app', executable)
     smoke = subprocess.run([str(executable),'--help'],capture_output=True,text=True)
     if smoke.returncode:
         raise RuntimeError('Packaged entry point failed: ' + smoke.stderr[-4000:])
     from smoke_local_package import smoke as check_package
     smoke_result = check_package(executable)
     checks={p.relative_to(output/'app').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in (output/'app').rglob('*') if p.is_file()}
-    (output/'manifest.json').write_text(json.dumps({'schema':1,'platform':platform.system(),'architecture':platform.machine(),
-        'signing':'unsigned preview; no publisher identity certification','files':checks},indent=2),encoding='utf-8')
+    (output/'manifest.json').write_text(json.dumps({'schema':1,'version':(ROOT/'VERSION').read_text().strip(),'platform':platform.system(),'architecture':platform.machine(),
+        'signing':signing,'files':checks},indent=2),encoding='utf-8')
     archive = output / ('ai-constitution-worker-' + platform.system().lower() + '-' + platform.machine().lower() + '.zip')
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:
         for directory in ('app','licenses'):
@@ -58,9 +60,13 @@ def main():
                 if path.is_file(): bundle.write(path, path.relative_to(output).as_posix())
         for name in ('manifest.json','dependencies.json'): bundle.write(output / name, name)
         for name in ('LICENSE','THIRD_PARTY_NOTICES.md'): bundle.write(ROOT / name, name)
-        bundle.writestr('README.txt', 'AI Constitution portable worker. Unsigned preview. Extract the complete archive.\nSetup and upgrade instructions are in the controller dashboard: Set up a worker.\nKeep private worker state outside this package. Never delete it during upgrades.\n')
+        bundle.writestr('README.txt', 'AI Constitution portable worker preview. See manifest.json for publisher signing status. Extract the complete archive.\nSetup and upgrade instructions are in the controller dashboard: Set up a worker.\nKeep private worker state outside this package. Never delete it during upgrades.\n')
+    notarization = notarize(archive)
+    sbom = {'bomFormat':'CycloneDX','specVersion':'1.6','version':1,'metadata':{'component':{'type':'application','name':'ai-constitution','version':(ROOT/'VERSION').read_text().strip()}},
+        'components':[{'type':'library','name':v['name'],'version':v['version'],'purl':'pkg:pypi/'+v['name'].lower()+'@'+v['version']} for v in inventory]}
+    archive.with_suffix('.cdx.json').write_text(json.dumps(sbom,indent=2),encoding='utf-8')
     archive.with_suffix('.zip.sha256').write_text(hashlib.sha256(archive.read_bytes()).hexdigest() + '  ' + archive.name + '\n', encoding='utf-8')
-    print(json.dumps({'status':'built','executable':str(executable),'archive':str(archive),'files':len(checks),'signing':'unsigned-preview','smoke':smoke_result}))
+    print(json.dumps({'status':'built','executable':str(executable),'archive':str(archive),'files':len(checks),'signing':signing,'notarization':notarization,'smoke':smoke_result}))
 
 
 if __name__=='__main__':main()

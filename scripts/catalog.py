@@ -17,6 +17,11 @@ import tempfile
 import urllib.parse
 import urllib.request
 
+if __package__:
+    from .paths import is_link
+else:
+    from paths import is_link
+
 CATALOG_URL = "https://models.dev/api.json?type=all"
 MAX_BYTES = 32 * 1024 * 1024
 OFFICIAL_HOSTS = frozenset({
@@ -37,7 +42,7 @@ def digest(data: bytes) -> str:
 
 def atomic_bytes(path: Path, data: bytes):
     for part in (path, *path.parents):
-        if part.is_symlink() or (hasattr(part, "is_junction") and part.is_junction()):
+        if is_link(part):
             raise ValueError("Refusing to write through a symbolic link or junction")
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.is_symlink():

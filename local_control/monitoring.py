@@ -1,4 +1,5 @@
 """Private application/account inventory; read-only, explicitly enabled collectors."""
+import hashlib
 import json
 import math
 import os
@@ -57,7 +58,8 @@ def configure(root, body, *, local=True):
             if not isinstance(projects, list) or len(projects) > 100: raise ValueError('Choose up to 100 projects')
             fields['projects'] = [text(p, 500) for p in projects]
             previous = value['accounts'].get(identity, {})
-            value['accounts'][identity] = {**previous, **fields, 'id': identity, 'provider': provider, 'source': 'manual'}
+            value['accounts'][identity] = {**previous, **fields, 'id': identity, 'provider': provider, 'source': 'manual',
+                'subscription_key': hashlib.sha256((provider + '|' + fields['login'].strip().casefold() + '|' + fields['plan'].casefold()).encode()).hexdigest()[:24] if fields['login'] else identity}
             event(value, identity, 'saved', 'account_mapping_updated')
         if 'remove' in body:
             value['accounts'].pop(body['remove'], None)
@@ -205,6 +207,15 @@ def collect(root):
         current = load(root)
         # Respect a collector disabled while the probe was in flight.
         if not current['codex_enabled']: observations['codex'] = {'status': 'disabled', 'installed': bool(executable)}
+        for name, observation in observations.items():
+            previous = current.get('observations', {}).get(name, {})
+            if observation.get('status') == 'available':
+                observation['subscription_key'] = hashlib.sha256(('openai|' + observation.get('login', '').strip().casefold() + '|' + observation.get('plan', '').casefold()).encode()).hexdigest()[:24]
+                history = current.setdefault('history', {}).setdefault(name, [])
+                history.append({k:v for k,v in observation.items() if k in ('observed_at','windows','summary','subscription_key')})
+                del history[:-288]
+            elif previous.get('status') == 'available' or previous.get('last_successful'):
+                observation['last_successful'] = previous.get('last_successful') or previous
         current['observations'] = observations; current['refreshed_at'] = time.time()
         event(current, 'codex', observations['codex']['status'], observations['codex'].get('code', 'read_only_account_probe'))
         atomic(Path(root) / 'monitoring.json', current)
@@ -213,7 +224,8 @@ def collect(root):
 
 def local_report(control):
     value = load(control.root)
-    return {**value, 'diagnostics': diagnostics.report(control), 'provider_links': LINKS,
+    from .connectors import capabilities, alerts
+    return {**value, 'connectors': capabilities(), 'alerts': alerts(value), 'diagnostics': diagnostics.report(control), 'provider_links': LINKS,
             'note': 'Login identifiers are private metadata. No passwords, API keys, auth files or conversation contents are collected. Provider quotas are account-wide, not per-machine totals. A missing value is unknown, never zero.'}
 
 

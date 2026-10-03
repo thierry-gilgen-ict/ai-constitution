@@ -33,3 +33,5 @@ Describe the problem, resulting behavior, validation, and relevant limitations. 
 Never commit local state, credentials, personal paths, account exports, or private project facts. Review the staged diff and run the scanner before publishing. A clean heuristic scan does not replace that review.
 
 Maintainers should follow the [release guide](docs/releasing.md) for versioned archives, package checksums, smoke checks and upgrade documentation.
+
+For dashboard changes, run `npm ci --ignore-scripts`, `npx playwright install chromium`, and `npm run test:browser`. These tests use an isolated synthetic server on port 18766, never your real Local Control state. Keep node_modules and browser reports ignored. The optional restic, signing and physical acceptance workflows are described in the documentation; do not claim fixture success establishes physical hardware compatibility.
