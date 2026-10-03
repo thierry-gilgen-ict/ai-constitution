@@ -19,9 +19,9 @@ After an encrypted backup, Local Control runs a repository metadata check. That 
 
 **In the dashboard · Configure encrypted backups.** Configure the restic repository, password-file location or environment-variable name, and retention count. The password itself is never entered here.
 
-![Configure encrypted backups — demonstration data, UI 0.3.0](assets/screenshots/backup-encryption.png)
+![Configure encrypted backups — demonstration data, UI 0.3.1](assets/screenshots/backup-encryption.png)
 
-[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.0.
+[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.1.
 
 <!-- screenshots:encryption:end -->
 
@@ -33,9 +33,9 @@ After an encrypted backup, Local Control runs a repository metadata check. That 
 
 **In the dashboard · Review an encrypted restore.** Restore and verify into the new private destination. Active configuration is preserved.
 
-![Review an encrypted restore — demonstration data, UI 0.3.0](assets/screenshots/backup-restore-preview.png)
+![Review an encrypted restore — demonstration data, UI 0.3.1](assets/screenshots/backup-restore-preview.png)
 
-[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.0.
+[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.1.
 
 <!-- screenshots:restore:end -->
 

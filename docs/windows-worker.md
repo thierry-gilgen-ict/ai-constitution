@@ -45,9 +45,9 @@ Use this on a trusted home LAN. RustDesk can transfer the portable package and l
 
 **In the dashboard · Worker commands · windows.** Choose the OS and package type, then copy each command into a fresh terminal. These are screenshots of the dashboard’s instructions, not the operating-system terminal.
 
-![Worker commands · windows — demonstration data, UI 0.3.0](assets/screenshots/worker-windows.png)
+![Worker commands · windows — demonstration data, UI 0.3.1](assets/screenshots/worker-windows.png)
 
-[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.3.0.
+[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.3.1.
 
 <!-- screenshots:commands:end -->
 

@@ -23,6 +23,8 @@ class Fixture(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name).resolve(); self.root = self.base / 'control'
+        home = patch.object(Path, 'home', return_value=self.base / 'home')
+        home.start(); self.addCleanup(home.stop)
     def control(self):
         result = Control(self.root, lambda *a, **k: {})
         self.addCleanup(result.pool.shutdown)

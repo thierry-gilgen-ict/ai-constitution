@@ -2,19 +2,19 @@
 
 [All workflows](README.md) · [Detailed instructions](../getting-started.md)
 
-Actual Local Control UI **0.3.0**, captured with fictional accounts, paths, models and usage. Performance numbers and update versions are examples, not benchmarks or release announcements. CLI images are rendered transcripts from real isolated commands. [How these images are made](../screenshot-maintenance.md).
+Actual Local Control UI **0.3.1**, captured with fictional accounts, paths, models and usage. Performance numbers and update versions are examples, not benchmarks or release announcements. CLI images are rendered transcripts from real isolated commands. [How these images are made](../screenshot-maintenance.md).
 
 ## Verify the instruction toolkit
 
 A rendered transcript of a real isolated CLI check. This image is not a screenshot of a terminal application.
 
-![Verify the instruction toolkit — demonstration data, UI 0.3.0](../assets/screenshots/toolkit-check.png)
+![Verify the instruction toolkit — demonstration data, UI 0.3.1](../assets/screenshots/toolkit-check.png)
 
 ## Preview installation
 
 A rendered summary from a real dry-run against a temporary home. No live Codex or Cursor files are written.
 
-![Preview installation — demonstration data, UI 0.3.0](../assets/screenshots/toolkit-install-preview.png)
+![Preview installation — demonstration data, UI 0.3.1](../assets/screenshots/toolkit-install-preview.png)
 
 ## External application captures
 

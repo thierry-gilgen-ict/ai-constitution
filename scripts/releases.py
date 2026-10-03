@@ -8,9 +8,9 @@ import urllib.request
 import urllib.parse
 import zipfile
 if __package__:
-    from .paths import is_link
+    from .paths import is_link, no_links
 else:
-    from paths import is_link
+    from paths import is_link, no_links
 
 if __package__:
     from .catalog import atomic_bytes, digest, json_bytes
@@ -20,11 +20,30 @@ else:
 TOP = {"VERSION", "LICENSE", "README.md", "AGENTS.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "requirements-local-node.txt", "requirements-desktop.txt", "requirements-build.txt", "THIRD_PARTY_NOTICES.md"}
 DIRS = {"scripts", "registry", "adapters", "skills", "templates", "onboarding", "checks", "docs", "local_control", "packaging"}
 SUFFIXES = {".py", ".ps1", ".json", ".md", ".mdc", ".html", ".js", ".css", ".txt", ".png"}
+INVENTORY = 'checks/release-files.json'
+
+
+def private_path(name):
+    """Shared publication guard; source that manages credentials is not a key file."""
+    parts = PurePosixPath(name).parts
+    for part in parts:
+        lower = part.casefold()
+        if (lower in {'auth.json', 'config.json', 'runtime.json', 'pairing.json',
+                      'drivers.json', 'server.log', '.local', '.config', '.ssh',
+                      'transactions', 'configurations', 'local-worker', 'pki', 'secrets'}
+                or lower.startswith(('.env', 'credentials'))
+                or PurePosixPath(lower).suffix in {'.pem', '.key', '.p12', '.pfx'}):
+            if part == 'credentials.py' and parts[-2:] == ('local_control', 'credentials.py'):
+                continue
+            return True
+    return False
 
 
 def allowed(name):
+    if not isinstance(name, str) or private_path(name):
+        return False
     path = PurePosixPath(name)
-    return (isinstance(name, str) and '\\' not in name and ':' not in name
+    return ('\\' not in name and ':' not in name
             and not path.is_absolute() and '..' not in path.parts and str(path) == name
             and (name in TOP or (len(path.parts) > 1 and path.parts[0] in DIRS
                  and not any(p.startswith('.') or p == '__pycache__' for p in path.parts)
@@ -50,6 +69,31 @@ def files(root):
     return result
 
 
+def public_files(root):
+    """Export exactly the reviewed inventory, independently of Git ignore rules."""
+    root = Path(root)
+    no_links(root / INVENTORY)
+    try:
+        document = json.loads((root / INVENTORY).read_text(encoding='utf-8'))
+        names = document['files']
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise ValueError('Public release inventory is missing or invalid') from exc
+    if (set(document) != {'schema_version', 'files'} or document['schema_version'] != 1
+            or not isinstance(names, list) or not names or len(names) > 1000
+            or any(not allowed(name) for name in names)
+            or len({name.casefold() for name in names}) != len(names)
+            or names != sorted(names) or not {'VERSION', INVENTORY}.issubset(names)):
+        raise ValueError('Public release inventory contains unsafe or duplicate paths')
+    payload = {}
+    for name in names:
+        path = root / name
+        no_links(path)
+        if not path.is_file():
+            raise ValueError('Public release inventory has a missing file: ' + name)
+        payload[name] = path.read_bytes()
+    return payload
+
+
 def manifest(payload):
     version = payload.get('VERSION', b'').decode().strip()
     if not re.fullmatch(r'\d+\.\d+\.\d+', version):
@@ -59,7 +103,7 @@ def manifest(payload):
 
 
 def export(root, output):
-    payload = files(root)
+    payload = public_files(root)
     document = manifest(payload)
     stream = io.BytesIO()
     with zipfile.ZipFile(stream, 'w', compression=zipfile.ZIP_DEFLATED) as archive:

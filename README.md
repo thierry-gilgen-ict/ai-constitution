@@ -45,7 +45,7 @@ Bring existing repositories through a conflict-aware onboarding wizard. Follow o
 
 ## See it before setting it up
 
-Actual UI **0.3.0**, with fictional data. Open an image at full size, or follow the **[80-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.
+Actual UI **0.3.1**, with fictional data. Open an image at full size, or follow the **[80-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.
 
 | Models and projects | Maintenance and visibility |
 | --- | --- |
@@ -58,59 +58,59 @@ Actual UI **0.3.0**, with fictional data. Open an image at full size, or follow 
 
 ### [Get started](docs/manual/setup.md)
 
-![Get started — fictional documentation data, UI 0.3.0](docs/assets/screenshots/setup.png)
+![Get started — fictional documentation data, UI 0.3.1](docs/assets/screenshots/setup.png)
 
 ### [Overview](docs/manual/overview.md)
 
-![Overview — fictional documentation data, UI 0.3.0](docs/assets/screenshots/overview.png)
+![Overview — fictional documentation data, UI 0.3.1](docs/assets/screenshots/overview.png)
 
 ### [Model library](docs/manual/models.md)
 
-![Model library — fictional documentation data, UI 0.3.0](docs/assets/screenshots/models.png)
+![Model library — fictional documentation data, UI 0.3.1](docs/assets/screenshots/models.png)
 
 ### [Your machines](docs/manual/machines.md)
 
-![Your machines — fictional documentation data, UI 0.3.0](docs/assets/screenshots/machines.png)
+![Your machines — fictional documentation data, UI 0.3.1](docs/assets/screenshots/machines.png)
 
 ### [Connect a project](docs/manual/connect.md)
 
-![Connect a project — fictional documentation data, UI 0.3.0](docs/assets/screenshots/connect.png)
+![Connect a project — fictional documentation data, UI 0.3.1](docs/assets/screenshots/connect.png)
 
 ### [Project templates](docs/manual/architectures.md)
 
-![Project templates — fictional documentation data, UI 0.3.0](docs/assets/screenshots/architectures.png)
+![Project templates — fictional documentation data, UI 0.3.1](docs/assets/screenshots/architectures.png)
 
 ### [Constitution files](docs/manual/constitution.md)
 
-![Constitution files — fictional documentation data, UI 0.3.0](docs/assets/screenshots/constitution.png)
+![Constitution files — fictional documentation data, UI 0.3.1](docs/assets/screenshots/constitution.png)
 
 ### [Projects](docs/manual/projects.md)
 
-![Projects — fictional documentation data, UI 0.3.0](docs/assets/screenshots/projects.png)
+![Projects — fictional documentation data, UI 0.3.1](docs/assets/screenshots/projects.png)
 
 ### [Apps & subscriptions](docs/manual/accounts.md)
 
-![Apps & subscriptions — fictional documentation data, UI 0.3.0](docs/assets/screenshots/accounts.png)
+![Apps & subscriptions — fictional documentation data, UI 0.3.1](docs/assets/screenshots/accounts.png)
 
 ### [Set up a worker](docs/manual/workers.md)
 
-![Set up a worker — fictional documentation data, UI 0.3.0](docs/assets/screenshots/workers.png)
+![Set up a worker — fictional documentation data, UI 0.3.1](docs/assets/screenshots/workers.png)
 
 ### [Storage & locations](docs/manual/storage.md)
 
-![Storage & locations — fictional documentation data, UI 0.3.0](docs/assets/screenshots/storage.png)
+![Storage & locations — fictional documentation data, UI 0.3.1](docs/assets/screenshots/storage.png)
 
 ### [Updates & model inbox](docs/manual/updates.md)
 
-![Updates & model inbox — fictional documentation data, UI 0.3.0](docs/assets/screenshots/updates.png)
+![Updates & model inbox — fictional documentation data, UI 0.3.1](docs/assets/screenshots/updates.png)
 
 ### [Measured performance](docs/manual/insights.md)
 
-![Measured performance — fictional documentation data, UI 0.3.0](docs/assets/screenshots/insights.png)
+![Measured performance — fictional documentation data, UI 0.3.1](docs/assets/screenshots/insights.png)
 
 ### [Configs & backups](docs/manual/vault.md)
 
-![Configs & backups — fictional documentation data, UI 0.3.0](docs/assets/screenshots/vault.png)
+![Configs & backups — fictional documentation data, UI 0.3.1](docs/assets/screenshots/vault.png)
 
 </details>
 
@@ -263,7 +263,7 @@ The source repository can live anywhere, including a development drive. Runtime 
 
 ## Status
 
-**v0.3.0** adds reviewed application updates, workspace onboarding, template revisions, encrypted backups and recovery controls to the shared toolkit and workspace control center. Automated checks cover installation, catalogs, templates, private configuration, synchronization and recovery on Windows, macOS and Linux. Each live client still needs an instruction-loading check. Initial route recommendations are provisional, not a published performance benchmark.
+**v0.3.1** adds reviewed public-file inventories, secret checks before every artifact upload, fresh native build staging, dependency security updates and the complete illustrated manual. It includes the application updates, workspace onboarding, template revisions, encrypted backups and recovery controls introduced in 0.3. Automated checks cover installation, catalogs, templates, private configuration, synchronization and recovery on Windows, macOS and Linux. Each live client still needs an instruction-loading check. Initial route recommendations are provisional, not a published performance benchmark.
 
 The optional **Local Control preview** adds a separately operated inference service. Its Windows reference setup has live Codex and GPU-to-CPU handoff checks; the [review and roadmap](docs/review-and-roadmap.md) distinguishes current evidence from work still needed.
 

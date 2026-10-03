@@ -13,12 +13,29 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def prepare_output(output):
+    if __package__:
+        from .paths import no_links
+        from .releases import DIRS
+    else:
+        from paths import no_links
+        from releases import DIRS
+    output = Path(output).absolute()
+    no_links(output)
+    output = output.resolve()
+    if output == ROOT or any(output.is_relative_to(ROOT / name) for name in DIRS):
+        raise ValueError('Build output must be outside public source folders')
+    if output.exists() and (not output.is_dir() or any(output.iterdir())):
+        raise ValueError('Build output must be empty; choose a fresh directory. Existing files were preserved.')
+    output.mkdir(parents=True, exist_ok=True)
+    return output
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
-    output=args.output.absolute()
-    output.mkdir(parents=True,exist_ok=True)
+    output=prepare_output(args.output)
     inventory=[]
     licenses=output/'licenses'; licenses.mkdir(exist_ok=True)
     for dist in importlib.metadata.distributions():
@@ -28,20 +45,20 @@ def main():
             if '.dist-info' in str(file) and ('license' in file.name.lower() or 'copying' in file.name.lower()):
                 (licenses/(name+'-'+file.name)).write_bytes(dist.locate_file(file).read_bytes())
     (output/'dependencies.json').write_text(json.dumps(inventory,indent=2),encoding='utf-8')
-    from releases import files
+    from releases import public_files
     library = output / 'library'
-    for name, data in files(ROOT).items():
+    for name, data in public_files(ROOT).items():
         path = library / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
     command=[sys.executable,'-m','PyInstaller','--noconfirm','--onedir','--noupx','--name','ai-constitution-local',
              '--distpath',str(output/'app'),'--workpath',str(output/'build'),'--specpath',str(output),
-             '--paths',str(ROOT),'--collect-submodules','local_control','--collect-submodules','pystray',
-             '--hidden-import','cryptography','--add-data',str(ROOT/'local_control/web')+':local_control/web',
+             '--paths',str(library),'--collect-submodules','local_control','--collect-submodules','pystray',
+             '--hidden-import','cryptography','--add-data',str(library/'local_control/web')+':local_control/web',
              '--add-data',str(library)+':library']
     if platform.system()=='Windows':command+=['--hide-console','hide-early']
-    command+=[str(ROOT/'packaging/entrypoint.py')]
-    subprocess.run(command,cwd=ROOT,check=True)
+    command+=[str(library/'packaging/entrypoint.py')]
+    subprocess.run(command,cwd=library,check=True)
     executable=output/'app/ai-constitution-local'/('ai-constitution-local.exe' if platform.system()=='Windows' else 'ai-constitution-local')
     from sign_package import sign, notarize
     signing = sign(output/'app', executable)

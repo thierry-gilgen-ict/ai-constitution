@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.3.1 — 2026-10-03
+
+- Restricted public exports and native build inputs to a reviewed file inventory. Reject sensitive filenames and preserve existing output by requiring fresh build directories; compile the native companion from the isolated public input tree.
+- Added checksum-verified Gitleaks publication gates for native packages, complete release assets, browser reports, screenshot comparisons and catalog patches. Reject unsafe archives and block uploads on unresolved findings or scanner failures; dismiss only cryptographically verified manifest checksums.
+- Enabled dependency security-fix pull requests and added weekly dependency reviews for Python, npm and GitHub Actions. Isolated remaining test home defaults from real private configuration.
 - Added an illustrated manual with 80 images across all 14 dashboard pages, detailed workflows, recovery states and responsive layouts. Updated the README and guides with screenshots beside their instructions.
 - Added one-command fixture captures, real isolated CLI transcripts, screenshot provenance and integrity/freshness/coverage checks. CI produces visual comparisons and enforces image and release-size budgets. External native application captures remain explicitly pending.
 

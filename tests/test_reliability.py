@@ -26,6 +26,8 @@ class Reliability(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name).resolve(); self.root = self.base / 'control'
         self.project = self.base / 'project'; self.project.mkdir()
+        home = patch.object(Path, 'home', return_value=self.base / 'home')
+        home.start(); self.addCleanup(home.stop)
 
     def vault(self):
         config = self.base / 'config' / 'demo'; config.mkdir(parents=True)

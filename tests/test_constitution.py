@@ -35,6 +35,11 @@ class Workspace(unittest.TestCase):
         for name in ["registry", "templates", "skills"]:
             shutil.copytree(ROOT / name, self.root / name)
         kit.build(self.root)
+        # Isolated release fixtures explicitly declare their own public input set.
+        import releases
+        (self.root / 'checks').mkdir()
+        names = sorted(set(releases.files(self.root)) | {releases.INVENTORY})
+        (self.root / releases.INVENTORY).write_text(json.dumps({'schema_version': 1, 'files': names}), encoding='utf-8')
         self.state = self.base / "private"
         self.project = self.base / "a project with spaces"
         self.project.mkdir()

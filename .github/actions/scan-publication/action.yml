@@ -1,0 +1,14 @@
+name: Scan public upload inputs
+description: Verify a pinned Gitleaks release and reject private files or unresolved secrets before upload
+inputs:
+  paths:
+    description: Newline-separated files or directories; every path must exist
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        PUBLICATION_PATHS: ${{ inputs.paths }}
+      run: |
+        python -c 'import os,subprocess,sys; paths=[p for p in os.environ["PUBLICATION_PATHS"].splitlines() if p.strip()]; assert paths; subprocess.run([sys.executable,"scripts/scan_publication.py",*paths],check=True)'

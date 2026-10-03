@@ -7,11 +7,15 @@ on:
       - 'packaging/**'
       - 'scripts/local_control.py'
       - 'scripts/package_local.py'
+      - 'scripts/releases.py'
+      - 'scripts/release_inventory.py'
+      - 'scripts/scan_publication.py'
+      - 'checks/release-files.json'
+      - '.github/actions/scan-publication/**'
       - 'scripts/sign_package.py'
       - 'scripts/smoke_local_package.py'
       - 'scripts/constitution.py'
       - 'scripts/architecture.py'
-      - 'scripts/releases.py'
       - 'templates/**'
       - 'requirements-*.txt'
       - '.github/workflows/package-preview.yml'
@@ -31,6 +35,9 @@ jobs:
           python-version: '3.13'
       - run: python -m pip install -r requirements-build.txt
       - run: python scripts/package_local.py --output .local/package
+      - uses: ./.github/actions/scan-publication
+        with:
+          paths: .local/package
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: local-control-preview-${{ runner.os }}-${{ runner.arch }}

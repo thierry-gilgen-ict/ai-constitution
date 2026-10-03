@@ -1,13 +1,13 @@
-AI Constitution 0.3 makes ongoing workspace maintenance easier to review and recover.
+AI Constitution 0.3.1 hardens public packaging and adds the complete illustrated manual.
 
-- An **Update available** notification, GitHub release notes, verified application staging, idle-session restart checks and retained rollback copies. Compatible paired workers expose the same controls.
-- A project discovery wizard with conflict/adoption previews, configuration associations and richer project cards.
-- Pinned template revisions, saved revision history, immutable inheritance, dependency constraints and monorepo manifest capture. Unsaved templates no longer revert during synchronization.
-- Optional encrypted restic backups, reviewed retention, verified restoration and explicit OS backup schedules. Rejected backup jobs retry without consuming the daily interval.
-- Durable actionable failures, inline job progress, private Windows ACLs and Python 3.11-compatible junction protection.
-- Last-successful subscription reports, bounded history and alerts, read-only OpenAI/Anthropic API cost connectors, model-definition review inbox, measured performance profiles and pre-dispatch fallback selection.
-- Real browser journeys and accessibility checks, native package SBOMs, release build attestations and optional signing/notarization hooks.
+- Public exports and native build inputs include only the reviewed release inventory. Sensitive filenames are rejected; unlisted and ignored local files cannot silently enter a release.
+- Native builds compile from an isolated public source copy and require an empty output directory. Rejected stale output is preserved.
+- Every package/report upload runs a checksum-verified Gitleaks scan first. Unsafe/nested private archive entries, unresolved findings, missing inputs and scanner failures block upload. Manifest checksum exceptions require verification against the actual packaged file.
+- Dependency security-fix pull requests are enabled, with weekly Python/npm/GitHub Actions update reviews.
+- The README and manual now cover all 14 dashboard pages with 80 images, real isolated CLI transcripts, synthetic data, and checked screenshot provenance/freshness.
 
-The instruction toolkit remains standard-library-only. Local Control native packages remain **preview** and are unsigned unless their manifest explicitly reports a configured publisher signature. Physical two-machine GPU qualification, a 48-hour soak and external usability trials remain documented acceptance gates. No native Cursor Agent switching, in-progress generation migration or distributed VRAM pooling is claimed.
+Read the versioned [release guide](https://github.com/thierry-gilgen-ict/ai-constitution/blob/v0.3.1/docs/releasing.md), [security policy](https://github.com/thierry-gilgen-ict/ai-constitution/blob/v0.3.1/SECURITY.md) and [illustrated manual](https://github.com/thierry-gilgen-ict/ai-constitution/blob/v0.3.1/docs/manual/README.md).
 
-Read the versioned [workspace guide](https://github.com/thierry-gilgen-ict/ai-constitution/blob/v0.3.0/docs/workspace-upgrades.md), [backup guide](https://github.com/thierry-gilgen-ict/ai-constitution/blob/v0.3.0/docs/encrypted-backups.md) and [compatibility matrix](https://github.com/thierry-gilgen-ict/ai-constitution/blob/v0.3.0/docs/compatibility-matrix.md). Keep your existing private state; use the manual upgrade once from packages predating the dashboard updater.
+Download the managed instruction archive for the toolkit, the Grok Bot bundle for cloud setup, or the Windows x64/macOS ARM64/Linux x64 portable companion. Preserve your existing private state and pairing when upgrading. Existing 0.3.0 controllers can use the normal dashboard update flow while clients are idle; source users can pull the reviewed revision. Older public source archives remain readable; custom libraries exported with the new tooling need their own reviewed file inventory.
+
+The instruction toolkit remains standard-library-only. Native companions remain unsigned **preview** builds. Secret scanners do not guarantee detection of arbitrary secrets, image pixels or compressed executable bytecode. Physical GPU qualification, a 48-hour soak, external usability and native application screenshots remain explicitly pending; see the [acceptance matrix](https://github.com/thierry-gilgen-ict/ai-constitution/blob/v0.3.1/docs/compatibility-matrix.md).

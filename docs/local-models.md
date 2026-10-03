@@ -31,8 +31,8 @@ Sources: [Ollama list models](https://docs.ollama.com/api/tags), [LM Studio list
 
 **In the dashboard · Find models for your hardware.** Choose Find models for my hardware. Estimated fit is shown separately from measured results.
 
-![Find models for your hardware — demonstration data, UI 0.3.0](assets/screenshots/model-fit.png)
+![Find models for your hardware — demonstration data, UI 0.3.1](assets/screenshots/model-fit.png)
 
-[Illustrated walkthrough](manual/models.md) · Fictional data; UI 0.3.0.
+[Illustrated walkthrough](manual/models.md) · Fictional data; UI 0.3.1.
 
 <!-- screenshots:fit:end -->
