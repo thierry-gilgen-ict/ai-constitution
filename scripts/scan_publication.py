@@ -202,20 +202,29 @@ def main():
     parser.add_argument('paths', nargs='+', type=Path)
     parser.add_argument('--gitleaks', type=Path, help='Previously verified executable (otherwise install a pinned release)')
     args = parser.parse_args()
+    phase = 'input inspection'
     try:
         # Inspect first, so private filenames never require a scanner download.
         inspect_sources(args.paths)
         if args.gitleaks:
+            phase = 'content scan'
             result = scan(args.paths, args.gitleaks.absolute())
         else:
             with tempfile.TemporaryDirectory(prefix='verified-gitleaks-') as folder:
-                result = scan(args.paths, install(folder))
+                # macOS's OS-owned temporary directory is commonly reached via
+                # /var -> /private/var. Canonicalize our newly created private
+                # directory, without relaxing link checks on upload inputs.
+                phase = 'scanner installation'
+                executable = install(Path(folder).resolve())
+                phase = 'content scan'
+                result = scan(args.paths, executable)
         print(json.dumps(result))
     except PublicationError as error:
         raise SystemExit('Publication security check failed: ' + str(error) + '. Upload blocked.') from None
-    except Exception:
+    except Exception as error:
         # Unexpected provider/tool errors can contain secrets, so withhold raw details.
-        raise SystemExit('Publication security check failed. Review inputs privately; nothing may be uploaded.') from None
+        raise SystemExit('Publication security check failed during ' + phase + ' (' + type(error).__name__
+                         + '). Review inputs privately; nothing may be uploaded.') from None
 
 
 if __name__ == '__main__':
