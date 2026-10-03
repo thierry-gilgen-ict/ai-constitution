@@ -12,7 +12,7 @@ from unittest.mock import patch
 import zipfile
 
 from scripts import releases, scan_publication as security
-from scripts.package_local import prepare_output
+from scripts.package_local import prepare_output, application_files
 
 
 class Publication(unittest.TestCase):
@@ -80,6 +80,29 @@ class Publication(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'outside public'):
                 prepare_output(self.root / '.local/../local_control/new-output')
         self.assertFalse((self.root / 'local_control').exists())
+
+    def link(self, source, target, directory=False):
+        try:
+            source.symlink_to(target, target_is_directory=directory)
+        except (OSError, NotImplementedError):
+            self.skipTest('OS does not grant symlink creation')
+
+    def test_native_internal_aliases_are_complete_and_external_links_are_refused(self):
+        app = self.root / 'app'; app.mkdir()
+        directory = app / 'version'; directory.mkdir(); (directory/'module.py').write_bytes(b'Public fixture')
+        self.link(app/'current',directory,True)
+        self.link(app/'module.py',directory/'module.py')
+        files = application_files(app)
+        self.assertEqual(set(files), {'version/module.py','current/module.py','module.py'})
+        self.assertEqual(files['current/module.py'].read_bytes(),b'Public fixture')
+        outside = self.root/'private.txt'; outside.write_bytes(b'Synthetic private placeholder')
+        self.link(app/'outside.txt',outside)
+        with self.assertRaisesRegex(ValueError,'escapes'): application_files(app)
+
+    def test_native_directory_alias_cycles_are_refused(self):
+        app = self.root/'app';app.mkdir()
+        self.link(app/'cycle',app,True)
+        with self.assertRaisesRegex(ValueError,'cycle'): application_files(app)
 
     def zip(self, name, members):
         path = self.root / name

@@ -37,17 +37,9 @@ jobs:
       - run: python scripts/package_local.py --output .local/package
       - uses: ./.github/actions/scan-publication
         with:
-          paths: .local/package
+          paths: .local/package/public
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: local-control-preview-${{ runner.os }}-${{ runner.arch }}
-          path: |
-            .local/package/app
-            .local/package/licenses
-            .local/package/dependencies.json
-            .local/package/manifest.json
-            .local/package/*.zip
-            .local/package/*.sha256
-            .local/package/*.cdx.json
-          include-hidden-files: true
+          path: .local/package/public
           retention-days: 7

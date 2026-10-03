@@ -30,6 +30,8 @@ Create `SHA256SUMS.txt` covering all published payloads. Compare native package 
 
 Build native packages into a new empty directory. A nonempty output is rejected without deletion; preserve the previous build and choose another destination. The companion compiles from a fresh copy of the reviewed public inventory, including its web assets, rather than arbitrary files in the source directory.
 
+Publish only the build's `public/` directory (portable ZIP, checksum and SBOM). PyInstaller [uses internal symbolic links on POSIX hosts](https://pyinstaller.org/en/stable/common-issues-and-pitfalls.html#requirements-imposed-by-symbolic-links-in-frozen-application). Package collection resolves only aliases contained within the build application tree, rejects escapes/cycles and includes alias-directory files as regular ZIP members. The extracted ZIP receives a second smoke test. Raw build trees are not upload inputs, and the publication scanner still rejects links in upload directories or ZIP entries.
+
 Before any manual upload, scan the exact publication directory:
 
 ```sh

@@ -52,14 +52,11 @@ jobs:
       - run: python scripts/package_local.py --output .local/package
       - uses: ./.github/actions/scan-publication
         with:
-          paths: .local/package
+          paths: .local/package/public
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: release-${{ runner.os }}-${{ runner.arch }}
-          path: |
-            .local/package/*.zip
-            .local/package/*.sha256
-            .local/package/*.cdx.json
+          path: .local/package/public
           retention-days: 14
   publish:
     needs: build
