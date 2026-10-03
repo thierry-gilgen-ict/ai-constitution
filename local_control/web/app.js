@@ -67,10 +67,12 @@ function page(name) {
       setup: "Get started",
       architectures: "Project templates",
       constitution: "Constitution files",
+      projects: "Project sync", accounts: "Apps & subscriptions", workers: "Set up a worker", storage: "Storage & locations", vault: "Configs & backups",
     }[name];
   if (name === "models") loadInventory();
   if (name === "setup") loadSetup();
   if (window.studioPage) window.studioPage(name);
+  if (window.centerPage) window.centerPage(name);
   if (name === "machines" && !driversRequested) {
     driversRequested = true;
     action({action: "driver-check-all"});
@@ -494,7 +496,7 @@ $("pair-form").onsubmit = async (e) => {
     state = await api("/api/status");
     authorized = true;
     renderState();
-    if (!state.primary) page("setup");
+    if (!state.primary && document.querySelector('.page.active')?.id === 'overview') page("setup");
     loadHardware();
     loadInventory();
   } catch (e) {

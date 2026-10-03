@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/style.css" />
     <script defer src="/app.js"></script>
     <script defer src="/studio.js"></script>
+    <script defer src="/center.js"></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -27,6 +28,11 @@
         </button>
         <button class="nav" data-page="architectures"><span>◇</span> Project templates</button>
         <button class="nav" data-page="constitution"><span>≡</span> Constitution files</button>
+        <button class="nav" data-page="projects"><span>⇄</span> Project sync</button>
+        <button class="nav" data-page="accounts"><span>◎</span> Apps &amp; subscriptions</button>
+        <button class="nav" data-page="workers"><span>＋</span> Set up a worker</button>
+        <button class="nav" data-page="storage"><span>▤</span> Storage &amp; locations</button>
+        <button class="nav" data-page="vault"><span>▣</span> Configs &amp; backups</button>
       </nav>
       <div class="sidebar-note">
         <span class="dot"></span> Private by default
@@ -349,7 +355,7 @@ python scripts/local_control.py cursor --project /path/to/project</pre
       <section id="architectures" class="page">
         <div class="page-heading"><span class="eyebrow">YOUR NEXT PROJECT, ALREADY THOUGHT THROUGH</span><h1>A good place to start.</h1><p>Keep the choices that work. Bring them to every new project.</p></div>
         <div class="studio-intro"><span class="step">01 / CHOOSE A BASELINE</span><span class="step">02 / MAKE IT YOURS</span><span class="step">03 / PREVIEW &amp; APPLY</span></div>
-        <div class="section-title"><h2>Your project baselines</h2><div class="button-row"><button id="template-import">Import JSON</button><input id="template-import-file" type="file" accept=".json,application/json" hidden><button id="template-new" class="primary">+ New baseline</button></div></div>
+        <div class="section-title"><h2>Your project baselines</h2><div class="button-row"><button id="template-capture">From existing project</button><button id="template-import">Import JSON</button><input id="template-import-file" type="file" accept=".json,application/json" hidden><button id="template-new" class="primary">+ New baseline</button></div></div>
         <p class="caption">These templates define choices and agent handoffs. Dependencies are reviewed during implementation; applying a baseline does not install or run them.</p>
         <div id="template-gallery" class="template-gallery" aria-live="polite">Loading your library…</div>
         <article id="template-workbench" class="panel studio-workbench" hidden>
@@ -373,6 +379,11 @@ python scripts/local_control.py cursor --project /path/to/project</pre
           <article class="panel file-panel"><div class="section-title"><h2 id="library-path">Choose a file</h2><span id="library-file-status" class="pill">Library</span></div><p id="library-file-note" class="caption">Start with constitution.md for working defaults, or registry/routes.json for model routing.</p><img id="library-image" alt="Selected library image" hidden><label id="library-editor-label">File contents<textarea id="library-editor" class="code-editor library-editor" spellcheck="false" readonly></textarea></label><div class="button-row"><button id="library-save" class="primary" disabled>Review &amp; save draft</button><button id="library-reload" disabled>Reload file</button><button id="library-previous" hidden>Previous page</button><button id="library-next" hidden>Next page</button></div><p id="library-result" role="status" class="caption"></p></article>
         </div>
       </section>
+      <section id="projects" class="page"><div class="page-heading"><span class="eyebrow">GOOD CHANGES, EVERYWHERE THEY BELONG</span><h1>Projects that keep up.</h1><p>Shared instructions and matching templates flow to enrolled projects. Your local edits stay protected.</p></div><div id="sync-content" aria-live="polite"></div></section>
+      <section id="accounts" class="page"><div class="page-heading"><span class="eyebrow">YOUR WHOLE WORKSPACE, IN VIEW</span><h1>Know what is running.<br><em>And what is left.</em></h1><p>Connect machines, applications, account logins and projects. Every usage figure carries its source and observation time.</p></div><div id="accounts-content" aria-live="polite"></div></section>
+      <section id="workers" class="page"><div class="page-heading"><span class="eyebrow">ANOTHER COMPUTER. ONE WORKSPACE.</span><h1>Bring a worker along.</h1><p>Download a package, start it on your other computer, then pair it here.</p></div><div id="workers-content"></div></section>
+      <section id="storage" class="page"><div class="page-heading"><span class="eyebrow">A PLACE FOR EVERYTHING</span><h1>Room to grow.</h1><p>Choose where your weights, private library and managed downloads live. Existing data stays recoverable.</p></div><div id="storage-content"></div></section>
+      <section id="vault" class="page"><div class="page-heading"><span class="eyebrow">PRIVATE CONFIGURATION, TAKEN CARE OF</span><h1>The keys to your projects.</h1><p>One private folder per project. Verified backups. A restore you can review before putting it to work.</p></div><div id="vault-content" aria-live="polite"></div></section>
       <footer>
         <span>AI Constitution / Local Control</span
         ><span>Built for your workflow. Kept on your machines.</span>
@@ -426,6 +437,7 @@ python scripts/local_control.py cursor --project /path/to/project</pre
       </form>
     </dialog>
     <dialog id="studio-preview" class="studio-modal" aria-labelledby="studio-preview-title"><span class="eyebrow">A MOMENT TO REVIEW</span><h2 id="studio-preview-title">Review changes</h2><div id="studio-preview-body"></div><div class="dialog-actions"><button id="studio-preview-cancel">Close</button><button id="studio-preview-confirm" class="primary">Apply reviewed changes</button></div></dialog>
+    <dialog id="center-dialog" class="studio-modal" aria-labelledby="center-dialog-title"><span class="eyebrow">YOUR WORKSPACE, YOUR CHOICES</span><h2 id="center-dialog-title"></h2><div id="center-dialog-body"></div><p id="center-dialog-error" class="review-error" role="alert"></p><div class="dialog-actions"><button id="center-dialog-close">Close</button><button id="center-dialog-apply" class="primary">Apply</button></div></dialog>
     <dialog id="component-dialog" class="studio-modal" aria-labelledby="component-title"><form id="component-form"><span class="eyebrow">ONE PIECE OF YOUR ARCHITECTURE</span><h2 id="component-title">Component details</h2><div class="studio-fields"><label>Name<input id="component-name" required maxlength="120"></label><label>Identifier<input id="component-id" required pattern="[a-z][a-z0-9-]{0,63}"></label><label>Role<select id="component-role"></select></label></div><label>Repository URL<input id="component-repository" type="url" placeholder="https://github.com/owner/repository"></label><div class="studio-fields"><label>Release tag or commit<input id="component-reference" placeholder="Choose a reviewed version"></label><label>Documentation URL<input id="component-docs" type="url" placeholder="https://…"></label></div><label>Implementation guidance<textarea id="component-instructions" rows="4"></textarea></label><div class="studio-fields"><label>Provides · comma separated<input id="component-provides" placeholder="typescript, server"></label><label>Requires<input id="component-requires" placeholder="sql"></label><label>Conflicts with<input id="component-conflicts"></label></div><label>Acceptance checks · one per line<textarea id="component-checks" rows="3"></textarea></label><label>Environment variables · NAME | secret or public | purpose<textarea id="component-env" rows="3" placeholder="RESEND_API_KEY | secret | Server-side email API credential" spellcheck="false"></textarea></label><p class="caption">Store names and purpose here. Keep credential values in your project’s secret store.</p><div class="dialog-actions"><button type="button" id="component-cancel">Cancel</button><button class="primary">Use component</button></div></form></dialog>
   </body>
 </html>

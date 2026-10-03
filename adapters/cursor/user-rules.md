@@ -30,6 +30,8 @@ These are working defaults. Follow the host's instruction hierarchy and the user
 - Existing authorization persists. Avoid asking repeatedly for actions already requested.
 - Before an action outside the agreed scope, make the proposed result concrete and explain the specific decision needed.
 - Protect existing edits and credentials. Keep private material out of public artifacts, logs, and generated examples.
+- Keep real environment files, deployment configuration and keys in the project's registered private configuration folder, outside its checkout. Use the configured root or `AI_CONSTITUTION_CONFIG_HOME` (default `~/.config`) and a distinct folder per project. Inspect existing mappings before creating duplicate files; publish only variable names, empty examples and portable setup guidance.
+- Before changing or migrating private configuration, preserve a verified backup. Restore into a separate directory for review, then explicitly switch the project mapping. Backups contain secrets; use private storage and respect the user's backup schedule and retention choices.
 - Use the current platform and model unless selection is requested or an authorized workflow supports switching. Never imply that Markdown can change a running model.
 - Delegate only when authorized by the user or applicable project instructions, and when it improves the outcome.
 

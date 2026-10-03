@@ -32,7 +32,9 @@ The project must already exist. Existing guidance outside the managed block is p
 
 Project and template changes after preview invalidate the plan. The whole onboarding/baseline update uses one private transaction. Its returned snapshot works with `python scripts/constitution.py rollback --snapshot SNAPSHOT_ID`. Later edits prevent rollback from overwriting newer work. A pinned project's existing shared instruction bundle is preserved; open the generated architecture handoff explicitly if its older entry point does not mention architecture files.
 
-Changes to a saved baseline do not automatically change projects that used it. Preview and apply the revised baseline to each project deliberately. Normal instruction-library activation does not overwrite architecture files.
+While Local Control is running, **Project sync** updates enrolled projects using a changed baseline when they follow shared settings. Pins, pauses and local edits are preserved; conflicts are visible per project. The CLI still supports explicit preview/apply. Global instruction-library activation alone does not overwrite architecture files.
+
+Use **From existing project** to propose a baseline from supported manifests and environment-variable names. Review detected components in the editor before saving; scripts and secret values are excluded. See [capture, synchronization and private configuration](control-center.md).
 
 ## CLI and portable format
 

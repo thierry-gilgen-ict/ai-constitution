@@ -18,7 +18,7 @@ from local_control.server import Server
 from local_control.setup import certificate, install_fit, install_ollama, cpu_runtime
 from local_control.storage import ProcessLock, atomic, load, private_root
 from local_control.transport import request
-from local_control import processes
+from local_control import processes, locations, distribution, monitoring, project_vault
 from local_control.launcher import command
 
 
@@ -107,6 +107,17 @@ def main():
     serve.add_argument("--open", action="store_true")
     sub.add_parser("open", help="Open the existing dashboard using a private login link")
     sub.add_parser('status', help='Show route, sessions and durable operation status')
+    packages = sub.add_parser('packages', help='Register reviewed worker packages for dashboard downloads')
+    packages.add_argument('action', choices=['add','list','source'])
+    packages.add_argument('--file', type=Path)
+    monitor = sub.add_parser('monitor', help='Control this OS user’s read-only account collector and worker sharing')
+    monitor.add_argument('action', choices=['enable','disable','refresh'])
+    monitor.add_argument('--share', action='store_true', help='Share account identifiers and usage with paired controllers')
+    relocate = sub.add_parser('relocate', help='Copy private controller state after stopping it, preserving old launch commands')
+    relocate.add_argument('--destination', type=Path, required=True)
+    relocate.add_argument('--plan', help='Apply the fingerprint returned by a fresh stopped-service preview')
+    backup = sub.add_parser('backup', help='Back up explicitly registered project configuration folders')
+    backup.add_argument('--plan', help='Apply the fingerprint returned by the backup preview')
     start = sub.add_parser('start', help='Start a hidden, per-user controller if none owns its state')
     start.add_argument('--port', type=int, default=8766)
     start.add_argument('--open', action='store_true')
@@ -132,7 +143,20 @@ def main():
     cursor = sub.add_parser("cursor", help="Open a project workspace with a Local Codex terminal task")
     cursor.add_argument("--project", type=Path, required=True)
     args = parser.parse_args(sys.argv[1:] or ['start', '--open'])
-    root = args.state_dir.absolute()
+    root = locations.resolve_root(args.state_dir)
+    if args.command == 'relocate':
+        result = locations.relocate(root, args.destination, args.plan) if args.plan else locations.relocation_plan(root, args.destination)[0]
+        print(json.dumps(result, indent=2)); return 0
+    if args.command == 'packages':
+        if args.action == 'add' and args.file is None: raise ValueError('Use --file with a reviewed portable ZIP')
+        result = distribution.register(root, args.file) if args.action == 'add' else distribution.source_bundle(root) if args.action == 'source' else distribution.catalog(root)
+        print(json.dumps(result, indent=2)); return 0
+    if args.command == 'monitor':
+        result = monitoring.collect(root) if args.action == 'refresh' else monitoring.configure(root, {
+            'codex_enabled': args.action == 'enable', 'share_with_controllers': args.action == 'enable' and args.share})
+        print(json.dumps({'status':'refreshed'} if args.action == 'refresh' else result)); return 0
+    if args.command == 'backup':
+        print(json.dumps(project_vault.backup(root, args.plan) if args.plan else project_vault.plan(root), indent=2)); return 0
     if args.command == "setup":
         results = {}
         if args.upgrade_ollama and (root / 'runtime.json').exists():
@@ -268,6 +292,9 @@ def main():
         server.socket = context.wrap_socket(server.socket, server_side=True, do_handshake_on_connect=False)
     else:
         atomic(runtime_path, {"url": url, "pid": os.getpid(), 'process': processes.identity(os.getpid())})
+        from .services import Services
+        server.services = Services(control)
+        server.services.start()
         if args.open:
             webbrowser.open(url + "/#" + config["token"])
     print("Local Control listening at " + url + ". Use the open command for authenticated dashboard access.", flush=True)
@@ -283,6 +310,7 @@ def main():
                 except ValueError as error:
                     print(str(error) + '. Service continues; use Gaming mode to free the GPU.', flush=True)
     finally:
+        if getattr(server, 'services', None): server.services.close()
         server.server_close()
         control.pool.shutdown(wait=False, cancel_futures=True)
         ownership.close()

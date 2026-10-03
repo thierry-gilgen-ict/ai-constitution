@@ -8,6 +8,8 @@ import tempfile
 
 from scripts import constitution as kit, architecture, releases
 from scripts.catalog import atomic_bytes, digest, json_bytes
+from . import locations
+from .storage import wait_lock
 
 MAX_EDIT = 512 * 1024
 PAGE_SIZE = 64000
@@ -25,10 +27,12 @@ def difference(name, before, after):
 
 class Studio:
     def __init__(self, root, *, source=None, state=None):
-        self.base = Path(root) / 'studio'
+        self.root = Path(root)
+        self.base = locations.folder(root, 'studio')
+        self.guard = Path(root) / 'studio-operations'
         self.draft = self.base / 'library'
         self.history = self.base / 'state'
-        self.state = Path(state) if state is not None else Path(root).parent / 'state'
+        self.state = Path(state) if state is not None else locations.folder(root, 'constitution_state')
         self.source = Path(source) if source is not None else bundled_source()
 
     def initialize(self):
@@ -77,7 +81,7 @@ class Studio:
         origin = kit.read_json(self.base / 'origin.json')['files']
         return {'files': [{'path': n, 'bytes': len(b), 'editable': self.editable(n, len(b)),
                            'generated': n in generated, 'modified': digest(b) != origin.get(n)} for n,b in payload.items()],
-                'scope': 'Private library draft. Saving here does not activate client instructions or change the public checkout.',
+                'scope': 'Private library. Enrolled projects following shared settings synchronize automatically while Local Control runs; global client activation is separate.',
                 'draft': str(self.draft)}
 
     def read(self, name, offset=0):
@@ -185,7 +189,7 @@ class Studio:
     def dispatch(self, operation, body=None, query=None):
         query = query or {}
         # Serialize edits, initialization and previews across browser tabs/processes.
-        with kit.state_lock(self.history):
+        with wait_lock(self.guard):
             self.initialize()
             if body is None:
                 if operation == 'files': return self.files()
@@ -200,6 +204,9 @@ class Studio:
                 raise ValueError('Unknown studio read operation')
             if operation == 'file-preview': return self.file_plan(body.get('path'), body.get('content'), body.get('sha256'))[0]
             if operation == 'file-save': return self.save(body)
+            if operation == 'project-capture':
+                from .project_capture import capture
+                return capture(self, self.root, body)
             if operation == 'template-validate':
                 value = architecture.validate(body.get('template'))
                 return {'template': value, 'review': architecture.review(value)}

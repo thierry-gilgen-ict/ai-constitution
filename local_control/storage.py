@@ -3,10 +3,29 @@ import json
 import os
 from pathlib import Path
 import secrets
+import time
+from contextlib import contextmanager
 
 
 def private_root():
     return Path(os.environ.get("AI_CONSTITUTION_LOCAL_HOME", str(Path.home() / ".config/ai-constitution/local-control"))).absolute()
+
+
+@contextmanager
+def wait_lock(path, timeout=10):
+    """Queue brief dashboard edits behind initialization without retrying mutations."""
+    from scripts import constitution as kit
+    deadline = time.monotonic() + timeout
+    while True:
+        lock = kit.state_lock(path)
+        try:
+            lock.__enter__()
+            break
+        except ValueError as error:
+            if not str(error).startswith('Another installation or rollback') or time.monotonic() >= deadline: raise
+            time.sleep(.05)
+    try: yield
+    finally: lock.__exit__(None, None, None)
 
 
 def atomic(path, value):

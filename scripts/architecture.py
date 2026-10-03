@@ -167,7 +167,7 @@ def render(value, project_name):
         if c.get('checks'): lines += ['Acceptance checks:', '', *['- ' + v for v in c['checks']], '']
         for item in c.get('env', []): environment[item['name']] = item
     if value.get('decisions'): lines += ['## Decisions', '', *['- ' + v for v in value['decisions']], '']
-    lines += ['## Configuration', '', 'Variable names and placeholders are in `.ai/architecture.env.example`. Keep real values in a secret store or ignored environment files. Verify any external service/domain before use.', '']
+    lines += ['## Configuration', '', 'Variable names and placeholders are in `.ai/architecture.env.example`. Keep real environment files and deployment credentials in this project’s registered private configuration folder outside its checkout (configured root or AI_CONSTITUTION_CONFIG_HOME, default ~/.config). Resolve the private mapping locally; never publish its contents or host-specific paths. Verify any external service/domain before use.', '']
     for item in environment.values():
         lines.append('- `' + item['name'] + '` (' + ('secret' if item['secret'] else 'configuration') + '): ' + item['purpose'])
     lines += ['', '## Implementation handoff', '', 'Follow `.ai/architecture-onboarding.md`. Applying this baseline does not install packages, clone repositories, send email, start containers, or establish that the application works.', '']

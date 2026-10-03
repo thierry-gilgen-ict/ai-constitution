@@ -8,6 +8,7 @@ from pathlib import Path
 import platform
 import subprocess
 import sys
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -50,7 +51,16 @@ def main():
     checks={p.relative_to(output/'app').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in (output/'app').rglob('*') if p.is_file()}
     (output/'manifest.json').write_text(json.dumps({'schema':1,'platform':platform.system(),'architecture':platform.machine(),
         'signing':'unsigned preview; no publisher identity certification','files':checks},indent=2),encoding='utf-8')
-    print(json.dumps({'status':'built','executable':str(executable),'files':len(checks),'signing':'unsigned-preview','smoke':smoke_result}))
+    archive = output / ('ai-constitution-worker-' + platform.system().lower() + '-' + platform.machine().lower() + '.zip')
+    with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as bundle:
+        for directory in ('app','licenses'):
+            for path in sorted((output / directory).rglob('*')):
+                if path.is_file(): bundle.write(path, path.relative_to(output).as_posix())
+        for name in ('manifest.json','dependencies.json'): bundle.write(output / name, name)
+        for name in ('LICENSE','THIRD_PARTY_NOTICES.md'): bundle.write(ROOT / name, name)
+        bundle.writestr('README.txt', 'AI Constitution portable worker. Unsigned preview. Extract the complete archive.\nSetup and upgrade instructions are in the controller dashboard: Set up a worker.\nKeep private worker state outside this package. Never delete it during upgrades.\n')
+    archive.with_suffix('.zip.sha256').write_text(hashlib.sha256(archive.read_bytes()).hexdigest() + '  ' + archive.name + '\n', encoding='utf-8')
+    print(json.dumps({'status':'built','executable':str(executable),'archive':str(archive),'files':len(checks),'signing':'unsigned-preview','smoke':smoke_result}))
 
 
 if __name__=='__main__':main()

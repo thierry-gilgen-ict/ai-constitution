@@ -61,7 +61,9 @@ For the actual xAI Grok Bot product, follow the [Bot onboarding guide](onboardin
 
 Open **Project templates** in [Local Control](docs/local-control.md). Start with a web product, data dashboard or Python service. Choose repositories for authentication, charts, email and deployment, record your setup decisions, then preview the files before applying them to a project. Export the baseline to reuse or share it. [Template guide](docs/project-templates.md).
 
-Open **Constitution files** to browse the library and tailor its instructions in a private draft. Saving validates your changes and rebuilds generated routing/adapters; a separate activation preview updates enrolled projects while preserving pins and private overrides. [Editor and upgrade guide](docs/constitution-studio.md).
+Open **Constitution files** to browse the library and tailor its instructions privately. Saving validates changes and rebuilds generated routing/adapters. **Project sync** updates enrolled projects that follow shared settings, preserving pins and reporting local edits; global client activation remains explicitly reviewed. [Editor and upgrade guide](docs/constitution-studio.md).
+
+The [workspace control center](docs/control-center.md) adds account login labels, supported Codex usage readings, per-machine diagnostics, worker downloads and setup commands, configurable storage, central private project configuration with verified/scheduled backups, and architecture capture from existing projects. Provider availability and observation times are explicit; secret values stay out of templates and public packages.
 
 ## New models? One command.
 

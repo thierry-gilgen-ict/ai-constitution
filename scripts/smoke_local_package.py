@@ -13,6 +13,10 @@ def smoke(binary):
     with tempfile.TemporaryDirectory(prefix='constitution-package-') as folder:
         root = Path(folder).resolve()
         state = root / 'control'
+        state.mkdir()
+        # Background reconciliation has its own tests; keep this exact-preview
+        # packaging smoke deterministic while it exercises activation explicitly.
+        (state / 'synchronization.json').write_text(json.dumps({'schema':1,'enabled':False,'paused_projects':[]}))
         with socket.socket() as listener:
             listener.bind(('127.0.0.1', 0))
             port = listener.getsockname()[1]

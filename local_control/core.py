@@ -593,10 +593,11 @@ class Control:
 
     def submit(self, label, function, *args):
         with self.lock:
+            if self.stopping: raise ValueError('Local Control is stopping; no new operations can start')
             if sum(j["status"] in ("queued", "running") for j in self.jobs.values()) >= 4:
                 raise ValueError("Four operations are already queued; wait for one to finish")
             identity = uuid.uuid4().hex[:12]
-            job = {"id": identity, "label": label, "status": "queued", "detail": "Waiting"}
+            job = {"id": identity, "label": label, "status": "queued", "detail": "Waiting", "created_at": time.time()}
             self.jobs[identity] = job
             if len(self.jobs) > 50:
                 for old in list(self.jobs):
@@ -629,7 +630,6 @@ class Control:
                 self.event(label + " failed: " + message)
             finally:
                 with self.lock:
-                    self.phase = "idle"
                     self.cancelled.discard(identity)
         self.pool.submit(run)
         return {"job": identity}
@@ -768,10 +768,16 @@ class Control:
                     raise
             return {"route": endpoint, "responses_tested": True, "tool_execution_tested": True, 'coding_quality_tested': False}
 
+    @contextmanager
+    def switching_phase(self):
+        try: yield
+        finally:
+            with self.lock: self.phase = 'idle'
+
     def switch(self, mode, progress=lambda _: None):
         if mode not in ("work", "gaming"):
             raise ValueError("Unknown mode")
-        with self.operation:
+        with self.operation, self.switching_phase():
             with self.lock:
                 if mode == self.mode == 'work':
                     return {"mode": self.mode}

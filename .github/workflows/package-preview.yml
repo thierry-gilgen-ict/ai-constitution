@@ -37,5 +37,7 @@ jobs:
             .local/package/licenses
             .local/package/dependencies.json
             .local/package/manifest.json
+            .local/package/*.zip
+            .local/package/*.sha256
           include-hidden-files: true
           retention-days: 7

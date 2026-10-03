@@ -8,8 +8,8 @@ The draft is created lazily from the controller's bundled library under `<local-
 
 1. Open `constitution.md`, `engineering.md`, another instruction module, or a configuration file. Use the search field or **Customized files only** filter.
 2. Edit the text. **Review & save draft** validates the whole library and shows the changed source plus generated adapters/routing. Invalid JSON or broken references prevent saving.
-3. Save. Nothing is activated yet. The editor creates a private rollback snapshot and checks that another tab has not changed the file or library since your preview.
-4. **Preview activation** shows affected enrolled installations and skipped pinned projects. Confirm to create an immutable release and update eligible installations transactionally.
+3. Save. The editor creates a private rollback snapshot and checks that another tab has not changed the file or library since your preview. Enrolled projects following shared settings synchronize while Local Control runs; inspect **Project sync** for pins, pauses and conflicts.
+4. **Preview activation** additionally shows enrolled global client installations and skipped pins. Confirm to create an immutable release and update eligible installations transactionally. Automatic project sync preserves global client settings.
 5. Start a fresh client session and verify instruction loading. Updating files does not establish that an already-running agent has loaded them.
 
 Existing personal and project [policy overlays](updates.md) remain in effect. The draft edits shared defaults, not those private policy files. A more specific override can still determine the effective behavior. Use `python scripts/constitution.py explain` for the resolved policy.
@@ -35,4 +35,4 @@ After updating the controller from a reviewed checkout or portable package, choo
 
 Routine model refreshes remain separate from the editor. `update` maintains the accepted catalog in private state; `--source-checkout` is for intentionally maintaining a library source. To refresh a private dashboard draft directly, use its path with `--root` and `update --source-checkout`, then review it in the dashboard. Follow [model maintenance](updates.md), including removal review and source evidence. New definitions do not automatically change preferred routes.
 
-These features are local to the controller. Opening the dashboard does not activate drafts, install dependencies, load models or modify worker routing.
+These features are local to the controller. The running controller synchronizes following projects automatically; dashboard visits do not install dependencies or load models. See the [control-center guide](control-center.md) for synchronization, storage, backups, account monitoring and template capture.

@@ -76,6 +76,7 @@
   }
   ['name','id','version','description','decisions','files'].forEach(key => $('template-' + key).oninput = changed);
   $('template-new').onclick = () => selectTemplate({schema_version:1, id:'my-baseline', name:'My project baseline', version:'1.0.0', description:'The starting point for my projects.', components:[], decisions:[], files:{}});
+  window.useCapturedTemplate = value => { selectTemplate(value); changed(); };
   $('template-clone').onclick = safely(() => {
     const value = readTemplate(); value.id += '-copy'; value.name += ' · copy';
     templateDirty = false; selectTemplate(value); changed();
@@ -170,7 +171,7 @@
     currentFile = value; fileDirty = false;
     $('library-path').textContent = path;
     $('library-file-status').textContent = value.editable ? 'Private draft' : 'View only';
-    $('library-file-note').textContent = value.editable ? 'Saving validates this library and rebuilds generated files. Activate separately when ready.' : value.reason || 'Library image';
+    $('library-file-note').textContent = value.editable ? 'Saving validates and rebuilds generated files. Following projects synchronize automatically; global client activation is separate.' : value.reason || 'Library image';
     $('library-editor').value = value.content || ''; $('library-editor').readOnly = !value.editable;
     $('library-editor').classList.toggle('prose-editor', /\.(md|mdc|txt)$/.test(path));
     $('library-editor-label').hidden = Boolean(value.image); $('library-image').hidden = !value.image;
@@ -193,7 +194,7 @@
       const result = await call('file-save', {...body,plan:plan.plan});
       fileDirty = false; await loadFiles(); await openFile(body.path); templatesLoaded = false;
       $('library-result').textContent = 'Draft saved. ' + (result.snapshot ? 'Rollback snapshot: ' + result.snapshot : 'No changes.');
-      notice('Saved and validated. Preview activation when you want enrolled projects to receive the changes.');
+      notice('Saved and validated. Following projects synchronize automatically while Local Control runs. Check Project sync for conflicts; global client activation remains separate.');
     });
   });
   $('library-activate').onclick = safely(async () => {
@@ -223,7 +224,7 @@
       if (!confirm('Restore the files from before this save? Later modifications will prevent rollback.')) return;
       await call('rollback', {snapshot:b.dataset.rollback}); await loadFiles(); templatesLoaded = false;
       if (currentFile && fileList.some(v => v.path === currentFile.path)) await openFile(currentFile.path);
-      $('studio-preview').close(); notice('Draft save rolled back. Active installations were not changed.');
+      $('studio-preview').close(); notice('Draft save rolled back. Following projects receive the restored library on the next synchronization.');
     }));
   });
   window.studioPage = safely(async name => {

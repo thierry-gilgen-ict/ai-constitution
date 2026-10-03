@@ -9,12 +9,12 @@ import threading
 from contextlib import nullcontext
 from urllib.parse import parse_qs, urlsplit
 
-from . import hardware, credentials, diagnostics, launcher
+from . import hardware, credentials, diagnostics, launcher, locations, distribution, synchronization, monitoring, project_vault
 from .core import ALIAS, model_name
 from .transport import connect
 
 WEB = Path(__file__).parent / "web"
-ASSETS = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
+ASSETS = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/center.js": ("center.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
 NODE_GET = {"/api/version", "/api/tags", "/api/ps"}
 NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions"}
 
@@ -180,6 +180,14 @@ class Handler(BaseHTTPRequestHandler):
                     self.reply(hardware.run_fit(control.root, ["--json", "system"]))
                 elif target == "/recommendations" and not post:
                     self.reply(hardware.recommendations(control.root))
+                elif target == '/diagnostics' and not post:
+                    self.reply(diagnostics.report(control))
+                elif target in ('/monitoring', '/monitoring/refresh'):
+                    if not monitoring.load(control.root)['share_with_controllers']:
+                        raise ValueError('Account sharing is disabled on this worker. Enable it locally with monitor enable --share.')
+                    if target == '/monitoring/refresh' and post: monitoring.collect(control.root)
+                    elif post: raise ValueError('Unsupported monitoring operation')
+                    self.reply(monitoring.local_report(control))
                 elif target == '/drivers/check' and post:
                     self.reply(control.driver_check('local', body.get('updates', False)))
                 elif target == '/drivers/open' and post:
@@ -199,7 +207,64 @@ class Handler(BaseHTTPRequestHandler):
             elif path == "/api/status" and not post:
                 self.reply(control.status())
             elif path.startswith('/api/studio/'):
-                self.reply(self.server.studio.dispatch(path.removeprefix('/api/studio/'), body, query))
+                from .studio import Studio
+                self.reply(Studio(control.root).dispatch(path.removeprefix('/api/studio/'), body, query))
+                if post and getattr(self.server, 'services', None): self.server.services.wake.set()
+            elif path == '/api/projects/sync' and not post:
+                self.reply(synchronization.status(control.root))
+            elif path == '/api/projects/sync' and post:
+                self.reply(control.submit('Synchronize enrolled projects', synchronization.reconcile, control.root, control.config))
+            elif path == '/api/projects/follow' and post:
+                self.reply(synchronization.configure(control.root, body))
+            elif path == '/api/monitoring' and not post:
+                self.reply(monitoring.overview(control))
+            elif path == '/api/monitoring/settings' and post:
+                self.reply(monitoring.configure(control.root, body))
+            elif path == '/api/monitoring/usage' and post:
+                self.reply(monitoring.record_usage(control.root, body.get('id'), body.get('sample')))
+            elif path == '/api/monitoring/refresh' and post:
+                self.reply(control.submit('Refresh application and subscription data', monitoring.refresh, control, body.get('node', 'local')))
+            elif path == '/api/monitoring/diagnostics' and not post:
+                node = control.node(query.get('node', ['local'])[0])
+                self.reply(diagnostics.report(control) if node['kind'] == 'ollama' else control.rpc(node, '/diagnostics', timeout=10))
+            elif path == '/api/vault' and not post:
+                self.reply(project_vault.overview(control.root))
+            elif path == '/api/vault/settings' and post:
+                self.reply(project_vault.configure(control.root, body))
+            elif path == '/api/vault/preview' and post:
+                self.reply(project_vault.plan(control.root))
+            elif path == '/api/vault/backup' and post:
+                if not body.get('plan'): raise ValueError('Preview the backup first')
+                self.reply(control.submit('Back up project configurations', project_vault.backup, control.root, body['plan']))
+            elif path == '/api/vault/restore-preview' and post:
+                self.reply(project_vault.restore_plan(control.root, body.get('snapshot'), body.get('project'), body.get('destination')))
+            elif path == '/api/vault/restore' and post:
+                self.reply(control.submit('Restore project configuration', project_vault.restore, control.root, body.get('snapshot'), body.get('project'), body.get('destination'), body.get('plan')))
+            elif path == '/api/storage' and not post:
+                self.reply(locations.inspect(control.root, control.rpc, control.node('local')))
+            elif path == '/api/storage/preview' and post:
+                self.reply(locations.settings_plan(control.root, body.get('paths')))
+            elif path == '/api/storage/save' and post:
+                self.reply(control.submit('Configure storage locations', locations.save_settings, control.root, body.get('paths'), body.get('plan')))
+            elif path == '/api/storage/ollama' and post:
+                self.reply(locations.apply_models(control.root))
+            elif path == '/api/storage/models-preview' and post:
+                self.reply(locations.model_copy_plan(control))
+            elif path == '/api/storage/models-copy' and post:
+                self.reply(control.submit('Copy and verify model weights', locations.copy_models, control, body.get('plan')))
+            elif path == '/api/workers' and not post:
+                self.reply(distribution.catalog(control.root))
+            elif path == '/api/workers/source' and post:
+                self.reply(distribution.source_bundle(control.root))
+            elif path == '/api/worker-package' and not post:
+                filename, record = distribution.download(control.root, query.get('id', [''])[0])
+                self.send_response(200)
+                self.headers_common('application/zip')
+                self.send_header('Content-Disposition', 'attachment; filename="' + record['filename'] + '"')
+                self.send_header('Content-Length', str(filename.stat().st_size))
+                self.end_headers(); self.started = True
+                with filename.open('rb') as stream:
+                    for data in iter(lambda: stream.read(1024 * 1024), b''): self.wfile.write(data)
             elif path == '/api/setup' and not post:
                 self.reply(control.setup_status())
             elif path == '/api/diagnostics' and not post:

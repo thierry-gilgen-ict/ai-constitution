@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add the private workspace control center: per-project automatic instruction/template synchronization with pin and drift protection; subscription login mappings; an opt-in, read-only Codex account/usage collector; worker diagnostics and bounded integration logs; manual/imported provider observations with explicit freshness and scope.
+- Add configurable library, package and Ollama storage, verified model copies and stopped-service profile relocation; dashboard worker downloads and complete cross-platform setup/upgrade commands. Native builds produce a registerable portable ZIP.
+- Add central private project configuration mappings, verified backups, opt-in schedules and restore into a new directory. Backups contain secrets and require private storage; they are not encrypted by the application. Capture architecture proposals from supported existing-project manifests and environment-variable names, discarding values and executable setup content.
+
 - Add portable architecture baselines with component repositories, declared compatibility, setup guidance, environment-variable names, bounded scaffold files and agent handoffs. Dashboard and CLI previews protect existing files and apply onboarding with reversible transactions.
 - Add a private constitution-library editor with search, generated-source previews, stale-edit checks, draft history, reviewed activation and conservative merging from newer controller bundles. Include the library in portable packages; existing workers need no upgrade for these controller features.
 
