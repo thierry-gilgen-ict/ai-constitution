@@ -102,7 +102,9 @@ class Studio:
         payload = self.payload()
         payload.update(edits)
         with tempfile.TemporaryDirectory() as folder:
-            candidate = Path(folder)
+            # macOS exposes its OS temporary directory through /var -> /private/var.
+            # Canonicalize our newly created scratch root, not user-selected paths.
+            candidate = Path(folder).resolve()
             for name, data in payload.items():
                 atomic_bytes(kit.safe_path(candidate, name), data)
             # These are trusted imported functions. No subprocess/import from the draft.
