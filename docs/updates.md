@@ -108,3 +108,13 @@ The installed onboarding and maintenance skills work from Codex or Cursor. A man
 ## Application and worker updates in 0.3
 
 The dashboard now provides an **Update available** notification, public release notes, verified staging, guarded restart and retained application rollback. The instruction-library updater above remains separate. See [the application update flow](workspace-upgrades.md#update-available), including idle-client checks, source environment requirements and worker maintenance.
+
+<!-- screenshots:restart:begin -->
+
+**In the dashboard · Review an update restart.** After verification, restart only when tracked and external clients are idle. Private settings and model storage are retained.
+
+![Review an update restart — demonstration data, UI 0.3.0](assets/screenshots/update-restart.png)
+
+[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:restart:end -->

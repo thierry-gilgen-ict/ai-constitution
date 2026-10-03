@@ -41,6 +41,16 @@ Use this on a trusted home LAN. RustDesk can transfer the portable package and l
 
 7. Verify one request with the new fallback, then switch to Gaming and confirm the main computer's managed GPU allocation is zero. Keep both computers awake during initial tests. An in-flight response cannot move between computers if a worker sleeps or loses its network connection.
 
+<!-- screenshots:commands:begin -->
+
+**In the dashboard · Worker commands · windows.** Choose the OS and package type, then copy each command into a fresh terminal. These are screenshots of the dashboard’s instructions, not the operating-system terminal.
+
+![Worker commands · windows — demonstration data, UI 0.3.0](assets/screenshots/worker-windows.png)
+
+[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:commands:end -->
+
 ## Stop, update or remove
 
 Drain the machine through the controller's **Your machines** page before stopping its worker window with Ctrl+C. Active response leases prevent normal shutdown; other directly connected clients cannot be tracked between requests. For runtime upgrades on a worker, drain it, finish or stop any other local sessions, and use the runtime's official updater on that computer. Restart the worker, check health and re-test its route before leaving maintenance.

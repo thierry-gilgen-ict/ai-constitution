@@ -14,6 +14,16 @@ The draft is created lazily from the controller's bundled library under `<local-
 
 Existing personal and project [policy overlays](updates.md) remain in effect. The draft edits shared defaults, not those private policy files. A more specific override can still determine the effective behavior. Use `python scripts/constitution.py explain` for the resolved policy.
 
+<!-- screenshots:edit:begin -->
+
+**In the dashboard · Review instruction edits.** Edit your private draft and choose Review & save draft. Validation and generated-file rebuilding happen before saving.
+
+![Review instruction edits — demonstration data, UI 0.3.0](assets/screenshots/constitution-edit.png)
+
+[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:edit:end -->
+
 ## What can be edited
 
 | Library content | Dashboard behavior |
@@ -26,6 +36,16 @@ Existing personal and project [policy overlays](updates.md) remain in effect. Th
 | Git metadata, environment files, client credentials, runtime state | Excluded from the shared-library browser |
 
 Files over 512 KiB are view-only. Text pages are bounded to 64,000 characters and the viewer limit is 32 MiB. The dashboard displays source text, not executable Markdown or HTML. Validation uses the controller's trusted implementation; it never runs code from the draft.
+
+<!-- screenshots:history:begin -->
+
+**In the dashboard · Recover a previous draft.** Draft history retains reviewed saves. Later edits are protected when undoing a save.
+
+![Recover a previous draft — demonstration data, UI 0.3.0](assets/screenshots/constitution-history.png)
+
+[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:history:end -->
 
 ## Upgrade and recovery
 

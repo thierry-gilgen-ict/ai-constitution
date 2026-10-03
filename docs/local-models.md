@@ -26,3 +26,13 @@ The list endpoint does not prove context size, tool calling, structured output, 
 Use the client's supported provider configuration or your own API runner to actually run the model. This toolkit does not impersonate a hosted model, bypass a product's provider restrictions, or silently substitute a local endpoint into Codex, Cursor, or Grok Bot. Grok Bot's own model remains platform managed.
 
 Sources: [Ollama list models](https://docs.ollama.com/api/tags), [LM Studio list models](https://lmstudio.ai/docs/developer/openai-compat/models).
+
+<!-- screenshots:fit:begin -->
+
+**In the dashboard · Find models for your hardware.** Choose Find models for my hardware. Estimated fit is shown separately from measured results.
+
+![Find models for your hardware — demonstration data, UI 0.3.0](assets/screenshots/model-fit.png)
+
+[Illustrated walkthrough](manual/models.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:fit:end -->

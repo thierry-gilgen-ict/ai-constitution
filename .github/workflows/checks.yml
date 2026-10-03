@@ -43,3 +43,5 @@ jobs:
         run: python scripts/constitution.py scan
       - name: Verify local documentation links
         run: python scripts/check_docs.py
+      - name: Verify screenshot freshness and publication budgets
+        run: python scripts/check_screenshots.py

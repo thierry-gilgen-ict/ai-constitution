@@ -6,9 +6,23 @@ The model snapshot records the source URL, retrieval timestamp, SHA-256, and cou
 
 The community snapshot is source data, not an independent audit of every field. Account inventories and local endpoints are excluded from public data.
 
-## Dashboard screenshot
+<!-- screenshots:capture-summary:begin -->
 
-The `control-center-preview.jpg` release asset is a screenshot of the project's own dashboard captured on October 3, 2026 with isolated fixture data. Its example login, usage figures, subscription and machine labels are demonstrations, not a user's account export. It is used in the README to illustrate the current preview.
+The current [illustrated manual](manual/README.md) contains **80 captures of UI 0.3.0**. Dashboard images use synthetic data; CLI images render real isolated commands.
+
+<!-- screenshots:capture-summary:end -->
+
+## Dashboard screenshots and CLI transcripts
+
+Dashboard screenshots render the project's actual web assets through an isolated loopback asset server, with synthetic API responses. Example accounts, model names, locations, addresses, usage, driver versions, jobs and future releases are fictional. Performance figures are simulated, not benchmarks. The fixture does not read live controller state, query subscriptions or download models.
+
+The two CLI images are rendered transcripts: the check and installer dry-run execute against temporary installation targets, then paths are normalized to demonstration locations. They are not captures of a terminal application.
+
+The [capture manifest](assets/screenshots/manifest.json) records UI version, source digest, browser/OS, fixed clock, locale, dimensions, byte counts, SHA-256 values, captions and pending external interfaces. The [maintenance guide](screenshot-maintenance.md) documents regeneration, review and CI. Each image carries a demonstration label. These original screenshots and documentation are covered by the repository's MIT license; external product names remain their owners' marks.
+
+Actual Cursor/Codex native UI, Grok Bot and OS installer/updater captures remain explicitly pending. Dashboard screenshots do not replace instruction-loading or physical acceptance evidence.
+
+The older `control-center-preview.jpg` v0.2.0 release asset was captured on October 3, 2026 using isolated fixture data. It remains a historical release artifact; the current README uses the versioned PNG set in this checkout.
 
 ## Banner artwork
 

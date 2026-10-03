@@ -30,6 +30,16 @@ The source checkout is not copied into `.config`. Runtime copies are generated f
 
 If your `.cursor` directory is a junction or symlink to a relocated profile, first inspect its destination. Pass that real, existing configuration directory explicitly with `install --platform cursor --cursor-dir /real/cursor/configuration`. The installer records the selected location privately, so later `sync` and `doctor` commands work without repeating it. The normal rule against writing through links still applies. Instruction libraries stay under `.config`.
 
+<!-- screenshots:check:begin -->
+
+**In the dashboard · Verify the instruction toolkit.** A rendered transcript of a real isolated CLI check. This image is not a screenshot of a terminal application.
+
+![Verify the instruction toolkit — demonstration data, UI 0.3.0](assets/screenshots/toolkit-check.png)
+
+[Illustrated walkthrough](manual/toolkit.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:check:end -->
+
 ## Confirm activation
 
 Restart or start a fresh agent session. Ask it to identify its active constitution version and instruction sources. File installation is deterministic; actual instruction loading depends on the client. Follow [acceptance.md](../checks/acceptance.md).
@@ -53,6 +63,16 @@ Existing team and project rules keep their native precedence. Review conflicts; 
 Use `onboard --pin` for a project that must stay on its installed version. `sync --all` skips pinned targets. An explicit `sync --all --include-pinned` updates them while retaining their pin for subsequent runs.
 
 Commit the portable project files only if appropriate for that repository. They contain no machine paths. Project context may itself be private: review it under that project's publication policy.
+
+<!-- screenshots:onboard:begin -->
+
+**In the dashboard · Review enrollment.** The enrollment preview lists proposed managed-file changes. Only ready repositories are enrolled when you apply.
+
+![Review enrollment — demonstration data, UI 0.3.0](assets/screenshots/project-preview.png)
+
+[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:onboard:end -->
 
 ## Grok Bots
 

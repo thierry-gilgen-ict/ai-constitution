@@ -12,7 +12,7 @@ Shared instructions, reusable project architectures, and a private workspace das
 [![Core: no runtime packages](https://img.shields.io/badge/core_runtime_packages-zero-b7ab95)](scripts/constitution.py)
 [![Release](https://img.shields.io/github/v/release/thierry-gilgen-ict/ai-constitution)](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest)
 
-**[Start here](docs/getting-started.md) · [Download](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest) · [Documentation](docs/README.md) · [Control center](docs/control-center.md) · [Upgrade](docs/updates.md)**
+**[Start here](docs/getting-started.md) · [Download](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest) · [Illustrated manual](docs/manual/README.md) · [Documentation](docs/README.md) · [Control center](docs/control-center.md) · [Upgrade](docs/updates.md)**
 
 Switching agents should not mean explaining your working style again. A new model release should not mean finding every stale model name in every project. And a shared configuration should never turn your home directory into a public repository.
 
@@ -40,6 +40,83 @@ Catalog counts describe the bundled [models.dev](https://models.dev) snapshot, n
 Bring existing repositories through a conflict-aware onboarding wizard. Follow or pin architecture revisions. Keep private configuration encrypted with optional restic backups. Review new model definitions and measured local performance. When GitHub has a new release, the dashboard shows **Update available**, stages a verified package and guards the restart against active work.
 
 [Encrypted backups](docs/encrypted-backups.md) · [Worker updates](docs/workspace-upgrades.md#update-available) · [Compatibility and acceptance](docs/compatibility-matrix.md)
+
+<!-- screenshots:gallery:begin -->
+
+## See it before setting it up
+
+Actual UI **0.3.0**, with fictional data. Open an image at full size, or follow the **[80-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.
+
+| Models and projects | Maintenance and visibility |
+| --- | --- |
+| **[Overview](docs/manual/overview.md)**<br>[![Overview — demonstration data](docs/assets/screenshots/overview.png)](docs/assets/screenshots/overview.png) | **[Project templates](docs/manual/architectures.md)**<br>[![Project templates — demonstration data](docs/assets/screenshots/architectures.png)](docs/assets/screenshots/architectures.png) |
+| **[Apps & subscriptions](docs/manual/accounts.md)**<br>[![Apps & subscriptions — demonstration data](docs/assets/screenshots/accounts.png)](docs/assets/screenshots/accounts.png) | **[Set up a worker](docs/manual/workers.md)**<br>[![Set up a worker — demonstration data](docs/assets/screenshots/workers.png)](docs/assets/screenshots/workers.png) |
+| **[Updates & model inbox](docs/manual/updates.md)**<br>[![Updates & model inbox — demonstration data](docs/assets/screenshots/updates.png)](docs/assets/screenshots/updates.png) | **[Configs & backups](docs/manual/vault.md)**<br>[![Configs & backups — demonstration data](docs/assets/screenshots/vault.png)](docs/assets/screenshots/vault.png) |
+
+<details>
+<summary>Explore all 14 dashboard pages</summary>
+
+### [Get started](docs/manual/setup.md)
+
+![Get started — fictional documentation data, UI 0.3.0](docs/assets/screenshots/setup.png)
+
+### [Overview](docs/manual/overview.md)
+
+![Overview — fictional documentation data, UI 0.3.0](docs/assets/screenshots/overview.png)
+
+### [Model library](docs/manual/models.md)
+
+![Model library — fictional documentation data, UI 0.3.0](docs/assets/screenshots/models.png)
+
+### [Your machines](docs/manual/machines.md)
+
+![Your machines — fictional documentation data, UI 0.3.0](docs/assets/screenshots/machines.png)
+
+### [Connect a project](docs/manual/connect.md)
+
+![Connect a project — fictional documentation data, UI 0.3.0](docs/assets/screenshots/connect.png)
+
+### [Project templates](docs/manual/architectures.md)
+
+![Project templates — fictional documentation data, UI 0.3.0](docs/assets/screenshots/architectures.png)
+
+### [Constitution files](docs/manual/constitution.md)
+
+![Constitution files — fictional documentation data, UI 0.3.0](docs/assets/screenshots/constitution.png)
+
+### [Projects](docs/manual/projects.md)
+
+![Projects — fictional documentation data, UI 0.3.0](docs/assets/screenshots/projects.png)
+
+### [Apps & subscriptions](docs/manual/accounts.md)
+
+![Apps & subscriptions — fictional documentation data, UI 0.3.0](docs/assets/screenshots/accounts.png)
+
+### [Set up a worker](docs/manual/workers.md)
+
+![Set up a worker — fictional documentation data, UI 0.3.0](docs/assets/screenshots/workers.png)
+
+### [Storage & locations](docs/manual/storage.md)
+
+![Storage & locations — fictional documentation data, UI 0.3.0](docs/assets/screenshots/storage.png)
+
+### [Updates & model inbox](docs/manual/updates.md)
+
+![Updates & model inbox — fictional documentation data, UI 0.3.0](docs/assets/screenshots/updates.png)
+
+### [Measured performance](docs/manual/insights.md)
+
+![Measured performance — fictional documentation data, UI 0.3.0](docs/assets/screenshots/insights.png)
+
+### [Configs & backups](docs/manual/vault.md)
+
+![Configs & backups — fictional documentation data, UI 0.3.0](docs/assets/screenshots/vault.png)
+
+</details>
+
+[Capture provenance](docs/provenance.md) · [Refresh screenshots](docs/screenshot-maintenance.md) · [External application checklist](docs/manual/toolkit.md#external-application-captures)
+
+<!-- screenshots:gallery:end -->
 
 ## Five-minute start
 
@@ -76,14 +153,7 @@ Open **Constitution files** to browse the library and tailor its instructions pr
 
 The [workspace control center](docs/control-center.md) adds account login labels, supported Codex usage readings, per-machine diagnostics, worker downloads and setup commands, configurable storage, central private project configuration with verified/scheduled backups, and architecture capture from existing projects. Provider availability and observation times are explicit; secret values stay out of templates and public packages.
 
-<details>
-<summary>See the workspace dashboard</summary>
 
-![Local Control applications and subscriptions dashboard with explicitly labelled demonstration data](https://github.com/thierry-gilgen-ict/ai-constitution/releases/download/v0.2.0/control-center-preview.jpg)
-
-This screenshot uses demonstration accounts and usage figures. Codex collection is opt-in; Cursor and other providers currently use manual/imported observations. [Monitoring scope](docs/control-center.md).
-
-</details>
 
 ## New models? One command.
 

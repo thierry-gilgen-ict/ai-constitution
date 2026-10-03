@@ -9,6 +9,8 @@ Publish from a clean reviewed commit on `main`. Keep the core toolkit version se
 3. Run the checks in [Contributing](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/CONTRIBUTING.md). Require green GitHub tests and history secret scanning on the revision being merged.
 4. Merge the reviewed pull request, fast-forward the local `main`, and confirm it matches `origin/main`. Record its full commit ID. Check the merged revision's CI too.
 
+Refresh and visually review the illustrated manual after UI or version changes with `npm run screenshots`. Run `python scripts/check_screenshots.py` before exporting; it checks freshness, complete coverage and the updater’s release-size limits. See [Screenshot maintenance](screenshot-maintenance.md).
+
 ## Build public assets
 
 From the merged checkout:

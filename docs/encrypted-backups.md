@@ -15,9 +15,29 @@ The child process receives credentials in its environment or through restic’s 
 
 After an encrypted backup, Local Control runs a repository metadata check. That is not a full read of every stored data blob. Run **Restore encrypted snapshot** regularly: it restores into a new private directory and invokes restic’s content verification. Existing application configuration is never overwritten; manually inspect the result before changing a project mapping.
 
+<!-- screenshots:encryption:begin -->
+
+**In the dashboard · Configure encrypted backups.** Configure the restic repository, password-file location or environment-variable name, and retention count. The password itself is never entered here.
+
+![Configure encrypted backups — demonstration data, UI 0.3.0](assets/screenshots/backup-encryption.png)
+
+[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:encryption:end -->
+
 ## Retention
 
 **Review retention** previews the snapshots that exceed your selected keep-last count. Only this controller’s unique tag group is considered. Applying requires the same settings, inventory and preview; changed snapshots require another review. Other hosts’ backups remain outside that scope. Deleted snapshot data is reclaimed only when you separately run restic `prune`; Local Control does not automatically prune.
+
+<!-- screenshots:restore:begin -->
+
+**In the dashboard · Review an encrypted restore.** Restore and verify into the new private destination. Active configuration is preserved.
+
+![Review an encrypted restore — demonstration data, UI 0.3.0](assets/screenshots/backup-restore-preview.png)
+
+[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:restore:end -->
 
 ## Schedules and recovery
 

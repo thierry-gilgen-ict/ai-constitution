@@ -1,0 +1,1740 @@
+{
+  "schema": 1,
+  "ui_version": "0.3.0",
+  "source_digest": "60aff00485d72edc8af31ea74d4683c77301d51d6c69499cc1f3604232061c02",
+  "digest_format": "UTF-8 with LF newlines; filename + NUL + content + NUL",
+  "digest_inputs": [
+    "local_control/web/index.html",
+    "local_control/web/style.css",
+    "local_control/web/app.js",
+    "local_control/web/center.js",
+    "local_control/web/studio.js",
+    "local_control/web/experience.js",
+    "VERSION",
+    "tests/fixtures/documentation.cjs",
+    "scripts/documentation_scenarios.cjs",
+    "scripts/documentation_cli.py",
+    "scripts/screenshots.cjs",
+    "templates/architecture-components.json",
+    "templates/architectures/web-product.json",
+    "templates/architectures/data-dashboard.json",
+    "templates/architectures/python-api.json",
+    "constitution.md",
+    "engineering.md",
+    "research.md",
+    "routing.md",
+    "registry/routes.json"
+  ],
+  "capture": {
+    "browser": "Chromium",
+    "browser_version": "153.0.8010.12",
+    "platform": "win32",
+    "locale": "en-GB",
+    "timezone": "UTC",
+    "clock": "2026-10-03T12:00:00Z",
+    "default_viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "data": "Synthetic fixture; CLI transcripts use real isolated dry-runs"
+  },
+  "pages": {
+    "setup": "Get started",
+    "overview": "Overview",
+    "models": "Model library",
+    "machines": "Your machines",
+    "connect": "Connect a project",
+    "architectures": "Project templates",
+    "constitution": "Constitution files",
+    "projects": "Projects",
+    "accounts": "Apps & subscriptions",
+    "workers": "Set up a worker",
+    "storage": "Storage & locations",
+    "updates": "Updates & model inbox",
+    "insights": "Measured performance",
+    "vault": "Configs & backups"
+  },
+  "chapters": {
+    "setup": [
+      "Get started",
+      "getting-started.md"
+    ],
+    "overview": [
+      "Overview and GPU release",
+      "local-control.md"
+    ],
+    "models": [
+      "Choose and manage models",
+      "local-control.md"
+    ],
+    "machines": [
+      "Machines and drivers",
+      "driver-maintenance.md"
+    ],
+    "connect": [
+      "Connect Codex and Cursor projects",
+      "local-control.md"
+    ],
+    "architectures": [
+      "Architecture templates",
+      "project-templates.md"
+    ],
+    "constitution": [
+      "Constitution files",
+      "constitution-studio.md"
+    ],
+    "projects": [
+      "Project onboarding and synchronization",
+      "control-center.md"
+    ],
+    "accounts": [
+      "Applications and subscriptions",
+      "control-center.md"
+    ],
+    "workers": [
+      "Worker installation and upgrades",
+      "windows-worker.md"
+    ],
+    "storage": [
+      "Storage locations",
+      "control-center.md"
+    ],
+    "updates": [
+      "Application and model updates",
+      "workspace-upgrades.md"
+    ],
+    "insights": [
+      "Measured performance",
+      "workspace-upgrades.md"
+    ],
+    "vault": [
+      "Private configuration and backups",
+      "encrypted-backups.md"
+    ],
+    "recovery": [
+      "Progress and recovery",
+      "workspace-upgrades.md"
+    ],
+    "toolkit": [
+      "Instruction toolkit and external setup",
+      "getting-started.md"
+    ]
+  },
+  "entries": [
+    {
+      "id": "setup",
+      "page": "setup",
+      "chapter": "setup",
+      "title": "Get started",
+      "caption": "Open Get started from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/setup.png",
+      "sha256": "e45434f195885c09d6c7bec23b4617c43f30beff9fe4473f9c90d56277604070",
+      "width": 1440,
+      "height": 1218,
+      "bytes": 109221
+    },
+    {
+      "id": "overview",
+      "page": "overview",
+      "chapter": "overview",
+      "title": "Overview",
+      "caption": "Open Overview from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/overview.png",
+      "sha256": "9e7d187491830183179280f5e6619f120389ebb0c91d7704e91d6b20a95f46e4",
+      "width": 1440,
+      "height": 1507,
+      "bytes": 136891
+    },
+    {
+      "id": "models",
+      "page": "models",
+      "chapter": "models",
+      "title": "Model library",
+      "caption": "Open Model library from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/models.png",
+      "sha256": "c1509a2030575cd0da3c22d28f780ac6fdd2dd6eb261a9c2b4baa3252c67d470",
+      "width": 1440,
+      "height": 1130,
+      "bytes": 90114
+    },
+    {
+      "id": "machines",
+      "page": "machines",
+      "chapter": "machines",
+      "title": "Your machines",
+      "caption": "Open Your machines from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/machines.png",
+      "sha256": "6959cc012dbf9e6dec2c7afa658e5fda2d9f485d32b72c4c3cc2f59b505d2ea0",
+      "width": 1440,
+      "height": 3025,
+      "bytes": 192687
+    },
+    {
+      "id": "connect",
+      "page": "connect",
+      "chapter": "connect",
+      "title": "Connect a project",
+      "caption": "Open Connect a project from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/connect.png",
+      "sha256": "4238b2b0413a2c97d0cbdb60a2d7fd1efcf4f721ce02fd339108eebf153101f6",
+      "width": 1440,
+      "height": 1621,
+      "bytes": 128110
+    },
+    {
+      "id": "architectures",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Project templates",
+      "caption": "Open Project templates from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/architectures.png",
+      "sha256": "3ea457ab68ff347601da9ea53b60540ef0f21e98f67c0b8cc1ab129029cf6459",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 94360
+    },
+    {
+      "id": "constitution",
+      "page": "constitution",
+      "chapter": "constitution",
+      "title": "Constitution files",
+      "caption": "Open Constitution files from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/constitution.png",
+      "sha256": "67f5cd2ccfd7a0001cde71529dd2fb81f908eda90490254c0e6edffe1ee85620",
+      "width": 1440,
+      "height": 1259,
+      "bytes": 123166
+    },
+    {
+      "id": "projects",
+      "page": "projects",
+      "chapter": "projects",
+      "title": "Projects",
+      "caption": "Open Projects from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/projects.png",
+      "sha256": "f42555a62af520f42e03c76d43225a8b0842ca742e11aa0f570510693ee8839d",
+      "width": 1440,
+      "height": 1189,
+      "bytes": 90528
+    },
+    {
+      "id": "accounts",
+      "page": "accounts",
+      "chapter": "accounts",
+      "title": "Apps & subscriptions",
+      "caption": "Open Apps & subscriptions from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/accounts.png",
+      "sha256": "479d2815fe3050964056c270df54e74f5476adb5270bf61217dcf86494593225",
+      "width": 1440,
+      "height": 2336,
+      "bytes": 163868
+    },
+    {
+      "id": "workers",
+      "page": "workers",
+      "chapter": "workers",
+      "title": "Set up a worker",
+      "caption": "Open Set up a worker from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/workers.png",
+      "sha256": "7fe05525050e4a4cd1aca79f9b4bbe2dcbd17bdecbee1c70d5b530bf16f15103",
+      "width": 1440,
+      "height": 2382,
+      "bytes": 181365
+    },
+    {
+      "id": "storage",
+      "page": "storage",
+      "chapter": "storage",
+      "title": "Storage & locations",
+      "caption": "Open Storage & locations from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/storage.png",
+      "sha256": "1147b79ef30ed2ae9bc9fd04e1e258f93ec24fce5bbc5712e014417b8ecd115d",
+      "width": 1440,
+      "height": 1496,
+      "bytes": 111388
+    },
+    {
+      "id": "updates",
+      "page": "updates",
+      "chapter": "updates",
+      "title": "Updates & model inbox",
+      "caption": "Open Updates & model inbox from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/updates.png",
+      "sha256": "c788f537ea3cf775315ec803dfcfcbd265aed3a19ea153530f95a7d543f305db",
+      "width": 1440,
+      "height": 1321,
+      "bytes": 93319
+    },
+    {
+      "id": "insights",
+      "page": "insights",
+      "chapter": "insights",
+      "title": "Measured performance",
+      "caption": "Open Measured performance from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/insights.png",
+      "sha256": "50372299f97f3f82ffc4e69e29abb9927ca368148b60c0dc457aca1551a17c90",
+      "width": 1440,
+      "height": 1040,
+      "bytes": 85473
+    },
+    {
+      "id": "vault",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Configs & backups",
+      "caption": "Open Configs & backups from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/vault.png",
+      "sha256": "3de0f1ed07f52eb0803f2173915234b55b5ab19f65c7b20463d66bc9f18e4d91",
+      "width": 1440,
+      "height": 1675,
+      "bytes": 111373
+    },
+    {
+      "id": "welcome",
+      "page": "overview",
+      "chapter": "setup",
+      "title": "Open the authenticated dashboard",
+      "caption": "Opening the bare address shows this welcome dialog. Run the displayed open command to sign in locally.",
+      "steps": [],
+      "scenario": "login",
+      "scope": "#login",
+      "path": "docs/assets/screenshots/welcome.png",
+      "sha256": "d86a804c87fead0ec054f71a406a5867fd25a92ab505236d57f97707fc86fc01",
+      "width": 510,
+      "height": 308,
+      "bytes": 16227
+    },
+    {
+      "id": "gpu-gaming",
+      "page": "overview",
+      "chapter": "overview",
+      "title": "Gaming mode",
+      "caption": "After draining active responses, subsequent requests use the tested fallback and managed GPU residency is checked. This state is simulated; no GPU benchmark is claimed.",
+      "steps": [],
+      "scenario": "gaming",
+      "path": "docs/assets/screenshots/gpu-gaming.png",
+      "sha256": "d5d43be0c9022e9a65265973b11d1f81b39dbb1de83cdd2f342b78eba2154fd2",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 113395
+    },
+    {
+      "id": "gpu-draining",
+      "page": "overview",
+      "chapter": "overview",
+      "title": "Wait for the current response",
+      "caption": "A transition waits for the response already using the GPU. The next request can then use the fallback.",
+      "steps": [],
+      "scenario": "draining",
+      "path": "docs/assets/screenshots/gpu-draining.png",
+      "sha256": "501d5e12d3a48e8ce669172c8656ef6d5dd2751ca2c406aed85c5d82a31585ca",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 113397
+    },
+    {
+      "id": "model-fit",
+      "page": "models",
+      "chapter": "models",
+      "title": "Find models for your hardware",
+      "caption": "Choose Find models for my hardware. Estimated fit is shown separately from measured results.",
+      "steps": [
+        [
+          "click",
+          "#suggest"
+        ]
+      ],
+      "scope": "#recommendations",
+      "path": "docs/assets/screenshots/model-fit.png",
+      "sha256": "3d197ecd7f2d5ea09f4c1abb120fd29509f3af996fc02ca720331a45fd393d61",
+      "width": 1120,
+      "height": 355,
+      "bytes": 18539
+    },
+    {
+      "id": "hugging-face",
+      "page": "models",
+      "chapter": "models",
+      "title": "Review GGUF files",
+      "caption": "Search Hugging Face, open the file list, then review the model card, license and download size. This repository and model are fictional.",
+      "steps": [
+        [
+          "fill",
+          "#hf-query",
+          "demo-coder"
+        ],
+        [
+          "click",
+          "#hf-form button"
+        ],
+        [
+          "click",
+          "[data-files]"
+        ]
+      ],
+      "scope": "#models .panel:has(#hf-form)",
+      "path": "docs/assets/screenshots/hugging-face.png",
+      "sha256": "556c6a30021b6f0275eae4fd1aecdf6ab4f2c5ed9044f4ea9fb0604a2828964c",
+      "width": 1120,
+      "height": 425,
+      "bytes": 25140
+    },
+    {
+      "id": "model-route",
+      "page": "models",
+      "chapter": "models",
+      "title": "Test a route",
+      "caption": "Use in project opens the route configuration. Choose primary or fallback and request CPU placement when appropriate.",
+      "steps": [
+        [
+          "click",
+          "[data-use] >> nth=0"
+        ]
+      ],
+      "scope": "#configure-dialog",
+      "path": "docs/assets/screenshots/model-route.png",
+      "sha256": "1669ea671f98ff7aed9e0ce71be4e313d55aa3ab2ecef79dd85192d611696f55",
+      "width": 510,
+      "height": 400,
+      "bytes": 17725
+    },
+    {
+      "id": "models-empty",
+      "page": "models",
+      "chapter": "models",
+      "title": "No models installed",
+      "caption": "An empty inventory is a starting point, not an error. Install a runtime and choose a model before configuring routes.",
+      "steps": [],
+      "scenario": "empty",
+      "path": "docs/assets/screenshots/models-empty.png",
+      "sha256": "677d18d5a0d71f8a93262184abcd5689c60bd7356b3c780ebc13eeafed2d079c",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 82568
+    },
+    {
+      "id": "driver-update",
+      "page": "machines",
+      "chapter": "machines",
+      "title": "Prepare driver maintenance",
+      "caption": "Review the target computer and update method. Confirm other clients are idle before opening that machine’s native updater.",
+      "steps": [
+        [
+          "click",
+          "[data-driver-update=\"local\"]"
+        ]
+      ],
+      "scope": "#driver-dialog",
+      "path": "docs/assets/screenshots/driver-update.png",
+      "sha256": "ef5f3bfc844e04dc0bed9f16c117bad21374841cadc7095f588219119bd4198f",
+      "width": 510,
+      "height": 616,
+      "bytes": 35697
+    },
+    {
+      "id": "machine-pairing",
+      "page": "machines",
+      "chapter": "machines",
+      "title": "Pair a worker",
+      "caption": "Give the worker a recognizable name and paste its short-lived pairing record. The documentation leaves the credential field empty.",
+      "steps": [
+        [
+          "fill",
+          "#pair-name",
+          "Work PC · demonstration"
+        ]
+      ],
+      "scope": "#pair-form",
+      "path": "docs/assets/screenshots/machine-pairing.png",
+      "sha256": "b39980314d11403b8a9b86b1915d6017ebbb48720da91cfcb5e2d5d8464ac586",
+      "width": 1070,
+      "height": 287,
+      "bytes": 9623
+    },
+    {
+      "id": "connect-launch",
+      "page": "connect",
+      "chapter": "connect",
+      "title": "Open a local Codex session",
+      "caption": "Select the project directory and client. The launcher starts a new session; it does not migrate a running direct-provider session.",
+      "steps": [
+        [
+          "fill",
+          "#launch-project",
+          "/home/demo/projects/orbit-web"
+        ],
+        [
+          "select",
+          "#launch-client",
+          "codex"
+        ]
+      ],
+      "scope": "#launch-form",
+      "path": "docs/assets/screenshots/connect-launch.png",
+      "sha256": "853074986001223e6ca69143145ab8086e85c3a2046685b0b491b374e9176f17",
+      "width": 1120,
+      "height": 408,
+      "bytes": 17367
+    },
+    {
+      "id": "cursor-task",
+      "page": "connect",
+      "chapter": "connect",
+      "title": "Run Local Codex inside Cursor",
+      "caption": "The supported Cursor workflow is a generated workspace with Terminal → Run Task → AI Constitution: Local Codex.",
+      "steps": [],
+      "scope": "#connect .connect-grid",
+      "path": "docs/assets/screenshots/cursor-task.png",
+      "sha256": "6ff7b4250eda2a18d6f6318a5ac0dbc30d16f3aa7351bb6b62a1c77413ae585c",
+      "width": 1120,
+      "height": 648,
+      "bytes": 35223
+    },
+    {
+      "id": "coding-evaluation",
+      "page": "connect",
+      "chapter": "connect",
+      "title": "Compare bounded coding checks",
+      "caption": "Choose Compare results after evaluating configured routes. Values in this example are simulated fixture results.",
+      "steps": [
+        [
+          "click",
+          "#show-evaluations"
+        ]
+      ],
+      "scope": "#connect .panel:has(#evaluation-results)",
+      "path": "docs/assets/screenshots/coding-evaluation.png",
+      "sha256": "f3d786762245448268641eb76b52d97ae8b9417826bbba4a31b9ed42c3a11021",
+      "width": 1120,
+      "height": 542,
+      "bytes": 32273
+    },
+    {
+      "id": "template-editor",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Customize a baseline",
+      "caption": "Choose Explore baseline to edit its components and decisions. The selected web baseline includes authentication, charts, email and SQL services.",
+      "steps": [
+        [
+          "click",
+          "[data-template=\"0\"]"
+        ]
+      ],
+      "scope": "#template-workbench",
+      "path": "docs/assets/screenshots/template-editor.png",
+      "sha256": "00b033ef734d8738a4419e8419af8237348921432b0a0a2f311f5b6893442b84",
+      "width": 1120,
+      "height": 2100,
+      "bytes": 105350
+    },
+    {
+      "id": "template-component",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Review a component",
+      "caption": "Each component records its repository, reviewed version, guidance and compatibility requirements.",
+      "steps": [
+        [
+          "click",
+          "[data-template=\"0\"]"
+        ],
+        [
+          "click",
+          "[data-edit-component=\"0\"]"
+        ]
+      ],
+      "scope": "#component-dialog",
+      "path": "docs/assets/screenshots/template-component.png",
+      "sha256": "1646b7283db036934a96d37dec46db0220400312ccc44c0e462f4ff309ad7e02",
+      "width": 860,
+      "height": 880,
+      "bytes": 38910
+    },
+    {
+      "id": "template-environment",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Declare environment names",
+      "caption": "Scroll through component details to enter acceptance checks and environment-variable names and purposes. Credential values belong in the private configuration store.",
+      "steps": [
+        [
+          "click",
+          "[data-template=\"0\"]"
+        ],
+        [
+          "click",
+          "[data-edit-component=\"0\"]"
+        ],
+        [
+          "fill",
+          "#component-env",
+          "APP_ORIGIN | public | Application base URL"
+        ],
+        [
+          "inner-scroll",
+          "#component-dialog",
+          "bottom"
+        ]
+      ],
+      "scope": "#component-dialog",
+      "path": "docs/assets/screenshots/template-environment.png",
+      "sha256": "5052c87b91bd8510fe9ad7033402c9dea177b91406e4b94b5a8ca4ee42ce950e",
+      "width": 860,
+      "height": 880,
+      "bytes": 36873
+    },
+    {
+      "id": "template-revisions",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Versions and inheritance",
+      "caption": "Open Versions & inheritance to inspect saved revisions or create a child of an immutable parent.",
+      "steps": [
+        [
+          "click",
+          "[data-template=\"0\"]"
+        ],
+        [
+          "click",
+          "text=Versions & inheritance"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/template-revisions.png",
+      "sha256": "65fbbf4176861c85fbd67fe3548fd657e486618e3f1ac6ce6fce9f0261241bc8",
+      "width": 860,
+      "height": 626,
+      "bytes": 33413
+    },
+    {
+      "id": "template-capture",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Capture an existing project",
+      "caption": "Choose From existing project. Select the repository and, optionally, a private mapping to inspect variable names only.",
+      "steps": [
+        [
+          "click",
+          "#template-capture"
+        ],
+        [
+          "fill",
+          "#capture-project",
+          "/home/demo/projects/orbit-web"
+        ],
+        [
+          "fill",
+          "#capture-id",
+          "orbit-baseline"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/template-capture.png",
+      "sha256": "fd152eb729b1dddfaed3bfe858dc6162c163fb779e83fce2dac7be3a1a7a2fe9",
+      "width": 860,
+      "height": 648,
+      "bytes": 32735
+    },
+    {
+      "id": "template-capture-review",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Review detected architecture",
+      "caption": "Inspect project shows supported manifest evidence before opening the proposed baseline in the editor.",
+      "steps": [
+        [
+          "click",
+          "#template-capture"
+        ],
+        [
+          "fill",
+          "#capture-project",
+          "/home/demo/projects/orbit-web"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/template-capture-review.png",
+      "sha256": "130096895fe8be43b971d90b781a460fce3aba04a911270f6ff6a69dfe5bffff",
+      "width": 860,
+      "height": 474,
+      "bytes": 24423
+    },
+    {
+      "id": "template-save",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Review a baseline save",
+      "caption": "Saving first shows a managed-file preview. Review it before adding the baseline to your private library.",
+      "steps": [
+        [
+          "click",
+          "[data-template=\"0\"]"
+        ],
+        [
+          "click",
+          "#template-save"
+        ],
+        [
+          "click",
+          "#studio-preview .diff-file summary"
+        ]
+      ],
+      "scope": "#studio-preview",
+      "path": "docs/assets/screenshots/template-save.png",
+      "sha256": "3b0d2195d35cd254b54ddd3cd0f0f6d91b75edb07141e1719d351d517f720085",
+      "width": 860,
+      "height": 556,
+      "bytes": 25564
+    },
+    {
+      "id": "template-apply",
+      "page": "architectures",
+      "chapter": "architectures",
+      "title": "Apply a pinned revision",
+      "caption": "Enter the repository and project slug, select the revision policy, and preview generated files. Applying this plan does not install dependencies.",
+      "steps": [
+        [
+          "click",
+          "[data-template=\"0\"]"
+        ],
+        [
+          "fill",
+          "#template-project",
+          "/home/demo/projects/orbit-web"
+        ],
+        [
+          "fill",
+          "#template-project-name",
+          "orbit-web"
+        ],
+        [
+          "select",
+          "#template-follow-policy",
+          "pinned"
+        ],
+        [
+          "click",
+          "#template-apply-preview"
+        ],
+        [
+          "click",
+          "#studio-preview .diff-file summary"
+        ]
+      ],
+      "scope": "#studio-preview",
+      "path": "docs/assets/screenshots/template-apply.png",
+      "sha256": "d8205fef82254f74a2873a9184fe8c1eb1a6014d6df5cf02a8108bbfd5d59488",
+      "width": 860,
+      "height": 598,
+      "bytes": 28677
+    },
+    {
+      "id": "constitution-edit",
+      "page": "constitution",
+      "chapter": "constitution",
+      "title": "Review instruction edits",
+      "caption": "Edit your private draft and choose Review & save draft. Validation and generated-file rebuilding happen before saving.",
+      "steps": [
+        [
+          "fill",
+          "#library-editor",
+          "# Shared working defaults\n\nPreserve existing work. Verify behavior before publishing.\n"
+        ],
+        [
+          "click",
+          "#library-save"
+        ],
+        [
+          "click",
+          "#studio-preview .diff-file summary"
+        ]
+      ],
+      "scope": "#studio-preview",
+      "path": "docs/assets/screenshots/constitution-edit.png",
+      "sha256": "4b36438c2c12f401453f47c9d9b41eedf05a7f759be7e8bdd4c81b6c8c6980eb",
+      "width": 860,
+      "height": 598,
+      "bytes": 26984
+    },
+    {
+      "id": "constitution-generated",
+      "page": "constitution",
+      "chapter": "constitution",
+      "title": "Inspect generated routing",
+      "caption": "Generated routing is view-only. Change source definitions and route choices, then rebuild.",
+      "steps": [
+        [
+          "click",
+          "[data-file=\"routing.md\"]"
+        ]
+      ],
+      "scope": "#constitution .file-workspace",
+      "path": "docs/assets/screenshots/constitution-generated.png",
+      "sha256": "faf7280fb1db87efe5ce73f9377765bbdbc4903b85f2045dca2143d656eff598",
+      "width": 1120,
+      "height": 1357,
+      "bytes": 49985
+    },
+    {
+      "id": "constitution-activation",
+      "page": "constitution",
+      "chapter": "constitution",
+      "title": "Review activation",
+      "caption": "Activation lists affected installations and file paths. Confirm instruction loading in a fresh client session afterward.",
+      "steps": [
+        [
+          "click",
+          "#library-activate"
+        ]
+      ],
+      "scope": "#studio-preview",
+      "path": "docs/assets/screenshots/constitution-activation.png",
+      "sha256": "0134c58a77eda715661035dcd2a23724126f934f746ae4cdb0c9b8330dbfdf27",
+      "width": 860,
+      "height": 476,
+      "bytes": 26247
+    },
+    {
+      "id": "constitution-history",
+      "page": "constitution",
+      "chapter": "constitution",
+      "title": "Recover a previous draft",
+      "caption": "Draft history retains reviewed saves. Later edits are protected when undoing a save.",
+      "steps": [
+        [
+          "click",
+          "#library-history"
+        ]
+      ],
+      "scope": "#studio-preview",
+      "path": "docs/assets/screenshots/constitution-history.png",
+      "sha256": "c2adff2c255c4d473b541d7cc3f433013aa777eb4b3df45acc7cc1dc92aa2847",
+      "width": 860,
+      "height": 422,
+      "bytes": 18834
+    },
+    {
+      "id": "constitution-refresh",
+      "page": "constitution",
+      "chapter": "constitution",
+      "title": "Review a library refresh",
+      "caption": "Bring unchanged draft files up to date while preserving customizations. Activation remains a separate reviewed step.",
+      "steps": [
+        [
+          "click",
+          "#library-refresh"
+        ],
+        [
+          "click",
+          "#studio-preview .diff-file summary"
+        ]
+      ],
+      "scope": "#studio-preview",
+      "path": "docs/assets/screenshots/constitution-refresh.png",
+      "sha256": "4ba527c7db500ab34ae9589ed791d958182e50767660ef166ac158c428122f9a",
+      "width": 860,
+      "height": 534,
+      "bytes": 23661
+    },
+    {
+      "id": "project-discovery",
+      "page": "projects",
+      "chapter": "projects",
+      "title": "Choose repository roots",
+      "caption": "Bring my projects searches the roots you specify. It skips dependencies, build folders and filesystem links.",
+      "steps": [
+        [
+          "click",
+          "#bring-projects"
+        ],
+        [
+          "fill",
+          "#discover-roots",
+          "/home/demo/projects"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/project-discovery.png",
+      "sha256": "b86eb5f0ecd1e2fc4e150222d27ef051b15512526521693689426f9847ee1ba0",
+      "width": 860,
+      "height": 414,
+      "bytes": 19667
+    },
+    {
+      "id": "project-selection",
+      "page": "projects",
+      "chapter": "projects",
+      "title": "Select repositories and mappings",
+      "caption": "Choose repositories to enroll, associate existing private configuration, and explicitly adopt portable bundles when applicable.",
+      "steps": [
+        [
+          "click",
+          "#bring-projects"
+        ],
+        [
+          "fill",
+          "#discover-roots",
+          "/home/demo/projects"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/project-selection.png",
+      "sha256": "a430602b5754c5cc8aade42c07b250cab102f4dd09bcb987a0f019f2d252761b",
+      "width": 860,
+      "height": 776,
+      "bytes": 28322
+    },
+    {
+      "id": "project-preview",
+      "page": "projects",
+      "chapter": "projects",
+      "title": "Review enrollment",
+      "caption": "The enrollment preview lists proposed managed-file changes. Only ready repositories are enrolled when you apply.",
+      "steps": [
+        [
+          "click",
+          "#bring-projects"
+        ],
+        [
+          "fill",
+          "#discover-roots",
+          "/home/demo/projects"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/project-preview.png",
+      "sha256": "30070b13204f7159de493f26b361a49eb07d69cdcf31697dcf8e9a7e302e6462",
+      "width": 860,
+      "height": 502,
+      "bytes": 25239
+    },
+    {
+      "id": "project-conflict",
+      "page": "projects",
+      "chapter": "projects",
+      "title": "Resolve a synchronization conflict",
+      "caption": "Local managed-file edits stop synchronization for the affected project. Review the change before retrying.",
+      "steps": [],
+      "scenario": "conflict",
+      "path": "docs/assets/screenshots/project-conflict.png",
+      "sha256": "13432495b95255565e495a907da88b242e7de8f07b55f325af8cf21da78f4c1b",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 83904
+    },
+    {
+      "id": "projects-empty",
+      "page": "projects",
+      "chapter": "projects",
+      "title": "Start with no enrolled projects",
+      "caption": "Use Bring my projects or apply a baseline to create your first enrollment.",
+      "steps": [],
+      "scenario": "empty",
+      "path": "docs/assets/screenshots/projects-empty.png",
+      "sha256": "29627f6a38e52024e83526f3829fd4ab7938a6f8076291223cbe3dcc8aa2ca61",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 75846
+    },
+    {
+      "id": "subscription-edit",
+      "page": "accounts",
+      "chapter": "accounts",
+      "title": "Identify a subscription",
+      "caption": "Record the login identifier, provider, application, plan and machine. These fields identify the account without storing its password.",
+      "steps": [
+        [
+          "click",
+          "[data-account-edit] >> nth=0"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/subscription-edit.png",
+      "sha256": "ea4b7fe66f7a37d80bd1157408273d557ff11718965b4d163f29818429ad3390",
+      "width": 860,
+      "height": 628,
+      "bytes": 27150
+    },
+    {
+      "id": "subscription-usage",
+      "page": "accounts",
+      "chapter": "accounts",
+      "title": "Record a usage observation",
+      "caption": "Usage observations carry a unit, period, source and timestamp. They are separate from automatically collected quota windows.",
+      "steps": [
+        [
+          "click",
+          "[data-usage] >> nth=0"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/subscription-usage.png",
+      "sha256": "b805b1b91f376a919ca257c4ed5c627a84e713b66c2ab1217cc14bec600cf9d8",
+      "width": 860,
+      "height": 698,
+      "bytes": 31428
+    },
+    {
+      "id": "cost-connector",
+      "page": "accounts",
+      "chapter": "accounts",
+      "title": "Configure read-only API costs",
+      "caption": "Select a supported organization connector and the name of an existing admin-key environment variable. Never paste the key itself.",
+      "steps": [
+        [
+          "click",
+          "[data-connector-config] >> nth=0"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/cost-connector.png",
+      "sha256": "ef82b1ac054a3b6a5d100967d55f0407178a111e4ce944b23abadee0f6c93e47",
+      "width": 860,
+      "height": 490,
+      "bytes": 26202
+    },
+    {
+      "id": "subscription-log",
+      "page": "accounts",
+      "chapter": "accounts",
+      "title": "Inspect integration events",
+      "caption": "Integration logs show observation status and event codes for the selected subscription.",
+      "steps": [
+        [
+          "click",
+          "[data-account-log] >> nth=0"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/subscription-log.png",
+      "sha256": "02848667f9304b9aea30a53b7b476a145281b38008376c1499d21daf8cfe4693",
+      "width": 860,
+      "height": 352,
+      "bytes": 15702
+    },
+    {
+      "id": "machine-diagnostics",
+      "page": "accounts",
+      "chapter": "accounts",
+      "title": "Inspect worker diagnostics",
+      "caption": "Use Diagnostics & operation log for allowlisted support information. The example contains no credentials or conversation contents.",
+      "steps": [
+        [
+          "click",
+          "[data-machine-debug] >> nth=0"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/machine-diagnostics.png",
+      "sha256": "14d29263a61a99dd2ea2317d482f5f34529ccca7a4907d8c518cc2cfbe937084",
+      "width": 860,
+      "height": 614,
+      "bytes": 27628
+    },
+    {
+      "id": "collector-failure",
+      "page": "accounts",
+      "chapter": "accounts",
+      "title": "Retain the last successful report",
+      "caption": "A failed refresh is visible while the previous successful report remains available with its observation time.",
+      "steps": [],
+      "scenario": "collector-failed",
+      "path": "docs/assets/screenshots/collector-failure.png",
+      "sha256": "2e9fa08273849d2674911b0b343d95e23da99931fb11b446d5ced37546e18e5c",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 93465
+    },
+    {
+      "id": "worker-download",
+      "page": "workers",
+      "chapter": "workers",
+      "title": "Get a verified worker package",
+      "caption": "Choose Windows x64, Apple Silicon or Linux x64. Source packages support other compatible environments.",
+      "steps": [
+        [
+          "click",
+          "#worker-release-download"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/worker-download.png",
+      "sha256": "4ecf19be54e14826468a6edba94f8aa6bfad799cc06ff75cb8eeb50a49b41f57",
+      "width": 860,
+      "height": 408,
+      "bytes": 23490
+    },
+    {
+      "id": "worker-windows",
+      "page": "workers",
+      "chapter": "workers",
+      "title": "Worker commands · windows",
+      "caption": "Choose the OS and package type, then copy each command into a fresh terminal. These are screenshots of the dashboard’s instructions, not the operating-system terminal.",
+      "steps": [
+        [
+          "select",
+          "#worker-os",
+          "windows"
+        ],
+        [
+          "scroll",
+          "#worker-commands"
+        ]
+      ],
+      "scope": "#workers .panel:has(#worker-commands)",
+      "path": "docs/assets/screenshots/worker-windows.png",
+      "sha256": "f971d231ac43569fc9e3ab77fab23b12877285e93741c34240a4e9a3b922c628",
+      "width": 1120,
+      "height": 1089,
+      "bytes": 74129
+    },
+    {
+      "id": "worker-macos",
+      "page": "workers",
+      "chapter": "workers",
+      "title": "Worker commands · macos",
+      "caption": "Choose the OS and package type, then copy each command into a fresh terminal. These are screenshots of the dashboard’s instructions, not the operating-system terminal.",
+      "steps": [
+        [
+          "select",
+          "#worker-os",
+          "macos"
+        ],
+        [
+          "scroll",
+          "#worker-commands"
+        ]
+      ],
+      "scope": "#workers .panel:has(#worker-commands)",
+      "path": "docs/assets/screenshots/worker-macos.png",
+      "sha256": "c30f0319c933a8fb6c9e6e5092b91b0e197cee8f6d8bc4ab28ca67f0a169ee52",
+      "width": 1120,
+      "height": 1007,
+      "bytes": 67959
+    },
+    {
+      "id": "worker-linux",
+      "page": "workers",
+      "chapter": "workers",
+      "title": "Worker commands · linux",
+      "caption": "Choose the OS and package type, then copy each command into a fresh terminal. These are screenshots of the dashboard’s instructions, not the operating-system terminal.",
+      "steps": [
+        [
+          "select",
+          "#worker-os",
+          "linux"
+        ],
+        [
+          "scroll",
+          "#worker-commands"
+        ]
+      ],
+      "scope": "#workers .panel:has(#worker-commands)",
+      "path": "docs/assets/screenshots/worker-linux.png",
+      "sha256": "59cea4775ba55067c892ee6c6e0662f3a55ac26b8ea275ada16e4639bc1e01e2",
+      "width": 1120,
+      "height": 1007,
+      "bytes": 67748
+    },
+    {
+      "id": "worker-maintenance",
+      "page": "workers",
+      "chapter": "workers",
+      "title": "Worker version and updates",
+      "caption": "Review version and capabilities, check updates, manage login startup and prepare a guarded restart. Other controllers using the worker must also be idle.",
+      "steps": [
+        [
+          "click",
+          "[data-worker-open]"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/worker-maintenance.png",
+      "sha256": "5040ade8e63d19e122ffe876fa9555a5e214772371bc4cc091f240659f2c1036",
+      "width": 860,
+      "height": 482,
+      "bytes": 22520
+    },
+    {
+      "id": "storage-preview",
+      "page": "storage",
+      "chapter": "storage",
+      "title": "Review location changes",
+      "caption": "Choose new locations and review verified copies before saving. Existing storage is preserved.",
+      "steps": [
+        [
+          "fill",
+          "#location-studio",
+          "/home/demo/new-private-library"
+        ],
+        [
+          "click",
+          "#storage-form button"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/storage-preview.png",
+      "sha256": "828e90f3599cd7cfb46cbd7b1a1d1404a700bc5a1201fcaac5dac5a6147b06c5",
+      "width": 860,
+      "height": 360,
+      "bytes": 20490
+    },
+    {
+      "id": "model-storage-copy",
+      "page": "storage",
+      "chapter": "storage",
+      "title": "Copy and verify weights",
+      "caption": "Copy existing weights into a new destination. Review the file count and size before starting.",
+      "steps": [
+        [
+          "click",
+          "#storage-copy-models"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/model-storage-copy.png",
+      "sha256": "4ac508e10cf3ccb3ee4760e20111f4860a1ceade1a4773ee7742f922ba303697",
+      "width": 860,
+      "height": 374,
+      "bytes": 22288
+    },
+    {
+      "id": "update-release-notes",
+      "page": "updates",
+      "chapter": "updates",
+      "title": "Read release changes",
+      "caption": "The header notification opens Updates. Expand Release changes before choosing a verified download. The displayed release is fictional.",
+      "steps": [
+        [
+          "click",
+          "#updates-content details >> nth=0"
+        ]
+      ],
+      "path": "docs/assets/screenshots/update-release-notes.png",
+      "sha256": "7913aa54f48729234ec955942858108a1268dc58d4738ad6dcc20949f7c68d44",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 84316
+    },
+    {
+      "id": "update-restart",
+      "page": "updates",
+      "chapter": "updates",
+      "title": "Review an update restart",
+      "caption": "After verification, restart only when tracked and external clients are idle. Private settings and model storage are retained.",
+      "steps": [
+        [
+          "click",
+          "#update-apply"
+        ]
+      ],
+      "scenario": "staged",
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/update-restart.png",
+      "sha256": "8fe264227fea24c71fea1ac7af2bfbf50407d01019a6550d2841f6620b43ae2c",
+      "width": 860,
+      "height": 376,
+      "bytes": 19062
+    },
+    {
+      "id": "update-blocked",
+      "page": "updates",
+      "chapter": "updates",
+      "title": "Active work blocks restart",
+      "caption": "Active responses and managed sessions block restart. Finish the work and request a fresh preview.",
+      "steps": [
+        [
+          "click",
+          "#update-apply"
+        ]
+      ],
+      "scenario": "blocked",
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/update-blocked.png",
+      "sha256": "a44baee33166f140238e1f0683b5d29580f89ed0f07a7d98a6da220a52eb9743",
+      "width": 860,
+      "height": 450,
+      "bytes": 23214
+    },
+    {
+      "id": "update-rollback",
+      "page": "updates",
+      "chapter": "updates",
+      "title": "Review application rollback",
+      "caption": "Rollback uses the retained application and the same idle-service safeguards.",
+      "steps": [
+        [
+          "click",
+          "#update-rollback"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/update-rollback.png",
+      "sha256": "93f5cb7117ce36f2d48424de7bd5782d13f1dc7c46c212742a2b4a0f25cf2296",
+      "width": 860,
+      "height": 376,
+      "bytes": 19833
+    },
+    {
+      "id": "model-inbox-detail",
+      "page": "updates",
+      "chapter": "updates",
+      "title": "Inspect changed model fields",
+      "caption": "Review catalog differences and routing impact. Importing definitions does not establish account access or change a running model.",
+      "steps": [
+        [
+          "click",
+          "#model-diff-list summary"
+        ]
+      ],
+      "scope": "#updates-content .panel >> nth=1",
+      "path": "docs/assets/screenshots/model-inbox-detail.png",
+      "sha256": "f94e9ac2ec41d0335eb90475880167ffdde2a7748406f0e0adb330f441785e8d",
+      "width": 1120,
+      "height": 869,
+      "bytes": 32867
+    },
+    {
+      "id": "model-inbox-apply",
+      "page": "updates",
+      "chapter": "updates",
+      "title": "Review catalog application",
+      "caption": "Apply only the reviewed definitions. A transaction snapshot is retained and stale previews are refused.",
+      "steps": [
+        [
+          "click",
+          "#model-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/model-inbox-apply.png",
+      "sha256": "10114ed2619e326f23a078d274f7a08475ffeb2047a0938da7f633a34913cbc6",
+      "width": 860,
+      "height": 336,
+      "bytes": 19927
+    },
+    {
+      "id": "performance-empty",
+      "page": "insights",
+      "chapter": "insights",
+      "title": "No measured profiles yet",
+      "caption": "Configure and evaluate a model before using measured profiles. Estimates and observations remain separate.",
+      "steps": [],
+      "scenario": "empty",
+      "path": "docs/assets/screenshots/performance-empty.png",
+      "sha256": "bfced1e290cd48e81de79b34eb7abacdfb1d68c997b74b6b01a9839cdf968e46",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 80069
+    },
+    {
+      "id": "config-mapping",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Register a project configuration folder",
+      "caption": "Map an existing private configuration folder to its project. Only selected folders enter backups.",
+      "steps": [
+        [
+          "click",
+          "[data-vault-edit]"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/config-mapping.png",
+      "sha256": "268f63aee71fe69843dd2d737d5a4efe7d103c7886b3f9c20d333489ac952df2",
+      "width": 860,
+      "height": 576,
+      "bytes": 27701
+    },
+    {
+      "id": "backup-preview",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Review a configuration backup",
+      "caption": "Check selected projects, file count, size and the actual backend destination before creating a verified backup.",
+      "steps": [
+        [
+          "click",
+          "#vault-backup"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/backup-preview.png",
+      "sha256": "3a8af0715f1b6260ec4d1be043a897bc0699d6b10a6d7244d3b2c1edaac3c992",
+      "width": 860,
+      "height": 414,
+      "bytes": 23160
+    },
+    {
+      "id": "backup-encryption",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Configure encrypted backups",
+      "caption": "Configure the restic repository, password-file location or environment-variable name, and retention count. The password itself is never entered here.",
+      "steps": [
+        [
+          "click",
+          "#restic-settings"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/backup-encryption.png",
+      "sha256": "94f04e84729aef8640e72d17876fd283be1997cf40d5994889bc8e240bd4f5a0",
+      "width": 860,
+      "height": 664,
+      "bytes": 32882
+    },
+    {
+      "id": "backup-initialize",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Initialize the repository",
+      "caption": "Initialize the configured encrypted repository and retain its password separately before backing up.",
+      "steps": [
+        [
+          "click",
+          "#restic-init"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/backup-initialize.png",
+      "sha256": "98cc1a5db248fee22588d075b49b156f13946ad60d2c96abe698e7c47111e4fe",
+      "width": 860,
+      "height": 298,
+      "bytes": 17303
+    },
+    {
+      "id": "backup-schedule",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Schedule backups outside the dashboard",
+      "caption": "Create a task for the current OS user. Its credential source must be available to the scheduled process.",
+      "steps": [
+        [
+          "click",
+          "#backup-os-schedule"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/backup-schedule.png",
+      "sha256": "e3957d961759acf4acc8b969f36ed4e8032cbd597988eae0a9bdbbf2c7af6e6d",
+      "width": 860,
+      "height": 466,
+      "bytes": 28600
+    },
+    {
+      "id": "backup-retention",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Review retention deletion",
+      "caption": "Deletion is limited to the reviewed snapshot IDs in this controller’s tag group.",
+      "steps": [
+        [
+          "click",
+          "#restic-retention"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/backup-retention.png",
+      "sha256": "de5449b53ef4b2b0e23fe7cc2a8af60ce5477cc9499f7ce4575c33ca0af0bce6",
+      "width": 860,
+      "height": 406,
+      "bytes": 18950
+    },
+    {
+      "id": "backup-restore",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Select an encrypted snapshot",
+      "caption": "Choose a snapshot and a new directory before requesting the restoration preview.",
+      "steps": [
+        [
+          "click",
+          "#restic-restore"
+        ],
+        [
+          "fill",
+          "#encrypted-destination",
+          "/home/demo/restore-drill/orbit-web"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/backup-restore.png",
+      "sha256": "1d720afff40dda795b92c138913a7529cc80aa19b72fba39efd899cf47e9274b",
+      "width": 860,
+      "height": 428,
+      "bytes": 20620
+    },
+    {
+      "id": "backup-restore-preview",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Review an encrypted restore",
+      "caption": "Restore and verify into the new private destination. Active configuration is preserved.",
+      "steps": [
+        [
+          "click",
+          "#restic-restore"
+        ],
+        [
+          "fill",
+          "#encrypted-destination",
+          "/home/demo/restore-drill/orbit-web"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/backup-restore-preview.png",
+      "sha256": "d3a864f17beddad8b19be98c68667a51aba9ad4effea99544754323ede09b2af",
+      "width": 860,
+      "height": 336,
+      "bytes": 18462
+    },
+    {
+      "id": "local-restore-preview",
+      "page": "vault",
+      "chapter": "vault",
+      "title": "Restore a local snapshot",
+      "caption": "Local snapshots also restore into a new directory. Review restored files before changing the project mapping.",
+      "steps": [
+        [
+          "click",
+          "[data-restore]"
+        ],
+        [
+          "fill",
+          "#restore-destination",
+          "/home/demo/restore-drill/local-copy"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/local-restore-preview.png",
+      "sha256": "256ced13432366074523f490be5b26f11faad8d159d36b0a08d709fd8f7d30ef",
+      "width": 860,
+      "height": 360,
+      "bytes": 18361
+    },
+    {
+      "id": "notifications",
+      "page": "overview",
+      "chapter": "recovery",
+      "title": "Review actionable failures",
+      "caption": "Unacknowledged failures remain visible. Open the recovery page for a fresh preview and retry.",
+      "steps": [
+        [
+          "click",
+          "#notifications-button"
+        ]
+      ],
+      "scenario": "failure",
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/notifications.png",
+      "sha256": "9a37a02a01c03357803bcbe9fa01fff754a233ee57bbd3d04f3b73f3b5348d0b",
+      "width": 860,
+      "height": 504,
+      "bytes": 23040
+    },
+    {
+      "id": "operation-progress",
+      "page": "models",
+      "chapter": "recovery",
+      "title": "Keep using the dashboard during a job",
+      "caption": "A model download shows durable operation progress. This demonstration simulates progress without downloading weights.",
+      "steps": [
+        [
+          "fill",
+          "#pull-model",
+          "demo-coder:7b"
+        ],
+        [
+          "click",
+          "#pull-form button"
+        ]
+      ],
+      "path": "docs/assets/screenshots/operation-progress.png",
+      "sha256": "f17389664dbdd110acadeacfe1c2cbc8f5592387d80f042af03fc8017cb8fe0c",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 92753
+    },
+    {
+      "id": "support-report",
+      "page": "overview",
+      "chapter": "recovery",
+      "title": "Preview support information",
+      "caption": "Review the allowlisted diagnostic report before downloading it. Prompts, credentials and private raw provider errors are excluded.",
+      "steps": [
+        [
+          "click",
+          "#support-export"
+        ]
+      ],
+      "scope": "#overview .service-panel",
+      "path": "docs/assets/screenshots/support-report.png",
+      "sha256": "5c96aadd83ca8e05743aaac0b31d39e6f592587f349298d050d5bf4039a97320",
+      "width": 1120,
+      "height": 686,
+      "bytes": 30842
+    },
+    {
+      "id": "mobile-updates",
+      "page": "updates",
+      "chapter": "recovery",
+      "title": "Use a smaller screen",
+      "caption": "The same update controls remain available on a smaller viewport. This is responsive-browser coverage, not a native mobile app.",
+      "steps": [],
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "path": "docs/assets/screenshots/mobile-updates.png",
+      "sha256": "69b91471bd9aa46d1619624b104413a99bf5ebda828dbb42a96273dfccca057b",
+      "width": 390,
+      "height": 1600,
+      "bytes": 70031
+    },
+    {
+      "id": "tablet-projects",
+      "page": "projects",
+      "chapter": "recovery",
+      "title": "Project cards on a tablet-sized viewport",
+      "caption": "Project information and actions adapt to the available width.",
+      "steps": [],
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "fullPage": true,
+      "path": "docs/assets/screenshots/tablet-projects.png",
+      "sha256": "e1bd64c899e3b1363b102ef44cfef8bc09a78f5c58cc075dfa48446e17ec185c",
+      "width": 820,
+      "height": 1367,
+      "bytes": 93148
+    },
+    {
+      "id": "toolkit-check",
+      "page": null,
+      "chapter": "toolkit",
+      "title": "Verify the instruction toolkit",
+      "caption": "A rendered transcript of a real isolated CLI check. This image is not a screenshot of a terminal application.",
+      "steps": [],
+      "transcript": "check",
+      "path": "docs/assets/screenshots/toolkit-check.png",
+      "sha256": "723c5eb0e147c8db5ecd54e5ae56e6f00f80e41456580a0d974287b58b1385cd",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 28634
+    },
+    {
+      "id": "toolkit-install-preview",
+      "page": null,
+      "chapter": "toolkit",
+      "title": "Preview installation",
+      "caption": "A rendered summary from a real dry-run against a temporary home. No live Codex or Cursor files are written.",
+      "steps": [],
+      "transcript": "install",
+      "path": "docs/assets/screenshots/toolkit-install-preview.png",
+      "sha256": "43029c3077544a27710a463fa74e6692fdafc0e940cffdae648680e6852c98b6",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 51605
+    }
+  ],
+  "external_captures": [
+    {
+      "id": "cursor-task-picker",
+      "title": "Cursor task picker and local terminal session",
+      "guide": "docs/local-control.md",
+      "status": "pending",
+      "reason": "Requires an actual external application or OS capture. Dashboard fixtures cannot verify that interface."
+    },
+    {
+      "id": "codex-instructions",
+      "title": "Codex instruction-loading verification",
+      "guide": "onboarding/project.md",
+      "status": "pending",
+      "reason": "Requires an actual external application or OS capture. Dashboard fixtures cannot verify that interface."
+    },
+    {
+      "id": "grok-bot-setup",
+      "title": "xAI Grok Bot instruction setup",
+      "guide": "onboarding/bot.md",
+      "status": "pending",
+      "reason": "Requires an actual external application or OS capture. Dashboard fixtures cannot verify that interface."
+    },
+    {
+      "id": "windows-driver-updater",
+      "title": "Windows native driver update controls",
+      "guide": "docs/driver-maintenance.md",
+      "status": "pending",
+      "reason": "Requires an actual external application or OS capture. Dashboard fixtures cannot verify that interface."
+    },
+    {
+      "id": "macos-driver-updater",
+      "title": "macOS native Software Update",
+      "guide": "docs/driver-maintenance.md",
+      "status": "pending",
+      "reason": "Requires an actual external application or OS capture. Dashboard fixtures cannot verify that interface."
+    },
+    {
+      "id": "ollama-installer",
+      "title": "Ollama native installation",
+      "guide": "docs/local-models.md",
+      "status": "pending",
+      "reason": "Requires an actual external application or OS capture. Dashboard fixtures cannot verify that interface."
+    }
+  ]
+}

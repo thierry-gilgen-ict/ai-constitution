@@ -49,3 +49,13 @@ For removal, disable startup and stop the controller before removing its portabl
 ## Release gates
 
 CI build success is not physical inference certification. Signed Windows installers, notarized macOS app bundles, physical Mac/AMD/Intel/ARM inference coverage, multi-computer soak tests and external first-run usability checks remain required before a broad desktop release. No signing identity or certificate is stored in this repository.
+
+<!-- screenshots:packages:begin -->
+
+**In the dashboard · Get a verified worker package.** Choose Windows x64, Apple Silicon or Linux x64. Source packages support other compatible environments.
+
+![Get a verified worker package — demonstration data, UI 0.3.0](assets/screenshots/worker-download.png)
+
+[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.3.0.
+
+<!-- screenshots:packages:end -->

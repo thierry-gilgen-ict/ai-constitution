@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added an illustrated manual with 80 images across all 14 dashboard pages, detailed workflows, recovery states and responsive layouts. Updated the README and guides with screenshots beside their instructions.
+- Added one-command fixture captures, real isolated CLI transcripts, screenshot provenance and integrity/freshness/coverage checks. CI produces visual comparisons and enforces image and release-size budgets. External native application captures remain explicitly pending.
+
 ## 0.3.0 — 2026-10-03
 
 - Added GitHub update notifications, verified controller/worker staging, guarded restart and retained application rollback copies.
