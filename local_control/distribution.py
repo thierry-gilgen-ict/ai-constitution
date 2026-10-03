@@ -113,7 +113,7 @@ def catalog(root):
         kit.no_links(path)
         if path.is_file(): result.append({**record, 'download': '/api/worker-package?id=' + record['id']})
     return {'packages': result, 'builds_url': PROJECT + '/actions/workflows/package-preview.yml',
-            'docs_url': PROJECT + '/blob/feat/local-control/docs/windows-worker.md',
+            'docs_url': PROJECT + '/blob/main/docs/windows-worker.md',
             'note': 'Download here, then transfer the whole archive to the worker. The dashboard stays on loopback; it is not exposed on your LAN.'}
 
 
