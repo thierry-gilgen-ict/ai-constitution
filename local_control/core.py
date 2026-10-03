@@ -69,11 +69,16 @@ class Control:
             return copy.deepcopy(self.config["nodes"][identity])
 
     def status(self):
+        from .services import errors as service_errors
         with self.lock:
             nodes = {k: {a: b for a, b in n.items() if a not in ("token", "inference_token", "fingerprint")} for k, n in self.config["nodes"].items()}
             return {"nodes": nodes, "primary": self.config["primary"], "fallback": self.config["fallback"],
                     "mode": self.mode, "phase": self.phase, "active_requests": sum(self.active.values()),
-                    "jobs": list(self.jobs.values())[-15:][::-1], "events": self.events[:20], "alias": ALIAS,
+                    "service_errors": service_errors(self.root),
+                    "notifications": [j for j in self.jobs.values() if j["status"] in ("failed", "interrupted") and not j.get("acknowledged")],
+                    "jobs": list(self.jobs.values())[-50:][::-1], "events": self.events[:20], "alias": ALIAS,
+                    "task_profile": self.config.get("task_profile", "deep"), "automatic_fallback": self.config.get("automatic_fallback", True),
+                    "permissions": "Private state permissions enforced for the current OS user",
                     "context": self.config["context"], "managed": copy.deepcopy(self.config["managed"]),
                     "health": copy.deepcopy(self.health), "queued_requests": self.queued,
                     "health_history": self.health_history[-20:], "waiting_requests": list(self.waiting),
@@ -379,14 +384,8 @@ class Control:
             return {'status': 'cancellation-requested'}
 
     def route(self):
-        endpoint = self.config['fallback' if self.mode in ('gaming', 'draining') else 'primary']
-        if not endpoint:
-            raise ValueError('Configure a working route in the dashboard first')
-        if endpoint['node'] in self.config['maintenance']:
-            raise ValueError('Selected machine is in maintenance; choose and test another route first')
-        if self.mode in ('gaming', 'draining') and not self.gaming_eligible(endpoint):
-            raise ValueError('Selected route would use the protected GPU; test another fallback')
-        return copy.deepcopy(endpoint)
+        from .routing import select
+        return select(self)
 
     def gaming_eligible(self, endpoint):
         primary = self.config.get('primary')
@@ -436,16 +435,21 @@ class Control:
             self.changed.notify_all()
         return {'note': 'Queued request cancelled before inference; the client receives an explicit error'}
 
-    def health_check(self, progress=lambda _: None):
+    def health_check(self, progress=lambda _: None, *, force=True):
         result = {}
         for identity in list(self.config['nodes']):
+            if not force and self.health.get(identity, {}).get('retry_after', 0) > time.time():
+                result[identity] = self.health[identity]; continue
             start = time.monotonic()
             try:
                 value = self.rpc(self.node(identity), '/api/version', timeout=3)
-                result[identity] = {'status': 'online', 'version': value.get('version'), 'checked_at': time.time(),
+                tags = self.rpc(self.node(identity), '/api/tags', timeout=3)
+                result[identity] = {'failures': 0, 'status': 'online', 'version': value.get('version'), 'checked_at': time.time(),
                                     'latency_ms': round(1000 * (time.monotonic() - start))}
+                if isinstance(tags.get('models'), list): result[identity]['ready_models'] = [m['name'] for m in tags['models']]
             except Exception:
-                result[identity] = {'status': 'offline', 'checked_at': time.time()}
+                failures = min(self.health.get(identity, {}).get('failures', 0) + 1, 5)
+                result[identity] = {'status': 'offline', 'checked_at': time.time(), 'failures': failures, 'retry_after': time.time() + min(300, 15 * 2**failures)}
         with self.lock:
             self.health = result
             self.health_history.extend({'node': n, **value} for n, value in result.items())
@@ -591,7 +595,7 @@ class Control:
                     raise
             return {'status': 'removed'}
 
-    def submit(self, label, function, *args):
+    def submit(self, label, function, *args, quiet=False):
         with self.lock:
             if self.stopping: raise ValueError('Local Control is stopping; no new operations can start')
             if sum(j["status"] in ("queued", "running") for j in self.jobs.values()) >= 4:
@@ -599,12 +603,8 @@ class Control:
             identity = uuid.uuid4().hex[:12]
             job = {"id": identity, "label": label, "status": "queued", "detail": "Waiting", "created_at": time.time()}
             self.jobs[identity] = job
-            if len(self.jobs) > 50:
-                for old in list(self.jobs):
-                    if self.jobs[old]["status"] not in ("queued", "running"):
-                        del self.jobs[old]
-                        break
             job['operation'] = function.__name__
+            job['maintenance'] = quiet
             operations.save(self.root, self.jobs, self.events)
         def progress(detail):
             with self.lock:
@@ -622,11 +622,23 @@ class Control:
                 result = function(*args, progress=progress)
                 with self.lock:
                     job.update(status="done", detail="Complete", result=result)
-                self.event(label + " completed")
+                changed = not quiet or bool(isinstance(result, dict) and any(p.get("snapshot") or p.get("status") == "conflict" for p in result.get("projects", [])))
+                if changed: self.event(label + " completed")
+                else:
+                    with self.lock:
+                        self.jobs.pop(identity, None)
+                        operations.save(self.root, self.jobs, self.events)
             except Exception as error:
                 message = str(error) if isinstance(error, ValueError) else type(error).__name__ + ": check machine availability"
                 with self.lock:
                     job.update(status="cancelled" if isinstance(error, operations.Cancelled) else "failed", detail=message)
+                    if quiet:
+                        previous = next((j for k,j in self.jobs.items() if k != identity and j.get('maintenance')
+                            and j.get('operation') == function.__name__ and j['status'] == 'failed'
+                            and j.get('detail') == message and not j.get('acknowledged')), None)
+                        if previous:
+                            previous.update(occurrences=previous.get('occurrences', 1) + 1, last_observed=time.time())
+                            self.jobs.pop(identity, None)
                 self.event(label + " failed: " + message)
             finally:
                 with self.lock:

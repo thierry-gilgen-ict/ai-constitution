@@ -10,11 +10,12 @@ from contextlib import nullcontext
 from urllib.parse import parse_qs, urlsplit
 
 from . import hardware, credentials, diagnostics, launcher, locations, distribution, synchronization, monitoring, project_vault
+from . import workspace, updates, operations, encrypted_backup, schedules, model_inbox, insights, routing, connectors
 from .core import ALIAS, model_name
 from .transport import connect
 
 WEB = Path(__file__).parent / "web"
-ASSETS = {"/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/center.js": ("center.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
+ASSETS = {"/experience.js": ("experience.js", "text/javascript"), "/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/center.js": ("center.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
 NODE_GET = {"/api/version", "/api/tags", "/api/ps"}
 NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions"}
 
@@ -31,6 +32,7 @@ class Server(ThreadingHTTPServer):
         self.slots = threading.BoundedSemaphore(32)
         super().__init__(address, Handler)
         host, port = self.server_address[:2]
+        self.advertised = advertised or f"http://127.0.0.1:{port}"
         self.hosts = {f"127.0.0.1:{port}", f"localhost:{port}", f"{host}:{port}"}
         if advertised:
             self.hosts.add(urlsplit(advertised).netloc)
@@ -165,7 +167,16 @@ class Handler(BaseHTTPRequestHandler):
                     self.reply({"error": "Not a worker node"}, 404)
                     return
                 target = path.removeprefix("/node")
-                if target == '/admin/pairing' and post:
+                if target in ('/version', '/admin/version') and not post:
+                    self.reply({'version': updates.current(), 'protocol': 2, 'capabilities': ['updates', 'diagnostics', 'monitoring', 'drivers', 'autostart']})
+                elif target.startswith('/updates'):
+                    self.update_request(target.removeprefix('/updates'), post, body)
+                elif target == '/operations' and not post:
+                    self.reply({'jobs': control.status()['jobs']})
+                elif target == '/startup' and post:
+                    from .desktop import startup
+                    self.reply(startup(control.root, body.get('enabled') is True, address=urlsplit(self.server.advertised).hostname, port=self.server.server_address[1]))
+                elif target == '/admin/pairing' and post:
                     self.reply(control.pairing_code())
                 elif target == '/admin/controllers' and not post:
                     self.reply({'controllers': [{'id': k, 'name': v['name'], 'created': v['created']} for k, v in control.config['controllers'].items()],
@@ -204,6 +215,52 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply({"object": "list", "data": [{"id": ALIAS, "object": "model", "owned_by": "local-control"}]})
             elif path == "/api/login" and post:
                 self.reply({"authenticated": True}, cookie=True)
+            elif path == '/api/version' and not post:
+                self.reply({'version': updates.current(), 'protocol': 2})
+            elif path.startswith('/api/updates'):
+                self.update_request(path.removeprefix('/api/updates'), post, body)
+            elif path == '/api/workspace' and not post:
+                self.reply(workspace.overview(control))
+            elif path == '/api/workspace/discover' and post:
+                self.reply(workspace.discover(control.root, body))
+            elif path in ('/api/workspace/preview','/api/workspace/apply') and post:
+                self.reply(workspace.onboard(control.root, body, path.endswith('/apply')))
+            elif path == '/api/operations/acknowledge' and post:
+                self.reply(operations.acknowledge(control, body.get('id')))
+            elif path == '/api/insights' and not post:
+                self.reply(insights.suggestion(control))
+            elif path == '/api/routing/profile' and post:
+                self.reply(control.submit('Select routing profile', routing.configure, control, body))
+            elif path == '/api/model-inbox' and not post:
+                self.reply(model_inbox.read(control.root))
+            elif path == '/api/model-inbox/check' and post:
+                self.reply(control.submit('Check model definitions', model_inbox.check, control.root))
+            elif path == '/api/model-inbox/apply' and post:
+                self.reply(model_inbox.apply(control.root, body.get('plan')))
+            elif path == '/api/connectors/configure' and post:
+                self.reply(connectors.configure(control.root, body))
+            elif path == '/api/connectors/refresh' and post:
+                self.reply(control.submit('Refresh API organization costs', connectors.refresh, control.root, body.get('account')))
+            elif path.startswith('/api/encrypted-backup'):
+                self.encrypted_request(path.removeprefix('/api/encrypted-backup'), post, body)
+            elif path == '/api/backup-schedule' and not post:
+                self.reply(schedules.read(control.root))
+            elif path == '/api/backup-schedule' and post:
+                self.reply(schedules.configure(control.root, body.get('enabled'), body.get('hours', 24)))
+            elif path == '/api/workers/manage' and post:
+                identity = body.get('node'); node = control.node(identity)
+                if node['kind'] != 'worker': raise ValueError('Choose a remote worker')
+                operation = body.get('operation')
+                allowed = {'version': ('/version', None), 'updates': ('/updates', None),
+                    'check': ('/updates/check', {}), 'stage': ('/updates/stage', {'version': body.get('version')}),
+                    'preview': ('/updates/preview', {'rollback': body.get('rollback') is True}),
+                    'apply': ('/updates/apply', {k:body.get(k) for k in ('plan','rollback','acknowledge_external')}),
+                    'jobs': ('/operations', None), 'startup': ('/startup', {'enabled': body.get('enabled') is True})}
+                if operation not in allowed: raise ValueError('Choose a supported worker operation')
+                if operation == 'apply' and identity not in control.config['maintenance']:
+                    raise ValueError('Put this worker into maintenance before restarting it')
+                endpoint, data = allowed[operation]
+                self.reply(control.rpc(node, endpoint, data, timeout=30))
             elif path == "/api/status" and not post:
                 self.reply(control.status())
             elif path.startswith('/api/studio/'):
@@ -235,7 +292,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply(project_vault.plan(control.root))
             elif path == '/api/vault/backup' and post:
                 if not body.get('plan'): raise ValueError('Preview the backup first')
-                self.reply(control.submit('Back up project configurations', project_vault.backup, control.root, body['plan']))
+                self.reply(control.submit('Back up project configurations', encrypted_backup.backup if encrypted_backup.settings(control.root)['enabled'] else project_vault.backup, control.root, body['plan']))
             elif path == '/api/vault/restore-preview' and post:
                 self.reply(project_vault.restore_plan(control.root, body.get('snapshot'), body.get('project'), body.get('destination')))
             elif path == '/api/vault/restore' and post:
@@ -254,6 +311,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply(control.submit('Copy and verify model weights', locations.copy_models, control, body.get('plan')))
             elif path == '/api/workers' and not post:
                 self.reply(distribution.catalog(control.root))
+            elif path == '/api/workers/fetch' and post:
+                self.reply(control.submit('Download worker installation package', distribution.fetch_release, control.root, body.get('target')))
             elif path == '/api/workers/source' and post:
                 self.reply(distribution.source_bundle(control.root))
             elif path == '/api/worker-package' and not post:
@@ -355,6 +414,40 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 # Once headers/tokens have been emitted, close the stream. Never silently replay.
                 self.close_connection = True
+
+    def update_request(self, path, post, body):
+        control = self.server.control
+        if path == '' and not post: self.reply(updates.read(control.root))
+        elif path == '/check' and post: self.reply(control.submit('Check application updates', updates.check, control.root))
+        elif path == '/stage' and post: self.reply(control.submit('Download verified update', updates.stage, control.root, body.get('version')))
+        elif path == '/preview' and post: self.reply(updates.preview(control, body.get('rollback') is True))
+        elif path == '/apply' and post:
+            self.reply(updates.apply(self.server, body))
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
+        elif path == '/settings' and post:
+            enabled = body.get('automatic_check')
+            if type(enabled) is not bool: raise ValueError('Choose whether to check GitHub daily')
+            from .storage import atomic, wait_lock
+            with wait_lock(control.root / 'update-operations'):
+                value = updates.read(control.root); value['automatic_check'] = enabled
+                atomic(control.root / 'updates.json', value)
+            self.reply({'status': 'saved'})
+        else: raise ValueError('Unsupported update action')
+
+    def encrypted_request(self, path, post, body):
+        control = self.server.control; root = control.root
+        if path == '' and not post: self.reply(encrypted_backup.overview(root))
+        elif path == '/settings' and post: self.reply(encrypted_backup.configure(root, body))
+        elif path in ('/init','/check') and post:
+            self.reply(control.submit('Check encrypted repository' if path == '/check' else 'Initialize encrypted repository', encrypted_backup.run, root, [path[1:]]))
+        elif path == '/snapshots' and not post: self.reply({'snapshots': encrypted_backup.snapshots(root)})
+        elif path == '/retention-preview' and post: self.reply(encrypted_backup.retention(root))
+        elif path == '/retention-apply' and post:
+            if not body.get('plan'): raise ValueError('Preview retention first')
+            self.reply(encrypted_backup.retention(root, body['plan']))
+        elif path == '/restore-preview' and post: self.reply(encrypted_backup.restore_plan(root, body))
+        elif path == '/restore' and post: self.reply(control.submit('Restore encrypted configuration', encrypted_backup.restore, root, body))
+        else: raise ValueError('Unsupported encrypted backup action')
 
     def forward(self, node, path, body, *, timeout=600):
         conn, response = connect(node, path, body, timeout=timeout)

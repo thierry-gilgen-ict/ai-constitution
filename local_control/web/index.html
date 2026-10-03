@@ -8,6 +8,7 @@
     <script defer src="/app.js"></script>
     <script defer src="/studio.js"></script>
     <script defer src="/center.js"></script>
+    <script defer src="/experience.js"></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -28,27 +29,33 @@
         </button>
         <button class="nav" data-page="architectures"><span>◇</span> Project templates</button>
         <button class="nav" data-page="constitution"><span>≡</span> Constitution files</button>
-        <button class="nav" data-page="projects"><span>⇄</span> Project sync</button>
+        <button class="nav" data-page="projects"><span>⇄</span> Projects</button>
         <button class="nav" data-page="accounts"><span>◎</span> Apps &amp; subscriptions</button>
         <button class="nav" data-page="workers"><span>＋</span> Set up a worker</button>
         <button class="nav" data-page="storage"><span>▤</span> Storage &amp; locations</button>
+        <button class="nav" data-page="updates"><span>↑</span> Updates &amp; model inbox</button>
+        <button class="nav" data-page="insights"><span>◷</span> Measured performance</button>
         <button class="nav" data-page="vault"><span>▣</span> Configs &amp; backups</button>
       </nav>
       <div class="sidebar-note">
         <span class="dot"></span> Private by default
         <p>On your hardware.<br />Under your control.</p>
-        <small>PREVIEW · v0.2</small>
+        <small>PREVIEW · v0.3</small>
       </div>
     </aside>
     <main>
       <header class="topbar">
         <span id="breadcrumb">Workspace / Overview</span>
         <div>
+          <button id="release-badge" class="update-badge" hidden>Update available</button><button id="notifications-button" class="quiet">Notifications <span id="notifications-count">0</span></button>
           <span id="connection" class="pill">Connecting</span
           ><button class="quiet" id="refresh">↻ Refresh</button>
         </div>
       </header>
       <div id="notice" role="status" aria-live="polite" hidden></div>
+      <section id="updates" class="page"><div class="page-heading"><span class="eyebrow">KEEP YOUR WORKSPACE CURRENT</span><h1>Updates, under your control.</h1><p>Review application releases and new model definitions in one place.</p></div><div id="updates-content"></div></section>
+      <section id="insights" class="page"><div class="page-heading"><span class="eyebrow">MEASURE. THEN CHOOSE.</span><h1>Know what works here.</h1><p>Compare observations at the exact machine, model and context you tested.</p></div><div id="insights-content"></div></section>
+      <aside id="operation-strip" class="operation-strip" role="status" aria-live="polite" hidden></aside>
       <section id="setup" class="page">
         <div class="page-heading"><span class="eyebrow">A FEW STEPS. YOUR OWN WORKSPACE.</span><h1>Make yourself at home.</h1><p>Use what is already installed. Add only what you need.</p></div>
         <div id="setup-summary" class="panel" role="status">Checking this computer…</div>

@@ -21,7 +21,7 @@ def smoke(binary):
             listener.bind(('127.0.0.1', 0))
             port = listener.getsockname()[1]
         with (root / 'service.log').open('wb') as log:
-            child = subprocess.Popen([str(binary), '--state-dir', str(state), 'serve', '--port', str(port)],
+            child = subprocess.Popen([str(binary), '--state-dir', str(state), 'serve', '--port', str(port), '--no-background-services'],
                                      stdout=log, stderr=log,
                                      **({'creationflags': subprocess.CREATE_NO_WINDOW} if os.name == 'nt' else {}))
         def request(path, body=None, token=''):
@@ -48,6 +48,8 @@ def smoke(binary):
                 return json.loads(data)
             assert request('/api/studio/templates')[0] == 401
             assert request('/studio.js')[0] == 200
+            assert request('/experience.js')[0] == 200
+            assert request('/api/version', token=token)[0] == 200
             templates = api('templates')['templates']
             assert len(templates) >= 3
             opened = api('file?path=constitution.md')

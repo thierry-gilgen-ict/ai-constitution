@@ -90,9 +90,12 @@ def reconcile(root, config=None, progress=lambda _: None):
                         old = baselines.get(str(project))
                         if old:
                             template = kit.safe_path(studio.draft, 'templates/architectures/' + old['id'] + '.json')
-                            if not template.is_file(): raise ValueError('The project template is missing; choose a replacement explicitly')
-                            value = architecture.validate(kit.read_json(template))
-                            _, writes = architecture.plan(kit, studio.draft, studio.state, project, value, old['project_name'])
+                            if old.get('policy') == 'pinned':
+                                value = architecture.validate(old['snapshot'])
+                            else:
+                                if not template.is_file(): raise ValueError('The project template is missing; choose a replacement explicitly')
+                                value = architecture.validate(kit.read_json(template))
+                            _, writes = architecture.plan(kit, studio.draft, studio.state, project, value, old['project_name'], old.get('policy', 'latest'))
                             record['template'] = old['id']
                         # Replace the staged installer portion with an immutable source reference.
                         kit._install(studio.draft, studio.state, project=project, planned=writes, source_reference=source)

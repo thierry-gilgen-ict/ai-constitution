@@ -43,7 +43,8 @@ async function api(path, body, headers = {}) {
 async function action(body) {
   try {
     const result = await api("/api/action", body);
-    notice(result.job ? "Operation started. Follow its progress in Overview → Activity." : (result.note || result.applies || "Updated."));
+    if (result.job && window.trackOperation) window.trackOperation(result);
+    else notice(result.note || result.applies || "Updated.");
     await refresh();
   } catch (e) {
     notice(e.message, true);
@@ -67,7 +68,7 @@ function page(name) {
       setup: "Get started",
       architectures: "Project templates",
       constitution: "Constitution files",
-      projects: "Project sync", accounts: "Apps & subscriptions", workers: "Set up a worker", storage: "Storage & locations", vault: "Configs & backups",
+      updates: "Updates & model inbox", insights: "Measured performance", projects: "Projects", accounts: "Apps & subscriptions", workers: "Set up a worker", storage: "Storage & locations", vault: "Configs & backups",
     }[name];
   if (name === "models") loadInventory();
   if (name === "setup") loadSetup();
@@ -89,6 +90,7 @@ $("refresh").onclick = () => {
 $("work-mode").onclick = () => action({ action: "mode", mode: "work" });
 $("gaming-mode").onclick = () => action({ action: "mode", mode: "gaming" });
 function renderState() {
+  if (window.renderExperience) window.renderExperience(state);
   $("connection").textContent = "● Connected locally";
   $("active-count").textContent = state.active_requests;
   $("session-status").textContent = `${(state.sessions || []).filter(s => s.status === "open").length} open managed sessions · ${state.queued_requests || 0} queued requests. Interrupted operations remain visible below.`;

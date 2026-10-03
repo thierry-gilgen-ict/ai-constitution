@@ -37,3 +37,21 @@ Create a draft GitHub release with a new `vX.Y.Z` tag targeting the recorded com
 Publish the complete draft and mark the toolkit release latest. Verify the tag commit, uploaded asset sizes and SHA-256 digests. Download the public managed archive and checksum through the normal updater and validate them without changing real installation state. Check README links and ensure the local worktree is clean.
 
 The core updater uses the latest published non-prerelease and named archive assets. If a toolkit release is marked prerelease, it will not become the default `upgrade` target. The optional Local Control binaries can remain explicitly labelled preview within a normal toolkit release.
+
+## Unified release workflow
+
+From a reviewed, green `main` revision whose VERSION and release notes match:
+
+```sh
+gh workflow run release.yml --ref main -f version=0.3.0
+```
+
+The workflow validates source and browser journeys, builds/smoke-tests Windows x64, macOS ARM64 and Linux x64 packages, creates CycloneDX SBOM files, verifies every package version/checksum, assembles the managed/Grok bundles and attaches GitHub build attestations before publishing complete assets. `docs/release-notes.md` is the reviewed publication text. Do not rerun with an existing release tag; failed attempts must be inspected rather than overwritten.
+
+Verify downloaded assets with GitHub's attestation tooling, for example `gh attestation verify ARCHIVE --repo thierry-gilgen-ict/ai-constitution`. The dashboard separately validates the release checksums and file manifests. See [GitHub's official attestation guide](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations).
+
+### Optional publisher identities
+
+`package_local.py` invokes `sign_package.py` before hashing the native payload. On a controlled Windows build host, set `WINDOWS_SIGN_CERTIFICATE` to a private PFX file and `WINDOWS_SIGN_PASSWORD` in the process environment, with Windows SDK `signtool` on PATH. On macOS, install the Developer ID identity in the build keychain and set `MACOS_SIGN_IDENTITY`; configure a notarytool keychain profile and set `MACOS_NOTARY_PROFILE` to request notarization of the completed archive. Signing/notarization failures fail the build. Never commit certificates, passwords or keychain exports.
+
+The default hosted workflow has no publisher identities provisioned and therefore emits **unsigned preview** manifests. To publish signed builds, provision these inputs on a controlled runner or a reviewed secret/keychain setup step; repository permissions alone cannot create an OS signing identity. GitHub provenance and SBOMs work independently of signing. A notarized ZIP is not a stapled macOS application bundle.

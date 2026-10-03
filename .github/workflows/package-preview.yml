@@ -7,6 +7,8 @@ on:
       - 'packaging/**'
       - 'scripts/local_control.py'
       - 'scripts/package_local.py'
+      - 'scripts/sign_package.py'
+      - 'scripts/smoke_local_package.py'
       - 'scripts/constitution.py'
       - 'scripts/architecture.py'
       - 'scripts/releases.py'
@@ -39,5 +41,6 @@ jobs:
             .local/package/manifest.json
             .local/package/*.zip
             .local/package/*.sha256
+            .local/package/*.cdx.json
           include-hidden-files: true
           retention-days: 7

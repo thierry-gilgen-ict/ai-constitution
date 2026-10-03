@@ -56,7 +56,7 @@ def output_path(value):
 
 
 def validate(value):
-    if not isinstance(value, dict) or set(value) - {'schema_version','id','name','version','description','components','decisions','files'}:
+    if not isinstance(value, dict) or set(value) - {'schema_version','id','name','version','description','components','decisions','files','extends','constraints'}:
         raise ValueError('Unknown template fields')
     if type(value.get('schema_version')) is not int or value['schema_version'] != 1:
         raise ValueError('Unsupported architecture template version')
@@ -127,13 +127,51 @@ def validate(value):
         elif isinstance(item, list):
             for child in item: check_strings(child)
     check_strings(value)
+    parent = value.get('extends')
+    if parent is not None:
+        depth, current = 0, parent
+        while isinstance(current, dict) and 'extends' in current:
+            depth += 1; current = current['extends']
+            if depth >= 5: raise ValueError('Template inheritance is limited to five levels')
+        validate(parent)
+    constraints = value.get('constraints', {})
+    if not isinstance(constraints, dict) or len(constraints) > 30: raise ValueError('Invalid dependency constraints')
+    for key, rule in constraints.items():
+        identifier(key)
+        if not isinstance(rule, str) or not re.fullmatch(r'(?:>=|<=|>|<|==)\d+\.\d+\.\d+(?:,(?:>=|<=|>|<|==)\d+\.\d+\.\d+)*', rule):
+            raise ValueError('Constraints use exact numeric comparators, for example >=1.2.0,<2.0.0')
     return copy.deepcopy(value)
 
 
+def resolve(value):
+    value = validate(value)
+    parent = value.pop('extends', None)
+    if parent:
+        parent = resolve(parent)
+        components = {c['id']: c for c in parent['components']}
+        components.update({c['id']: c for c in value['components']})
+        value.update(components=list(components.values()), files={**parent.get('files', {}), **value.get('files', {})},
+            decisions=[*parent.get('decisions', []), *value.get('decisions', [])],
+            constraints={**parent.get('constraints', {}), **value.get('constraints', {})})
+    return validate(value)
+
+
 def review(value):
-    validate(value)
+    value = resolve(value)
     provided = {p for c in value['components'] for p in c.get('provides', [])}
     errors, warnings = [], []
+    by_id = {c['id']: c for c in value['components']}
+    for key, rules in value.get('constraints', {}).items():
+        reference = by_id.get(key, {}).get('reference', '').removeprefix('v')
+        if not re.fullmatch(r'\d+\.\d+\.\d+', reference):
+            errors.append(key + ': constraint requires an exact major.minor.patch component reference')
+            continue
+        actual = tuple(map(int, reference.split('.')))
+        for expression in rules.split(','):
+            op, number = re.fullmatch(r'(>=|<=|>|<|==)(.*)', expression).groups()
+            target = tuple(map(int, number.split('.')))
+            if not {'>=': actual >= target, '<=': actual <= target, '>': actual > target, '<': actual < target, '==': actual == target}[op]:
+                errors.append(key + ': ' + reference + ' does not satisfy ' + expression)
     if not value['components']:
         warnings.append('This baseline has no components yet.')
     for c in value['components']:
@@ -148,7 +186,7 @@ def review(value):
 
 
 def render(value, project_name):
-    value = validate(value)
+    value = resolve(value)
     if not isinstance(project_name, str) or not re.fullmatch(r'[a-z][a-z0-9-]{0,62}', project_name):
         raise ValueError('Project name must be a lowercase slug (letters, numbers and hyphens)')
     evidence = review(value)
@@ -187,7 +225,7 @@ def render(value, project_name):
     return outputs, evidence
 
 
-def plan(kit, root, state, project, value, project_name):
+def plan(kit, root, state, project, value, project_name, policy=None):
     project = Path(project).absolute()
     if not project.is_dir(): raise ValueError('Choose an existing project directory')
     kit.no_links(project)
@@ -195,6 +233,12 @@ def plan(kit, root, state, project, value, project_name):
     ownership = state / 'architectures.json'
     db = kit.read_json(ownership) if ownership.exists() else {'schema_version': 1, 'projects': {}}
     old = db['projects'].get(str(project), {})
+    saved_path = kit.safe_path(root, 'templates/architectures/' + value['id'] + '.json')
+    saved = kit.read_json(saved_path) if saved_path.exists() else None
+    policy = policy or ('latest' if saved == value else 'pinned')
+    if policy not in ('latest', 'pinned'): raise ValueError('Choose follow latest or pin this revision')
+    if policy == 'latest' and saved != value:
+        raise ValueError('Save this template before choosing follow latest, or pin the unsaved revision')
     writes = {}
     # One transaction owns onboarding, baseline output, enrollment and rollback.
     enrolled = kit.state_load(state)['targets'].get('project:' + str(project), {})
@@ -210,7 +254,7 @@ def plan(kit, root, state, project, value, project_name):
         tracked[name] = digest(content)
     retained = sorted(set(old.get('files', {})) - set(outputs))
     db['projects'][str(project)] = {'id': value['id'], 'version': value['version'], 'template_sha256': digest(json_bytes(value)),
-                                   'project_name': project_name, 'files': tracked}
+                                   'project_name': project_name, 'files': tracked, 'policy': policy, 'snapshot': value}
     writes[ownership] = json_bytes(db)
     changes, signature = [], {}
     for path, after in writes.items():
@@ -223,13 +267,14 @@ def plan(kit, root, state, project, value, project_name):
                                                                fromfile='before', tofile='after'))[:60000]})
     return {'plan': digest(json_bytes(signature)), 'changes': changes, 'review': evidence, 'retained_files': retained,
             'project': str(project), 'template': value['id'], 'version': value['version'],
+            'policy': policy, 'revision': digest(json_bytes(value)),
             'pinned_bundle_preserved': bool(enrolled.get('pinned')),
             'note': 'Review the files before applying. No external code, containers, emails or package installs will run.'}, writes
 
 
-def apply(kit, root, state, project, value, project_name, expected):
+def apply(kit, root, state, project, value, project_name, expected, policy=None):
     with kit.state_lock(state):
-        preview, writes = plan(kit, root, state, project, value, project_name)
+        preview, writes = plan(kit, root, state, project, value, project_name, policy)
         if expected != preview['plan']:
             raise ValueError('Project or template changed since preview. Preview again before applying.')
         return {**kit.transaction(state, writes), 'template': value['id'], 'retained_files': preview['retained_files']}

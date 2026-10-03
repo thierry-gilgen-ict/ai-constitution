@@ -47,7 +47,8 @@ def recommendations(root, context=65536):
         model["hugging_face_url"] = "https://huggingface.co/" + model["name"]
         model["download_verified"] = False
         models.append(model)
-    return {"system": actual, "models": models[:12], "context": context, "headroom_percent": 15,
+    from .insights import profiles
+    return {"measured_profiles": profiles(root), "system": actual, "models": models[:12], "context": context, "headroom_percent": 15,
             "note": "Predictions, not benchmarks. Verify a GGUF file, license and Ollama tool support before adopting a model."}
 
 

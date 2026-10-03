@@ -15,7 +15,7 @@ def recover(root):
     value = json.loads(path.read_text(encoding='utf-8'))
     if value.get('schema') != 1:
         raise ValueError('Unsupported operation history; preserve it before recovery')
-    jobs = {j['id']: j for j in value.get('jobs', [])[-50:]}
+    jobs = {j['id']: j for j in value.get('jobs', [])}
     for job in jobs.values():
         if job['status'] in ('queued', 'running'):
             job.update(status='interrupted', detail='Service restarted. Check actual machine state, then explicitly retry.')
@@ -25,4 +25,21 @@ def recover(root):
 
 
 def save(root, jobs, events):
-    atomic(root / 'operations.json', {'schema': 1, 'jobs': list(jobs.values())[-50:], 'events': events[:80]})
+    prune(jobs)
+    atomic(root / 'operations.json', {'schema': 1, 'jobs': list(jobs.values()), 'events': events[:80]})
+
+
+def prune(jobs):
+    disposable = [key for key,j in jobs.items() if j['status'] not in ('queued','running')
+                  and (j['status'] not in ('failed','interrupted') or j.get('acknowledged'))]
+    for key in disposable[:-50]: jobs.pop(key, None)
+
+
+def acknowledge(control, identity):
+    with control.lock:
+        if identity not in control.jobs: raise ValueError('Choose an existing operation')
+        job = control.jobs[identity]
+        if job['status'] in ('queued','running'): raise ValueError('This operation is still running')
+        job['acknowledged'] = time.time()
+        save(control.root, control.jobs, control.events)
+    return {'status': 'acknowledged'}

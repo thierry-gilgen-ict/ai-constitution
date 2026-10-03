@@ -4,6 +4,10 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 
 | I want to… | Guide |
 | --- | --- |
+| See the 0.3 workspace features | [Workspace maintenance](workspace-upgrades.md) |
+| Encrypt backups and schedule them outside the dashboard | [Encrypted backups](encrypted-backups.md) |
+| Try a disposable demonstration | [Synthetic browser journeys](demonstration.md) |
+| Check physical compatibility and release gates | [Acceptance matrix](compatibility-matrix.md) |
 | Install shared instructions for Codex or Cursor | [Getting started](getting-started.md) |
 | Bring an existing project into the shared setup | [Project onboarding](../onboarding/project.md) |
 | Configure an actual xAI Grok Bot | [Bot onboarding](../onboarding/bot.md) |

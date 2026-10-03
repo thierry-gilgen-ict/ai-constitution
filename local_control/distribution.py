@@ -127,3 +127,25 @@ def download(root, identity):
     kit.no_links(path)
     if not path.is_file() or locations.file_hash(path) != identity: raise ValueError('Package integrity check failed; register a verified package again')
     return path, record
+
+
+def fetch_release(root, target, progress=lambda _: None):
+    """Download a named native release package; registration never runs it."""
+    from . import updates
+    supported = {'windows-amd64': ('Windows','AMD64'), 'darwin-arm64': ('Darwin','arm64'), 'linux-x86_64': ('Linux','x86_64')}
+    if target not in supported: raise ValueError('Choose a supported native build; use the source package on other architectures')
+    value = updates.read(root)
+    if not value.get('assets'): updates.check(root, progress=progress); value=updates.read(root)
+    name='ai-constitution-worker-'+target+'.zip'
+    assets=value.get('assets',{})
+    if name not in assets or name+'.sha256' not in assets: raise ValueError('The latest release has no matching native package yet; use the source package')
+    progress('Downloading the official release package; nothing will be executed')
+    checksum=updates.fetch(assets[name+'.sha256'],1024).decode().split()[0]
+    data=updates.fetch(assets[name],1024**3)
+    if not re.fullmatch('[a-f0-9]{64}',checksum) or digest(data)!=checksum: raise ValueError('Worker package checksum failed')
+    with tempfile.TemporaryDirectory() as folder:
+        path=Path(folder).resolve()/name;path.write_bytes(data)
+        manifest=inspect_archive(path); system,arch=supported[target]
+        if manifest['platform']!=system or manifest.get('architecture','').lower()!=arch.lower(): raise ValueError('Worker package platform mismatch')
+        result=register(root,path)
+    return {**result,'note':'Verified worker package is ready to download from Set up a worker.'}

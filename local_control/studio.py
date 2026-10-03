@@ -147,6 +147,12 @@ class Studio:
         preview, writes = self.file_plan(body.get('path'), body.get('content'), body.get('sha256'))
         if not body.get('plan') or body['plan'] != preview['plan']:
             raise ValueError('Library changed since preview. Review the change again.')
+        from . import template_versions
+        path = body.get('path', '')
+        if path.startswith('templates/architectures/') and path.endswith('.json'):
+            before = self.file_path(path)
+            if before.exists(): template_versions.archive(self, kit.read_json(before))
+            template_versions.archive(self, json.loads(body['content']))
         return kit.transaction(self.history, writes)
 
     def templates(self):
@@ -195,6 +201,9 @@ class Studio:
                 if operation == 'files': return self.files()
                 if operation == 'file': return self.read(query.get('path', [''])[0], int(query.get('offset', ['0'])[0]))
                 if operation == 'templates': return self.templates()
+                if operation == 'template-versions':
+                    from .template_versions import versions
+                    return versions(self, query.get('id', [''])[0])
                 if operation == 'history':
                     items = []
                     for path in sorted((self.history / 'transactions').glob('*.json'), reverse=True)[:20]:
@@ -219,8 +228,8 @@ class Studio:
                 if not isinstance(body.get('project'), str) or not Path(body['project']).is_absolute():
                     raise ValueError('Enter the full path to an existing project directory')
                 if operation == 'project-preview':
-                    return architecture.plan(kit, self.draft, self.state, Path(body['project']), value, body.get('name'))[0]
-                return architecture.apply(kit, self.draft, self.state, Path(body['project']), value, body.get('name'), body.get('plan'))
+                    return architecture.plan(kit, self.draft, self.state, Path(body['project']), value, body.get('name'), body.get('policy'))[0]
+                return architecture.apply(kit, self.draft, self.state, Path(body['project']), value, body.get('name'), body.get('plan'), body.get('policy'))
             if operation == 'activation-preview': return kit.upgrade(self.draft, self.state, dry_run=True)
             if operation == 'activate':
                 if not isinstance(body.get('plan'), str): raise ValueError('Preview activation first')

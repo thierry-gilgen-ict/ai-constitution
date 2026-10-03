@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 — 2026-10-03
+
+- Added GitHub update notifications, verified controller/worker staging, guarded restart and retained application rollback copies.
+- Added project discovery and batch enrollment with adoption/conflict previews, configuration associations and richer project cards.
+- Fixed unsaved architecture revisions reverting during synchronization; added follow/pin policy, revision history, immutable inheritance, numeric dependency constraints and monorepo capture.
+- Fixed rejected scheduled backups consuming their full interval and tilde paths resolving differently at execution. Added durable reservations, bounded retry, optional encrypted restic repositories, retention previews, verified restoration and per-user OS schedules.
+- Kept unacknowledged failures visible, coalesced recurring errors and removed idle synchronization from Activity. Added inline progress and recovery actions.
+- Enforced Windows private-state ACLs and rejected reparse points on Python 3.11 as well as newer versions.
+- Added last-successful account reports, observation history, usage alerts, API organization cost connectors, a reviewed model-definition inbox, measured hardware profiles and pre-dispatch fallback selection.
+- Added worker release-package downloads and optional Windows/macOS worker autostart.
+- Added synthetic Playwright journeys and accessibility checks, release assembly/attestations/SBOMs, optional signing hooks and explicit physical acceptance procedures.
+
+Private state remains outside the checkout. New backup/collector/autostart actions are opt-in. Application release checks are on by default while the controller runs and can be disabled. Native packages remain preview; physical multi-machine/soak/usability acceptance and publisher signing identities remain external gates.
+
 ## 0.2.0 — 2026-10-03
 
 Shared toolkit release with an optional **Local Control preview**. Native companion packages remain unsigned; physical fleet validation is still in progress. See [upgrade instructions](docs/updates.md) and [preview boundaries](docs/desktop-preview.md).

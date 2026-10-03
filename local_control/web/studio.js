@@ -77,6 +77,7 @@
   ['name','id','version','description','decisions','files'].forEach(key => $('template-' + key).oninput = changed);
   $('template-new').onclick = () => selectTemplate({schema_version:1, id:'my-baseline', name:'My project baseline', version:'1.0.0', description:'The starting point for my projects.', components:[], decisions:[], files:{}});
   window.useCapturedTemplate = value => { selectTemplate(value); changed(); };
+  window.templateRevision = () => readTemplate();
   $('template-clone').onclick = safely(() => {
     const value = readTemplate(); value.id += '-copy'; value.name += ' · copy';
     templateDirty = false; selectTemplate(value); changed();
@@ -128,9 +129,9 @@
     });
   });
   $('template-apply-preview').onclick = safely(async () => {
-    const body = {template:readTemplate(), project:$('template-project').value.trim(), name:$('template-project-name').value.trim()};
+    const body = {policy: $('template-follow-policy')?.value || (templateDirty || !baselineHash ? 'pinned' : 'latest'), template:readTemplate(), project:$('template-project').value.trim(), name:$('template-project-name').value.trim()};
     const plan = await call('project-preview', body);
-    preview('Review project: ' + body.name, plan, 'Apply baseline to project', async () => {
+    preview('Review project: ' + body.name, {...plan, note: plan.note + ' Architecture policy: ' + plan.policy + ' · revision ' + plan.revision.slice(0,12)}, 'Apply baseline to project', async () => {
       const result = await call('project-apply', {...body, plan:plan.plan});
       $('template-result').textContent = 'Applied. Open .ai/architecture-onboarding.md in this project and give it to your coding agent. ' + (result.snapshot ? 'Rollback snapshot: ' + result.snapshot : 'Files were already current.');
       notice('Project onboarded with the selected architecture. Dependencies have not been installed.');

@@ -19,3 +19,7 @@ Optional desktop builds use [pystray](https://github.com/moses-palmer/pystray) (
 ## Visual reference
 
 The repository presentation is inspired by [Engawa](https://github.com/thierry-gilgen-ict/engawa). Its image and source code were not copied into this project. The banner is an original AI-generated asset; [provenance](docs/provenance.md) records the method and prompt.
+
+## Optional backup and development tools
+
+[restic](https://github.com/restic/restic) (BSD-2-Clause) is invoked only when separately installed and configured; its binary is not bundled. Browser tests use [Playwright](https://github.com/microsoft/playwright) (Apache-2.0) and [axe-core](https://github.com/dequelabs/axe-core) / its Playwright integration (MPL-2.0) as development dependencies. They are not included in the dashboard’s runtime assets. Native builds export a CycloneDX SBOM alongside their dependency inventory and bundled license notices.

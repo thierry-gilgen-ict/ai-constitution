@@ -7,7 +7,7 @@ import urllib.parse
 ROOT = Path(__file__).resolve().parents[1]
 failures = []
 for path in ROOT.rglob("*.md"):
-    if any(p in {".git", ".local", "__pycache__"} for p in path.relative_to(ROOT).parts):
+    if any(p in {".git", ".local", "__pycache__", "node_modules", ".venv"} for p in path.relative_to(ROOT).parts):
         continue
     content = re.sub(r"```.*?```", "", path.read_text(encoding="utf-8"), flags=re.S)
     for link in re.findall(r"!?\[[^\]]*\]\(([^)]+)\)", content):
