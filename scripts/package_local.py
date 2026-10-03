@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import importlib.metadata
 import json
+import os
 from pathlib import Path
 import platform
 import subprocess
@@ -32,7 +33,7 @@ def prepare_output(output):
     return output
 
 
-def application_files(root):
+def application_files(root, library_inputs=None):
     """Resolve PyInstaller's internal POSIX aliases into a closed regular-file ZIP."""
     root = Path(root).resolve()
     result = {}
@@ -52,6 +53,19 @@ def application_files(root):
             raise ValueError('Native application contains a non-file entry')
         if len(result) + len(pending) > 10000:
             raise ValueError('Native application exceeds file limits')
+    if library_inputs is not None:
+        prefix = 'ai-constitution-local/_internal/library/'
+        for name in list(result):
+            if name.startswith(prefix):
+                relative = name[len(prefix):]
+                if relative not in library_inputs:
+                    # Compilation/imports can create bytecode caches. They are
+                    # not reviewed public inputs and must not enter the ZIP.
+                    del result[name]
+                elif result[name].read_bytes() != library_inputs[relative]:
+                    raise ValueError('Public library changed during native compilation')
+        if {n[len(prefix):] for n in result if n.startswith(prefix)} != set(library_inputs):
+            raise ValueError('Native application is missing reviewed library files')
     return result
 
 
@@ -71,7 +85,8 @@ def main():
     (output/'dependencies.json').write_text(json.dumps(inventory,indent=2),encoding='utf-8')
     from releases import public_files
     library = output / 'library'
-    for name, data in public_files(ROOT).items():
+    inputs = public_files(ROOT)
+    for name, data in inputs.items():
         path = library / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
@@ -82,7 +97,7 @@ def main():
              '--add-data',str(library)+':library']
     if platform.system()=='Windows':command+=['--hide-console','hide-early']
     command+=[str(library/'packaging/entrypoint.py')]
-    subprocess.run(command,cwd=library,check=True)
+    subprocess.run(command,cwd=library,check=True,env={**os.environ, 'PYTHONDONTWRITEBYTECODE':'1'})
     executable=output/'app/ai-constitution-local'/('ai-constitution-local.exe' if platform.system()=='Windows' else 'ai-constitution-local')
     from sign_package import sign, notarize
     signing = sign(output/'app', executable)
@@ -91,7 +106,7 @@ def main():
         raise RuntimeError('Packaged entry point failed: ' + smoke.stderr[-4000:])
     from smoke_local_package import smoke as check_package
     smoke_result = check_package(executable)
-    application = application_files(output/'app')
+    application = application_files(output/'app', inputs)
     checks={name:hashlib.sha256(path.read_bytes()).hexdigest() for name,path in application.items()}
     (output/'manifest.json').write_text(json.dumps({'schema':1,'version':(ROOT/'VERSION').read_text().strip(),'platform':platform.system(),'architecture':platform.machine(),
         'signing':signing,'files':checks},indent=2),encoding='utf-8')

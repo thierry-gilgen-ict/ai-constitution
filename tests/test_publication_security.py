@@ -104,6 +104,17 @@ class Publication(unittest.TestCase):
         self.link(app/'cycle',app,True)
         with self.assertRaisesRegex(ValueError,'cycle'): application_files(app)
 
+    def test_native_bundled_library_cannot_gain_undeclared_import_side_effects(self):
+        app = self.root/'app'; app.mkdir()
+        library = app/'ai-constitution-local/_internal/library'; library.mkdir(parents=True)
+        (library/'VERSION').write_bytes(b'0.0.0')
+        (library/'credentials.json').write_bytes(b'Synthetic private placeholder')
+        (library/'__pycache__').mkdir(); (library/'__pycache__/fixture.pyc').write_bytes(b'cache')
+        files = application_files(app, {'VERSION':b'0.0.0'})
+        self.assertEqual(set(files), {'ai-constitution-local/_internal/library/VERSION'})
+        (library/'VERSION').write_bytes(b'Changed')
+        with self.assertRaisesRegex(ValueError,'changed'): application_files(app, {'VERSION':b'0.0.0'})
+
     def zip(self, name, members):
         path = self.root / name
         with zipfile.ZipFile(path, 'w') as archive:

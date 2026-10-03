@@ -33,16 +33,20 @@ MAX_BYTES = 8 * 1024 ** 3
 MAX_DEPTH = 3
 
 
+class PublicationError(ValueError):
+    """Only static, safe diagnostics belong in public CI output."""
+
+
 def install(folder):
     key = (platform.system(), platform.machine().lower())
     if key not in DOWNLOADS:
-        raise ValueError('Unsupported scanner platform; supply a verified Gitleaks executable')
+        raise PublicationError('Unsupported scanner platform; supply a verified Gitleaks executable')
     suffix, expected = DOWNLOADS[key]
     url = f'https://github.com/gitleaks/gitleaks/releases/download/v{VERSION}/gitleaks_{VERSION}_{suffix}'
     with urllib.request.urlopen(url, timeout=60) as response:
         data = response.read(32 * 1024 ** 2 + 1)
     if hashlib.sha256(data).hexdigest() != expected:
-        raise ValueError('Scanner download checksum mismatch')
+        raise PublicationError('Scanner download checksum mismatch')
     name = 'gitleaks.exe' if key[0] == 'Windows' else 'gitleaks'
     if suffix.endswith('.zip'):
         with zipfile.ZipFile(io.BytesIO(data)) as archive:
@@ -59,7 +63,7 @@ def install(folder):
 
 def inspect_archive(archive, budget, depth=1):
     if depth > MAX_DEPTH:
-        raise ValueError('Archive nesting exceeds the publication scan limit')
+        raise PublicationError('Archive nesting exceeds the publication scan limit')
     seen = set()
     for entry in archive.infolist():
         name = entry.orig_filename.rstrip('/')
@@ -67,14 +71,14 @@ def inspect_archive(archive, budget, depth=1):
         if (not name or p.is_absolute() or '..' in p.parts or '\\' in name or ':' in name
                 or str(p) != name or name.casefold() in seen
                 or stat.S_ISLNK(entry.external_attr >> 16) or private_path(name)):
-            raise ValueError('Private filename, link, duplicate or unsafe archive path')
+            raise PublicationError('Private filename, link, duplicate or unsafe archive path')
         seen.add(name.casefold())
         budget[0] += 1; budget[1] += entry.file_size
         if budget[0] > MAX_MEMBERS or budget[1] > MAX_BYTES:
-            raise ValueError('Publication exceeds archive inspection limits')
+            raise PublicationError('Publication exceeds archive inspection limits')
         if name.lower().endswith('.zip'):
             if entry.file_size > 1024 ** 3:
-                raise ValueError('Nested ZIP exceeds the inspection limit')
+                raise PublicationError('Nested ZIP exceeds the inspection limit')
             with zipfile.ZipFile(io.BytesIO(archive.read(entry))) as nested:
                 inspect_archive(nested, budget, depth + 1)
 
@@ -85,13 +89,13 @@ def inspect_sources(roots):
     for root in roots:
         root = Path(root).absolute(); no_links(root)
         if not root.exists():
-            raise ValueError('Publication input is missing')
+            raise PublicationError('Publication input is missing')
         # Walk explicitly to reject links before descending into a directory.
         pending = [root]
         while pending:
             path = pending.pop(); no_links(path)
             if private_path(path.relative_to(root).as_posix() if path != root else path.name):
-                raise ValueError('Publication input contains a private filename')
+                raise PublicationError('Publication input contains a private filename')
             if path.is_dir():
                 pending.extend(path.iterdir())
             elif path.is_file():
@@ -100,9 +104,9 @@ def inspect_sources(roots):
                     with zipfile.ZipFile(path) as archive:
                         inspect_archive(archive, budget)
             else:
-                raise ValueError('Publication input is not an ordinary file')
+                raise PublicationError('Publication input is not an ordinary file')
     if not files:
-        raise ValueError('Publication input contains no files')
+        raise PublicationError('Publication input contains no files')
     return files
 
 
@@ -179,17 +183,17 @@ def scan(roots, executable):
                        '--max-decode-depth', '3', '--max-archive-depth', str(MAX_DEPTH)]
             result = subprocess.run(command, capture_output=True, timeout=900)
             if result.returncode not in {0, 1} or not report.is_file():
-                raise ValueError('Secret scanner failed; no artifacts may be uploaded')
+                raise PublicationError('Secret scanner failed; no artifacts may be uploaded')
             rows = json.loads(report.read_text(encoding='utf-8'))
             if not isinstance(rows, list) or (result.returncode == 1 and not rows):
-                raise ValueError('Secret scanner returned an invalid report')
+                raise PublicationError('Secret scanner returned an invalid report')
             findings.extend(rows)
     unresolved = [f for f in findings if not checksum_finding(f)]
     if unresolved:
         # Paths and rule IDs only. Never echo matches, secrets or scanner stderr.
         for finding in unresolved:
             print(json.dumps({k: finding.get(k) for k in ('RuleID', 'File', 'StartLine')}))
-        raise ValueError('Potential secrets remain; upload blocked')
+        raise PublicationError('Potential secrets remain; upload blocked')
     return {'status': 'passed', 'input_files': len(files), 'verified_checksum_flags': len(findings)}
 
 
@@ -207,6 +211,8 @@ def main():
             with tempfile.TemporaryDirectory(prefix='verified-gitleaks-') as folder:
                 result = scan(args.paths, install(folder))
         print(json.dumps(result))
+    except PublicationError as error:
+        raise SystemExit('Publication security check failed: ' + str(error) + '. Upload blocked.') from None
     except Exception:
         # Unexpected provider/tool errors can contain secrets, so withhold raw details.
         raise SystemExit('Publication security check failed. Review inputs privately; nothing may be uploaded.') from None
