@@ -58,7 +58,7 @@ The core updater uses the latest published non-prerelease and named archive asse
 From a reviewed, green `main` revision whose VERSION and release notes match:
 
 ```sh
-gh workflow run release.yml --ref main -f version=0.3.1
+gh workflow run release.yml --ref main -f version=0.4.0
 ```
 
 The workflow validates source and browser journeys, builds/smoke-tests Windows x64, macOS ARM64 and Linux x64 packages, creates CycloneDX SBOM files, verifies every package version/checksum, assembles the managed/Grok bundles and attaches GitHub build attestations before uploading all assets to a draft release. Publication gates scan native build outputs and the complete assembled release before either is uploaded; a failure blocks upload. Assembly starts with exactly the three native ZIP/checksum/SBOM sets in a fresh directory and rejects extra files. It publishes the draft only after every upload succeeds, so update checks never observe a partial release. `docs/release-notes.md` is the reviewed publication text. Do not rerun with an existing release tag; failed attempts must be inspected rather than overwritten.
