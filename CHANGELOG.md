@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.4.0 — 2026-10-04
+
+- Added effective project setup inspection, reviewed preparation recipes, private checkpoints and workspace previews with canary rollout, pin, pause and drift protection.
+- Added a keyboard command palette for metadata search and reusable agent toolkits with native Codex/Cursor adapters, Rulesync bundles and a documented Continue subset. Preserve unrelated client settings and verify actual instruction loading separately.
+- Added subscription-aware advice for new sessions using fresh, account-wide observations. Native authentication and existing conversations remain client-managed.
+- Added independently scoped TLS controller pairing, cached inventories, reviewed three-way library synchronization and portable new-computer recovery recipes. Secrets and host-specific path mappings stay private.
+- Added repeated bounded local model fixture comparisons, matching regression fingerprints, opt-in resource schedules/application triggers, manual priority and fair per-node gateway admission.
+- Expanded the illustrated manual to 99 synthetic images across 15 dashboard pages and 17 chapters. Added browser journeys for the workflow controls and fixed Windows screenshot validation of UTF-8 HTML.
+
+Existing private state is preserved; new workflow state is additive. Controller sharing and resource automation require deliberate enablement. Native packages remain unsigned preview builds, and physical LAN/GPU/sleep-wake, availability soak and external usability acceptance remain pending. The local lab makes no paid provider calls and executes no arbitrary generated project code.
+
 ## 0.3.1 — 2026-10-03
 
 - Restricted public exports and native build inputs to a reviewed file inventory. Reject sensitive filenames and preserve existing output by requiring fresh build directories; compile the native companion from the isolated public input tree.

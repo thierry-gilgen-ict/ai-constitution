@@ -68,6 +68,7 @@ function page(name) {
       setup: "Get started",
       architectures: "Project templates",
       constitution: "Constitution files",
+      workflows: "Workspace workflows",
       updates: "Updates & model inbox", insights: "Measured performance", projects: "Projects", accounts: "Apps & subscriptions", workers: "Set up a worker", storage: "Storage & locations", vault: "Configs & backups",
     }[name];
   if (name === "models") loadInventory();

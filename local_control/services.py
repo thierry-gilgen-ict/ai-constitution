@@ -1,7 +1,7 @@
 """Bounded controller maintenance; no work starts outside the running service."""
 import threading
 import time
-from . import synchronization, project_vault, monitoring, updates
+from . import synchronization, project_vault, monitoring, updates, resource_profiles
 
 
 def errors(root):
@@ -71,10 +71,21 @@ class Services:
         if value.get('automatic_check', True) and time.time() - value.get('last_check', 0) >= 86400:
             self.submit('Check application updates', updates.check, self.control.root)
 
+    def profiles(self):
+        if resource_profiles.overview(self.control.root)['enabled']:
+            self.submit('Apply automatic resource profile',resource_profiles.automatic_profile,self.control)
+
+    def toolkits(self):
+        from .toolkits import overview,synchronize_toolkits
+        if synchronization.settings(self.control.root)['enabled'] and overview(self.control.root)['projects']:
+            self.submit('Synchronize project toolkits',synchronize_toolkits,self.control)
+
     def tick(self):
         if self.control.stopping: return
+        # The peer listener is independently optional. A stale record cannot
+        # manufacture an active listener when this service was started without it.
         errors = []
-        for task in (self.backups, self.synchronize, self.monitor, self.health, self.releases):
+        for task in (self.backups, self.synchronize, self.monitor, self.health, self.releases, self.profiles, self.toolkits):
             try: task()
             except Exception as error:
                 # Saturation is transient. Each independent service still gets its

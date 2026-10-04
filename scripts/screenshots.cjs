@@ -12,13 +12,15 @@ const args = process.argv.slice(2);
 const option = name => args.includes(name) ? args[args.indexOf(name) + 1] : null;
 const output = path.resolve(ROOT, option('--output') || 'docs/assets/screenshots');
 const selected = option('--only')?.split(',');
-const assets = ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js'];
+const assets = ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js'];
 const inputs = [...assets.map(a => 'local_control/web/' + a), 'VERSION', 'tests/fixtures/documentation.cjs', 'scripts/documentation_scenarios.cjs', 'scripts/documentation_cli.py', 'scripts/screenshots.cjs', 'templates/architecture-components.json', ...['web-product', 'data-dashboard', 'python-api'].map(id => 'templates/architectures/' + id + '.json'), 'constitution.md', 'engineering.md', 'research.md', 'routing.md', 'registry/routes.json'];
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
+inputs.push('tests/fixtures/workflows.cjs');
 const sourceDigest = hash(Buffer.concat(inputs.flatMap(file => [Buffer.from(file + '\0'), Buffer.from(fs.readFileSync(path.join(ROOT, file),'utf8').replaceAll('\r\n','\n')), Buffer.from('\0')])));
 const e = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ready = {setup:'#setup-summary', overview:'#route .route-row', models:'#installed-models', machines:'#machine-list .driver-panel', connect:'#launch-form', architectures:'[data-template="0"]', constitution:'#library-editor', projects:'#bring-projects', accounts:'[data-account-edit]', workers:'#worker-release-download', storage:'#storage-form', updates:'#update-check', insights:'#performance-refresh', vault:'#restic-settings'};
 const badge = `DEMONSTRATION DATA · UI ${VERSION}`;
+ready.workflows='#workflow-rollout';
 
 function externalCaptures() {
   return [

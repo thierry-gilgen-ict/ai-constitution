@@ -39,9 +39,9 @@ You can configure a CPU or eligible remote fallback while Gaming mode stays on. 
 
 **In the dashboard · Overview.** Open Overview from the sidebar. The page below uses fictional documentation data.
 
-![Overview — demonstration data, UI 0.3.1](assets/screenshots/overview.png)
+![Overview — demonstration data, UI 0.4.0](assets/screenshots/overview.png)
 
-[Illustrated walkthrough](manual/overview.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/overview.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:overview:end -->
 
@@ -68,9 +68,9 @@ The launcher needs a Codex CLI with `debug models --bundled`. Custom gateway ali
 
 **In the dashboard · Open a local Codex session.** Select the project directory and client. The launcher starts a new session; it does not migrate a running direct-provider session.
 
-![Open a local Codex session — demonstration data, UI 0.3.1](assets/screenshots/connect-launch.png)
+![Open a local Codex session — demonstration data, UI 0.4.0](assets/screenshots/connect-launch.png)
 
-[Illustrated walkthrough](manual/connect.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/connect.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:connect:end -->
 
@@ -106,9 +106,9 @@ CPU fallback uses RAM and CPU time and can affect game performance. A second com
 
 **In the dashboard · Wait for the current response.** A transition waits for the response already using the GPU. The next request can then use the fallback.
 
-![Wait for the current response — demonstration data, UI 0.3.1](assets/screenshots/gpu-draining.png)
+![Wait for the current response — demonstration data, UI 0.4.0](assets/screenshots/gpu-draining.png)
 
-[Illustrated walkthrough](manual/overview.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/overview.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:gaming:end -->
 
@@ -124,9 +124,9 @@ An advertised tool capability and a successful text response do not establish re
 
 **In the dashboard · Find models for your hardware.** Choose Find models for my hardware. Estimated fit is shown separately from measured results.
 
-![Find models for your hardware — demonstration data, UI 0.3.1](assets/screenshots/model-fit.png)
+![Find models for your hardware — demonstration data, UI 0.4.0](assets/screenshots/model-fit.png)
 
-[Illustrated walkthrough](manual/models.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/models.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:fit:end -->
 

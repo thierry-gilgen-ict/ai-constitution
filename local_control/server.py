@@ -10,13 +10,14 @@ from contextlib import nullcontext
 from urllib.parse import parse_qs, urlsplit
 
 from . import hardware, credentials, diagnostics, launcher, locations, distribution, synchronization, monitoring, project_vault
-from . import workspace, updates, operations, encrypted_backup, schedules, model_inbox, insights, routing, connectors
+from . import workspace, updates, operations, encrypted_backup, schedules, model_inbox, insights, routing, connectors, workflows, resource_profiles
 from .core import ALIAS, model_name
 from .transport import connect
 
 WEB = Path(__file__).parent / "web"
 ASSETS = {"/experience.js": ("experience.js", "text/javascript"), "/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/center.js": ("center.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
 NODE_GET = {"/api/version", "/api/tags", "/api/ps"}
+ASSETS['/workflows.js'] = ('workflows.js','text/javascript')
 NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions"}
 
 
@@ -219,6 +220,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply({'version': updates.current(), 'protocol': 2})
             elif path.startswith('/api/updates'):
                 self.update_request(path.removeprefix('/api/updates'), post, body)
+            elif path.startswith('/api/workflows/') and post:
+                self.reply(workflows.dispatch(control,path.removeprefix('/api/workflows/'),body))
             elif path == '/api/workspace' and not post:
                 self.reply(workspace.overview(control))
             elif path == '/api/workspace/discover' and post:
@@ -355,6 +358,7 @@ class Handler(BaseHTTPRequestHandler):
                 action = body.get("action")
                 node, model = body.get("node", "local"), body.get("model", "")
                 if action == "mode":
+                    resource_profiles.manual(control.root)
                     self.reply(control.submit("Switch to " + str(body.get("mode")), control.switch, body.get("mode")))
                 elif action == "configure":
                     self.reply(control.submit("Test and configure route", control.configure, node, model, body.get("role"), body.get("cpu", False)))

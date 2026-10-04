@@ -25,7 +25,11 @@ def main():
             if path == '/api/tags': return {'models':[{'name':'fixture:latest','size':1024**3,'details':{'parameter_size':'1B'}}]}
             if path == '/api/ps': return {'models':[]}
             return {'status':'fixture'}
-        control=Control(root,rpc); control.config['primary']={'node':'local','model':'fixture:latest','contract':{'level':'protocol-tested'}};control.save()
+        control=Control(root,rpc)
+        # This isolated loopback fixture deliberately uses recognizable test-only
+        # credentials. Failure traces must never contain generated bearer secrets.
+        control.config.update(token='fixture', gateway_token='fixture-gateway')
+        control.config['primary']={'node':'local','model':'fixture:latest','contract':{'level':'protocol-tested'}};control.save()
         atomic(root/'updates.json',{'schema':1,'automatic_check':False,'latest':'99.0.0','checked_at':time.time(),
             'notes':'Synthetic demonstration release. This is not a real release.','url':updates.REPOSITORY+'/releases'})
         monitoring.configure(root,{'account':{'provider':'openai','login':'demo@example.com','label':'Demonstration subscription','plan':'Fixture','projects':[str(project)]}})
