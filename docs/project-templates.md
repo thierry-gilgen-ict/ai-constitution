@@ -21,9 +21,9 @@ Applying a template writes an architecture, blank environment examples, an agent
 
 **In the dashboard · Customize a baseline.** Choose Explore baseline to edit its components and decisions. The selected web baseline includes authentication, charts, email and SQL services.
 
-![Customize a baseline — demonstration data, UI 0.3.1](assets/screenshots/template-editor.png)
+![Customize a baseline — demonstration data, UI 0.4.0](assets/screenshots/template-editor.png)
 
-[Illustrated walkthrough](manual/architectures.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/architectures.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:editor:end -->
 
@@ -65,9 +65,9 @@ See [the file editor](constitution-studio.md) for editing the library and [proje
 
 **In the dashboard · Versions and inheritance.** Open Versions & inheritance to inspect saved revisions or create a child of an immutable parent.
 
-![Versions and inheritance — demonstration data, UI 0.3.1](assets/screenshots/template-revisions.png)
+![Versions and inheritance — demonstration data, UI 0.4.0](assets/screenshots/template-revisions.png)
 
-[Illustrated walkthrough](manual/architectures.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/architectures.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:revisions:end -->
 

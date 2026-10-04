@@ -970,3 +970,11 @@ summary { cursor:pointer; line-height:1.6; }
 #model-diff-list { max-height:480px; overflow:auto; margin:16px 0; }
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible { outline:3px solid #526c45; outline-offset:3px; }
 @media(max-width:760px) { .topbar { flex-wrap:wrap; gap:10px; } .project-facts { grid-template-columns:1fr; gap:5px; } .project-facts dd { margin-bottom:10px; } }
+/* Workspace workflows use the dashboard's existing typography and surfaces. */
+.workflow-tabs { margin-bottom: 1.5rem; flex-wrap: wrap; }
+.workflow-tabs [aria-pressed="true"] { background: var(--accent, #435a39); color: #fff; }
+.workflow-editor { width: 100%; min-height: 12rem; font: .85rem/1.5 ui-monospace, monospace; }
+.workflow-code { max-height: 28rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+#workspace-palette { width: min(42rem, 90vw); max-height: 85vh; overflow: auto; }
+.palette-result { display: block; text-align: left; width: 100%; margin: .4rem 0; }
+.palette-result small, #workflows .caption { display: block; overflow-wrap: anywhere; }

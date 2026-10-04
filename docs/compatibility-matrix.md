@@ -28,6 +28,12 @@ Use disposable projects, a small model known to fit each machine, and private wo
 5. Resume the worker, then put it into maintenance. Test package staging, guarded restart, version verification and rollback while all clients are idle.
 6. Repeat after sleep/wake on each machine and after controller restart. Confirm Gaming remains protected, stale sessions are identified, and failed operations remain visible.
 
+## Workspace 0.4 acceptance
+
+Automated fixtures cover controller TLS scope separation and certificate pinning, one-use invitations, peer conflicts, mapped recovery, native toolkit ownership/removal/rollback, quota freshness, FIFO admission and resource schedules. Browser journeys cover all workflow sections, keyboard search and accessibility. The illustrated manual uses synthetic data.
+
+Physical acceptance remains pending: pair two independent controllers on Windows and macOS; disconnect/reconnect a peer without losing its last successful snapshot; stage competing edits and recover a renamed checkout; restore an encrypted configuration on the second machine; enable a real game-process trigger with a tested remote/CPU fallback; observe active-response completion and actual GPU release; repeat after sleep/wake. Do not run these inference/driver tests implicitly during repository checks.
+
 ## Availability soak
 
 Run explicitly in your own terminal:

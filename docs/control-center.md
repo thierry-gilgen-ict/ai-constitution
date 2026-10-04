@@ -16,9 +16,9 @@ Configured local sessions already use the stable `constitution-local` gateway al
 
 **In the dashboard · Projects.** Open Projects from the sidebar. The page below uses fictional documentation data.
 
-![Projects — demonstration data, UI 0.3.1](assets/screenshots/projects.png)
+![Projects — demonstration data, UI 0.4.0](assets/screenshots/projects.png)
 
-[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:projects:end -->
 
@@ -50,9 +50,9 @@ Supported units are tokens, requests, USD, EUR, CHF and percent. Optional `obser
 
 **In the dashboard · Apps & subscriptions.** Open Apps & subscriptions from the sidebar. The page below uses fictional documentation data.
 
-![Apps & subscriptions — demonstration data, UI 0.3.1](assets/screenshots/accounts.png)
+![Apps & subscriptions — demonstration data, UI 0.4.0](assets/screenshots/accounts.png)
 
-[Illustrated walkthrough](manual/accounts.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/accounts.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:accounts:end -->
 
@@ -84,9 +84,9 @@ Native builds now produce this ZIP automatically. Preview artifacts are unsigned
 
 **In the dashboard · Review location changes.** Choose new locations and review verified copies before saving. Existing storage is preserved.
 
-![Review location changes — demonstration data, UI 0.3.1](assets/screenshots/storage-preview.png)
+![Review location changes — demonstration data, UI 0.4.0](assets/screenshots/storage-preview.png)
 
-[Illustrated walkthrough](manual/storage.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/storage.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:storage:end -->
 
@@ -104,9 +104,9 @@ Restore selects a snapshot and project, verifies its inventory and hashes, previ
 
 **In the dashboard · Configs & backups.** Open Configs & backups from the sidebar. The page below uses fictional documentation data.
 
-![Configs & backups — demonstration data, UI 0.3.1](assets/screenshots/vault.png)
+![Configs & backups — demonstration data, UI 0.4.0](assets/screenshots/vault.png)
 
-[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/vault.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:vault:end -->
 

@@ -44,6 +44,7 @@ class Control:
         self.drivers = json.loads(driver_file.read_text(encoding='utf-8')) if driver_file.exists() else {}
         self.driver_lock = threading.Lock()
         self.waiting = {}
+        self.waiting_nodes = {}
         self.cancelled_requests = set()
         self.queued = 0
         self.stopping = False
@@ -376,7 +377,7 @@ class Control:
             job = self.jobs.get(identity)
             if not job or job['status'] not in ('queued', 'running'):
                 raise ValueError('No active operation with that ID')
-            if job['status'] == 'running' and job.get('operation') != 'pull':
+            if job['status'] == 'running' and job.get('operation') not in ('pull','run_lab'):
                 raise ValueError('This operation has started; let its safe transition finish')
             self.cancelled.add(identity)
             job['detail'] = 'Cancellation requested; waiting for the next download progress event'
@@ -608,7 +609,7 @@ class Control:
             operations.save(self.root, self.jobs, self.events)
         def progress(detail):
             with self.lock:
-                if identity in self.cancelled and function.__name__ == 'pull':
+                if identity in self.cancelled and function.__name__ in ('pull','run_lab'):
                     raise operations.Cancelled('Download cancelled; retry explicitly to let Ollama resume available chunks')
                 job["detail"] = str(detail)[:200]
                 operations.save(self.root, self.jobs, self.events)
@@ -682,6 +683,7 @@ class Control:
                         raise ValueError('Queued request cancelled before inference; no generation was sent')
                     endpoint = {'node': 'local', 'model': model_name(payload.get('model'))} if direct else self.route()
                     node_id = endpoint['node']
+                    self.waiting_nodes[request_id] = node_id
                     if self.config.get('driver_hold') or node_id in self.config['maintenance']:
                         raise ValueError('Machine is paused for maintenance; resume it before sending model requests')
                     health = self.health.get(node_id, {})
@@ -690,7 +692,9 @@ class Control:
                     count = sum(n for (machine, _), n in self.active.items() if machine == node_id)
                     if self.stopping:
                         raise ValueError('Controller is stopping')
-                    if node_id not in self.admin_nodes and count < limits['concurrent_per_node']:
+                    order=list(self.waiting)
+                    earlier = any(self.waiting_nodes.get(other) == node_id for other in order[:order.index(request_id)])
+                    if not earlier and node_id not in self.admin_nodes and count < limits['concurrent_per_node']:
                         break
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
@@ -701,6 +705,8 @@ class Control:
             finally:
                 self.queued -= 1
                 self.waiting.pop(request_id, None)
+                self.waiting_nodes.pop(request_id, None)
+                self.changed.notify_all()
                 self.cancelled_requests.discard(request_id)
         try:
             body = {**payload, "model": endpoint["model"], "store": False, "truncation": "disabled"}

@@ -48,7 +48,7 @@ function fixture(scenario = 'ready') {
   const vault = {config_root: HOME + '/.config', backup_root: HOME + '/backups/configuration', schedule: {enabled: true, hours: 24}, last_success: TIME - 1800, next_due: TIME + 84600,
     projects: {'orbit-web': {name: 'Orbit web', folder: HOME + '/.config/orbit-web', project: PROJECT}}, warnings: [], available_folders: [{name: 'orbit-web', path: HOME + '/.config/orbit-web'}],
     snapshots: [{id: 'snapshot-20261003T113000Z-abcdef01', created: TIME - 1800, projects: ['orbit-web'], files: 3, bytes: 2048}], note: 'Example mappings and snapshots. No environment values are displayed.'};
-  const updates = {current: VERSION, latest: '0.3.1', available: true, automatic_check: true, checked_at: TIME, notes: 'DEMONSTRATION RELEASE\nExample changes illustrate the update review. This is not an announcement of a published version.', url: 'https://github.com/thierry-gilgen-ict/ai-constitution/releases', previous: {version: '0.2.0'}};
+  const updates = {current: VERSION, latest: '99.0.0', available: true, automatic_check: true, checked_at: TIME, notes: 'DEMONSTRATION RELEASE\nExample changes illustrate the update review. This is not an announcement of a published version.', url: 'https://github.com/thierry-gilgen-ict/ai-constitution/releases', previous: {version: '0.2.0'}};
   const inbox = {status: 'review', changes: [{provider: 'example-provider', model: 'example-coder', kind: 'added', fields: {tool_call: {before: null, after: true}, limit: {before: null, after: {context: 32768}}}}], summary: {models_added: ['example-coder'], models_removed: [], models_changed: []}, plan: 'demonstration-preview', route_impact: [{id: 'example-route', preferred: 'Review preferred model deliberately'}], note: 'Synthetic catalog change. Definitions, account access and measured performance are separate.'};
   const profiles = [{node: 'Studio PC · demonstration', model: 'demo-coder:7b', context: 8192, count: 3, passed: 3, level: 'coding-tested', first_text_seconds: 0.8, tokens_per_second: 24, resident_gpu_bytes: 5 * 1024**3, memory: {samples: 4, peak_gpu_bytes_sampled: 5 * 1024**3}, note: 'Synthetic measurements for documentation. Not a model or hardware benchmark.'}, {node: 'Work PC · demonstration', model: 'demo-coder:3b', context: 8192, count: 2, passed: 2, level: 'coding-tested', first_text_seconds: 1.4, tokens_per_second: 16, resident_gpu_bytes: 3 * 1024**3, memory: {samples: 4}, note: 'Synthetic measurements for documentation.'}];
   if (scenario === 'gaming') { state.mode = 'gaming'; inventory.running = []; state.events = [{time: '12:00:00', message: 'Demonstration: fallback selected; protected GPU released.'}]; }
@@ -56,7 +56,7 @@ function fixture(scenario = 'ready') {
   if (scenario === 'failure') { state.jobs = [failure]; state.notifications = [failure]; }
   if (scenario === 'conflict') { workspace.projects[0].status = 'conflict'; workspace.projects[0].detail = 'Managed instructions were edited locally. Review the diff before retrying synchronization.'; }
   if (scenario === 'empty') { workspace.projects = []; inventory.models = []; inventory.running = []; profiles.length = 0; }
-  if (scenario === 'staged' || scenario === 'blocked') updates.staged = {version: '0.3.1'};
+  if (scenario === 'staged' || scenario === 'blocked') updates.staged = {version: '99.0.0'};
   if (scenario === 'collector-failed') { local.observations.codex = {status: 'unavailable', last_successful: observation}; local.alerts = [{message: 'Refresh failed. The last successful demonstration report is retained.'}]; }
   let authorized = scenario !== 'login';
   const schedule = {enabled: true, hours: 24, scope: 'Example per-user OS task'};
@@ -67,6 +67,7 @@ function fixture(scenario = 'ready') {
     const parsed = new URL(url, 'http://127.0.0.1'); const p = parsed.pathname;
     if (p === '/api/login') { authorized = true; return {}; }
     if (!authorized) return {__status: 401, error: 'Open the authenticated dashboard from your terminal.'};
+    if (p.startsWith('/api/workflows/')) return require('./workflows.cjs')(workspace,TIME)(p.replace('/api/workflows/',''),body);
     if (p === '/api/status') return state;
     if (p === '/api/version') return {version: VERSION, protocol: 2};
     if (p === '/api/inventory') return inventory;

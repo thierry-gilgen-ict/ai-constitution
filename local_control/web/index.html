@@ -9,6 +9,7 @@
     <script defer src="/studio.js"></script>
     <script defer src="/center.js"></script>
     <script defer src="/experience.js"></script>
+    <script defer src="/workflows.js"></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -30,6 +31,7 @@
         <button class="nav" data-page="architectures"><span>◇</span> Project templates</button>
         <button class="nav" data-page="constitution"><span>≡</span> Constitution files</button>
         <button class="nav" data-page="projects"><span>⇄</span> Projects</button>
+        <button class="nav" data-page="workflows"><span>⌁</span> Workspace workflows</button>
         <button class="nav" data-page="accounts"><span>◎</span> Apps &amp; subscriptions</button>
         <button class="nav" data-page="workers"><span>＋</span> Set up a worker</button>
         <button class="nav" data-page="storage"><span>▤</span> Storage &amp; locations</button>
@@ -53,6 +55,7 @@
         </div>
       </header>
       <div id="notice" role="status" aria-live="polite" hidden></div>
+      <section id="workflows" class="page"><div class="page-heading"><span class="eyebrow">PREPARE · UNDERSTAND · REPEAT</span><h1>A workspace that works for you.</h1><p>Inspect effective setup, prepare projects and review changes before applying them.</p></div><div class="button-row workflow-tabs" role="group" aria-label="Workspace sections"><button data-workflow-tab="projects">Projects</button><button data-workflow-tab="toolkits">Agent toolkits</button><button data-workflow-tab="controllers">Controllers</button><button data-workflow-tab="recovery">Recovery</button><button data-workflow-tab="lab">Model lab</button><button data-workflow-tab="profiles">Resource profiles</button></div><div id="workflows-content"></div></section>
       <section id="updates" class="page"><div class="page-heading"><span class="eyebrow">KEEP YOUR WORKSPACE CURRENT</span><h1>Updates, under your control.</h1><p>Review application releases and new model definitions in one place.</p></div><div id="updates-content"></div></section>
       <section id="insights" class="page"><div class="page-heading"><span class="eyebrow">MEASURE. THEN CHOOSE.</span><h1>Know what works here.</h1><p>Compare observations at the exact machine, model and context you tested.</p></div><div id="insights-content"></div></section>
       <aside id="operation-strip" class="operation-strip" role="status" aria-live="polite" hidden></aside>

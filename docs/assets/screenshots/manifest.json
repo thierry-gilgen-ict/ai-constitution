@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "ui_version": "0.3.1",
-  "source_digest": "78977ff8b6d569195a78d6584c9a4985f837821ac0b548cff096d0cd4102c831",
+  "ui_version": "0.4.0",
+  "source_digest": "1ea984099b276dd52763ed07e59275b0a95c741500a185f8cefc8e168981cf7a",
   "digest_format": "UTF-8 with LF newlines; filename + NUL + content + NUL",
   "digest_inputs": [
     "local_control/web/index.html",
@@ -10,6 +10,7 @@
     "local_control/web/center.js",
     "local_control/web/studio.js",
     "local_control/web/experience.js",
+    "local_control/web/workflows.js",
     "VERSION",
     "tests/fixtures/documentation.cjs",
     "scripts/documentation_scenarios.cjs",
@@ -23,7 +24,8 @@
     "engineering.md",
     "research.md",
     "routing.md",
-    "registry/routes.json"
+    "registry/routes.json",
+    "tests/fixtures/workflows.cjs"
   ],
   "capture": {
     "browser": "Chromium",
@@ -52,7 +54,8 @@
     "storage": "Storage & locations",
     "updates": "Updates & model inbox",
     "insights": "Measured performance",
-    "vault": "Configs & backups"
+    "vault": "Configs & backups",
+    "workflows": "Workspace workflows"
   },
   "chapters": {
     "setup": [
@@ -118,6 +121,10 @@
     "toolkit": [
       "Instruction toolkit and external setup",
       "getting-started.md"
+    ],
+    "workflows": [
+      "Workspace workflows",
+      "workspace-workflows.md"
     ]
   },
   "entries": [
@@ -130,10 +137,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/setup.png",
-      "sha256": "531409c2a026d8265b9424eb5dc54ea5eccbfa30e31dcf3e0c698652cd301c88",
+      "sha256": "969af05cae4132d2a1dbd93aa629d2b7bee7c619bb068e4acd17bcf7132d6c49",
       "width": 1440,
       "height": 1218,
-      "bytes": 109232
+      "bytes": 110374
     },
     {
       "id": "overview",
@@ -144,10 +151,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/overview.png",
-      "sha256": "b63e0f3c2fdc8469c3402148819cb5f4f63970f30fdf45301c785c1b586366b1",
+      "sha256": "712394312843c68be4167de01af3ca37877241c722317d50683ed94768f1ca8d",
       "width": 1440,
       "height": 1507,
-      "bytes": 136906
+      "bytes": 138035
     },
     {
       "id": "models",
@@ -158,10 +165,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/models.png",
-      "sha256": "d9b50f8c58313c736ff0a17c9fc895d843f093fe915203a26fb39dd188a87472",
+      "sha256": "410e7dbe953bf6b9b63e249feddfc87197ad4317abe42ae6b9f2ad6be0a13604",
       "width": 1440,
       "height": 1130,
-      "bytes": 90127
+      "bytes": 91271
     },
     {
       "id": "machines",
@@ -172,10 +179,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/machines.png",
-      "sha256": "514becf134ae69ba52330fcd7cdac93ca7e45131b3950f4b8dbad8297e1a1a54",
+      "sha256": "c27b5d37e029929daff07b7a31d7989c9f1fb33051ac045303e9354164cfabbd",
       "width": 1440,
       "height": 3025,
-      "bytes": 192698
+      "bytes": 193708
     },
     {
       "id": "connect",
@@ -186,10 +193,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/connect.png",
-      "sha256": "02cb465f59a29c698394094c2bac5ed89cfd6d4f685ec05ea9b00a3a1e822c3b",
+      "sha256": "cadc92542d991713e9e62898a53a2a7bcbec923147183cad876b68bfaf2ded62",
       "width": 1440,
       "height": 1621,
-      "bytes": 128125
+      "bytes": 129225
     },
     {
       "id": "architectures",
@@ -200,10 +207,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/architectures.png",
-      "sha256": "a5305bbb08b83ce65c84732d0daec5197e8c2015c02cf3807bcf30430a7e8a59",
+      "sha256": "666be5d7955be7d419c1c5f36d68c4e3c35e23474b40644f4190a9c6dba46a16",
       "width": 1440,
       "height": 1000,
-      "bytes": 94376
+      "bytes": 95478
     },
     {
       "id": "constitution",
@@ -214,10 +221,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/constitution.png",
-      "sha256": "9de9dcdc250fa6ae366adf9a33bcbbce5ede68779e575e183acd98d96b286875",
+      "sha256": "b6e5be51ad4072ebbd4594b3b23cc0b2b98911ea58207dbdb0d7ed4468ac3bf6",
       "width": 1440,
       "height": 1259,
-      "bytes": 123178
+      "bytes": 124528
     },
     {
       "id": "projects",
@@ -228,10 +235,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/projects.png",
-      "sha256": "4840745155b525c22629f0be432e5f797b39708616b54b7644bc6917c7a2e854",
+      "sha256": "87acc2f5b1d4205d5436d89b4729dfee4a5165899558e6fa5b09bcdd5c00d5a0",
       "width": 1440,
       "height": 1189,
-      "bytes": 90541
+      "bytes": 91758
     },
     {
       "id": "accounts",
@@ -242,10 +249,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/accounts.png",
-      "sha256": "e6161bb30386cbd1acb84303bc93a9380bd4092a1582c72f952eb1a1a96dabc9",
+      "sha256": "a4eccfbd692121350a2aa67320234450501fd9f3c8a5fb3610a1e9a9810aae42",
       "width": 1440,
       "height": 2336,
-      "bytes": 163878
+      "bytes": 165092
     },
     {
       "id": "workers",
@@ -256,10 +263,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/workers.png",
-      "sha256": "9bf731e1d13d9eb348683de9e7288bd590653918f92046f55a3547863cc1fe79",
+      "sha256": "8f4dc167a8591ab3dded5b2c525749858687b497b65850f438d286db9a9abe88",
       "width": 1440,
       "height": 2382,
-      "bytes": 181380
+      "bytes": 182572
     },
     {
       "id": "storage",
@@ -270,10 +277,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/storage.png",
-      "sha256": "05cb357238c5a97c52378ec8d82c1f6f57abb2c6ffe8cd4d49b37eb55cc2cbd8",
+      "sha256": "44aa94038936999b322b291bfb6b33aca1708b2d7f34d1fc450b8e4ae042135a",
       "width": 1440,
       "height": 1496,
-      "bytes": 111400
+      "bytes": 112520
     },
     {
       "id": "updates",
@@ -284,10 +291,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/updates.png",
-      "sha256": "e08aa10d9f47a28d2cd7bd2faafd26e7a7e0db27656ff1e011d127ecedd579b1",
+      "sha256": "45decd84eba6088705ebf23b1f709f5bf4d8a6515cd3b6924c61a0375c08e22d",
       "width": 1440,
       "height": 1321,
-      "bytes": 93329
+      "bytes": 94990
     },
     {
       "id": "insights",
@@ -298,10 +305,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/insights.png",
-      "sha256": "c1cf0fbc90088612f261c510797fd385e226e29fdf8d15c314bfdb8ba0857279",
+      "sha256": "bfc8589dbc10c01b2cc9aeecaa450fdcfc79ba1e0a976628bec9725756b0775b",
       "width": 1440,
       "height": 1040,
-      "bytes": 85486
+      "bytes": 86460
     },
     {
       "id": "vault",
@@ -312,10 +319,24 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/vault.png",
-      "sha256": "5ba90a3a17d32882e6e358a514ba8b5521dd7b727ddb160c01ef46e9188856bb",
+      "sha256": "0d47d1cf019f838e1ecca1eb5d719b57fc6f844be2498c3b079edeea726159d7",
       "width": 1440,
       "height": 1675,
-      "bytes": 111388
+      "bytes": 112403
+    },
+    {
+      "id": "workflows",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Workspace workflows",
+      "caption": "Open Workspace workflows from the sidebar. The page below uses fictional documentation data.",
+      "steps": [],
+      "overview": true,
+      "path": "docs/assets/screenshots/workflows.png",
+      "sha256": "d77a9a46323ca9aef9f28466315403b3ab3e0b1d6ee07221eab575751015f009",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 72718
     },
     {
       "id": "welcome",
@@ -327,10 +348,10 @@
       "scenario": "login",
       "scope": "#login",
       "path": "docs/assets/screenshots/welcome.png",
-      "sha256": "af9b985027f38eae0eaa2624b05114eb242bc445ce7177476870c071d1a2bdba",
+      "sha256": "268e7cefcc8739ecd82f8abd10dcd8922354387b0c6d1e0776bbefd3138aa0a2",
       "width": 510,
       "height": 308,
-      "bytes": 16186
+      "bytes": 16236
     },
     {
       "id": "gpu-gaming",
@@ -341,10 +362,10 @@
       "steps": [],
       "scenario": "gaming",
       "path": "docs/assets/screenshots/gpu-gaming.png",
-      "sha256": "60b6d47bebe0ad030e90d42d9fb178d4bf38aa89834f0fec6ed97e05ff52410c",
+      "sha256": "b4fd78096e70237301599e784c1bb59098025ca986b950cc87636e8c22fbe894",
       "width": 1440,
       "height": 1000,
-      "bytes": 113407
+      "bytes": 114519
     },
     {
       "id": "gpu-draining",
@@ -355,10 +376,10 @@
       "steps": [],
       "scenario": "draining",
       "path": "docs/assets/screenshots/gpu-draining.png",
-      "sha256": "08258f6c53d47c0467e03e10aac8d5e90edaf39e76d93694ca8eada5fcc1ef5d",
+      "sha256": "d55c1c8cf5cd52fdfb52f151a2c1a3bf281cbc9c9748ce723ba766d690be67e9",
       "width": 1440,
       "height": 1000,
-      "bytes": 113412
+      "bytes": 114574
     },
     {
       "id": "model-fit",
@@ -374,10 +395,10 @@
       ],
       "scope": "#recommendations",
       "path": "docs/assets/screenshots/model-fit.png",
-      "sha256": "0619d29cf9933e9100aedac047707b0b522dd78e822a24e53394802004066ce4",
+      "sha256": "1255ab2d206332af7a84fe0b73863ba865a03bfc325bfa06b0c94f528d990944",
       "width": 1120,
       "height": 355,
-      "bytes": 18493
+      "bytes": 18593
     },
     {
       "id": "hugging-face",
@@ -402,10 +423,10 @@
       ],
       "scope": "#models .panel:has(#hf-form)",
       "path": "docs/assets/screenshots/hugging-face.png",
-      "sha256": "e967978102d995fc8016898d2dc32ad865f4514fac1d0ba9d99fc48eb2992647",
+      "sha256": "cabd3051cec4cc4b85166228207b4e6abdf064224e8fa6b502032516af62789d",
       "width": 1120,
       "height": 425,
-      "bytes": 25095
+      "bytes": 25194
     },
     {
       "id": "model-route",
@@ -421,10 +442,10 @@
       ],
       "scope": "#configure-dialog",
       "path": "docs/assets/screenshots/model-route.png",
-      "sha256": "f67e278a02f8794bd3c473b9a2d22e43d724f37fc66c94797ac051fd1fa70658",
+      "sha256": "036026b16563fddb93a1130c4649349569c8c7906b50fb5d49fd94a9f88eb315",
       "width": 510,
       "height": 400,
-      "bytes": 17684
+      "bytes": 17736
     },
     {
       "id": "models-empty",
@@ -435,10 +456,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/models-empty.png",
-      "sha256": "e5d0a6fcb90a0af0f7162b3a6c0f268a9ae78d23e1c5b34d08e0acad3133b5fa",
+      "sha256": "a710c6c25a2147bfeb4ed1efec7e7844db9e5548ec45f9f3d635baa84399f990",
       "width": 1440,
       "height": 1000,
-      "bytes": 82581
+      "bytes": 83586
     },
     {
       "id": "driver-update",
@@ -454,10 +475,10 @@
       ],
       "scope": "#driver-dialog",
       "path": "docs/assets/screenshots/driver-update.png",
-      "sha256": "255e2fe6c7d41c61d7436e3aa8fcd0b8d670e210cc0445277541c2e1b62b6f36",
+      "sha256": "fcf91aba82cbf6a1b9329d81929ee7390e6579eda2c92a3b915c25ba6337b566",
       "width": 510,
       "height": 616,
-      "bytes": 35656
+      "bytes": 35708
     },
     {
       "id": "machine-pairing",
@@ -474,10 +495,10 @@
       ],
       "scope": "#pair-form",
       "path": "docs/assets/screenshots/machine-pairing.png",
-      "sha256": "6f89b0450c76879c256a195dec42ab2db70eed4ef317fcb263c70f1e6202f4c5",
+      "sha256": "8b0ddc930996e2eea4e914e73a2587dc2f194399423d501bcf5de6bfce0e7971",
       "width": 1070,
       "height": 287,
-      "bytes": 9572
+      "bytes": 9677
     },
     {
       "id": "connect-launch",
@@ -499,10 +520,10 @@
       ],
       "scope": "#launch-form",
       "path": "docs/assets/screenshots/connect-launch.png",
-      "sha256": "f12df908025501b452f9e755bd19ae36d1ea8b6386a7ec36d4ce6b87949df730",
+      "sha256": "2c1c076cb5052c7c64519af9dafde45a662441e1cc69d3ce00aad874b5a4bd94",
       "width": 1120,
       "height": 408,
-      "bytes": 17321
+      "bytes": 17421
     },
     {
       "id": "cursor-task",
@@ -513,10 +534,10 @@
       "steps": [],
       "scope": "#connect .connect-grid",
       "path": "docs/assets/screenshots/cursor-task.png",
-      "sha256": "8c5eab94c24786f352d9a2629ba720d9aa07b9765e834fba8b186eb5ec3143e3",
+      "sha256": "b3094bdfcff0fa3c4976458af44e304c3ddab3ec75de02720fecdbbf4c8e44af",
       "width": 1120,
       "height": 648,
-      "bytes": 35179
+      "bytes": 35280
     },
     {
       "id": "coding-evaluation",
@@ -532,10 +553,10 @@
       ],
       "scope": "#connect .panel:has(#evaluation-results)",
       "path": "docs/assets/screenshots/coding-evaluation.png",
-      "sha256": "3f1e84bd98db344a2aed39d67bd74dd6a50e79e88f59b1cb17b4a00b840bb3f5",
+      "sha256": "cad99bf4427c4626db755596191c1c62b59340cdb9ec9915e922c70f8373c9a8",
       "width": 1120,
       "height": 542,
-      "bytes": 32227
+      "bytes": 32331
     },
     {
       "id": "template-editor",
@@ -551,10 +572,10 @@
       ],
       "scope": "#template-workbench",
       "path": "docs/assets/screenshots/template-editor.png",
-      "sha256": "bfd5b137e14a4c7899b4bbe3287615f041d362d656afb1ac3b2965a6c4ceb6d4",
+      "sha256": "326a0c913561d47219d68d1b1b1dafd5371f26e591225852cf87dfc6b883bb7b",
       "width": 1120,
       "height": 2100,
-      "bytes": 105304
+      "bytes": 105405
     },
     {
       "id": "template-component",
@@ -574,10 +595,10 @@
       ],
       "scope": "#component-dialog",
       "path": "docs/assets/screenshots/template-component.png",
-      "sha256": "ee392f3dd3cb607b20c66fcaf156721b8c044b3ea0ac7ca9475fe0e95a148ee5",
+      "sha256": "749e2b270e25639a51a164b3022199232fa26ae425d4b5eb62d388d5c384dacd",
       "width": 860,
       "height": 880,
-      "bytes": 38868
+      "bytes": 38966
     },
     {
       "id": "template-environment",
@@ -607,10 +628,10 @@
       ],
       "scope": "#component-dialog",
       "path": "docs/assets/screenshots/template-environment.png",
-      "sha256": "7da7d724ea937d1a849714bddaf19baee9019b2707a06958ee383cbba726ca7b",
+      "sha256": "f99c23f12bab7a41a402f49fa10f5528f88168904c8aef065d72ef3b79754e12",
       "width": 860,
       "height": 880,
-      "bytes": 36825
+      "bytes": 36887
     },
     {
       "id": "template-revisions",
@@ -630,10 +651,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-revisions.png",
-      "sha256": "361c77a46183e00f3cbf90b8c23abd8895454e0e68e02dc3a2e6800eee62194a",
+      "sha256": "db227bca887ecea002654e82076f4517ec6b350d3ebf13ab9dce35bdb3b00cdd",
       "width": 860,
       "height": 626,
-      "bytes": 33367
+      "bytes": 33425
     },
     {
       "id": "template-capture",
@@ -659,10 +680,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-capture.png",
-      "sha256": "6a6296f6547d6bec40f278aee7aff4e9c8d90ab69df5f78853f89481cb853f13",
+      "sha256": "6ac237991279e009edba49621cb6b1dce9cf8eb9b5d04cd280305d15da876087",
       "width": 860,
       "height": 648,
-      "bytes": 32691
+      "bytes": 32747
     },
     {
       "id": "template-capture-review",
@@ -687,10 +708,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-capture-review.png",
-      "sha256": "5718e1042d28d20bd517d3a0876781c20de76bb38a0c34c306ce89f6ecff302f",
+      "sha256": "48dca29a9132a3c06e9e5623c054e4bd7ef95176837be2a948d56fd882540320",
       "width": 860,
       "height": 474,
-      "bytes": 24377
+      "bytes": 24434
     },
     {
       "id": "template-save",
@@ -714,10 +735,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/template-save.png",
-      "sha256": "9da78f2fa1d77ec72ef17e89602e64930d14382f782831b0ab840725afe78959",
+      "sha256": "e4f17b1c2b5f19a873a79691385842932b6b624d45171dbb2b77edba843ad4d6",
       "width": 860,
       "height": 556,
-      "bytes": 25519
+      "bytes": 25576
     },
     {
       "id": "template-apply",
@@ -756,10 +777,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/template-apply.png",
-      "sha256": "c2e68e69845c25846f2ded4eecabb9a4d5076d9ccf6c63cfa92abae675ef501c",
+      "sha256": "43e781e576f42d7286dd1c6239871d630c16e1e1a03e75e08732442c8192557d",
       "width": 860,
       "height": 598,
-      "bytes": 28632
+      "bytes": 28689
     },
     {
       "id": "constitution-edit",
@@ -784,10 +805,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-edit.png",
-      "sha256": "114e2515b5f9f12141a5059f7ee6fb45c3c03461a6848d4cc99d724c06dcf231",
+      "sha256": "4340c5da1e9e89bfa28b8378c10d5ea31b8b31818184ee8fcba82a2cd6866bfa",
       "width": 860,
       "height": 598,
-      "bytes": 26937
+      "bytes": 26995
     },
     {
       "id": "constitution-generated",
@@ -803,10 +824,10 @@
       ],
       "scope": "#constitution .file-workspace",
       "path": "docs/assets/screenshots/constitution-generated.png",
-      "sha256": "29783d2f369969766318daa0141661364eec97d3892b0ff3683bfae978515962",
+      "sha256": "222d038136f06b82af76b8fc591c7a7282cd439ee1596fa969a83f11f3134632",
       "width": 1120,
       "height": 1357,
-      "bytes": 49872
+      "bytes": 50011
     },
     {
       "id": "constitution-activation",
@@ -822,10 +843,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-activation.png",
-      "sha256": "4b2b85660f9fa5bbf59b6654fa65c6e3d399385a89cfc8c18a501fd3d28e2805",
+      "sha256": "b1b0704f790401ae11780f24ca3123d2b0623367486839e22806b5cdc8502359",
       "width": 860,
       "height": 476,
-      "bytes": 26196
+      "bytes": 26259
     },
     {
       "id": "constitution-history",
@@ -841,10 +862,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-history.png",
-      "sha256": "74f32d7be99a944e0f01fc3dcb8d7c4b71d88a3de20401e9d5181753ab9ac9f5",
+      "sha256": "35f37edc8e3a19f4fe0f1b66f57e3e5c9dd3f62d1ac1d872ee824fb622c14d06",
       "width": 860,
       "height": 422,
-      "bytes": 18788
+      "bytes": 18845
     },
     {
       "id": "constitution-refresh",
@@ -864,10 +885,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-refresh.png",
-      "sha256": "b1588565208e7229239c95251837fda47ac34517f42bee7f154977cfd59b2273",
+      "sha256": "2a01e005702a20da2055ad2563f1e243bf7409ebb57f3206e956faf2e87f3ec0",
       "width": 860,
       "height": 534,
-      "bytes": 23615
+      "bytes": 23675
     },
     {
       "id": "project-discovery",
@@ -888,10 +909,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-discovery.png",
-      "sha256": "19c02f1c1cf04f63526c27c9b805a188e096e5962aa50f0d618a32d160962c2b",
+      "sha256": "42382df0146cc9ecd11ab98d793b2edebfb07e85669f4604ff89841b2f01404c",
       "width": 860,
       "height": 414,
-      "bytes": 19619
+      "bytes": 19678
     },
     {
       "id": "project-selection",
@@ -916,10 +937,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-selection.png",
-      "sha256": "e0bfee0520f6f253d01836d2d49c7826c853d12d05cc5da1891e6c5a9e692241",
+      "sha256": "6c15fa37dcc48608bb3b0fd8ecf42b483062f815c04bcac9575ba975e6cae4a0",
       "width": 860,
       "height": 776,
-      "bytes": 28277
+      "bytes": 28334
     },
     {
       "id": "project-preview",
@@ -948,10 +969,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-preview.png",
-      "sha256": "2b1fa0174e5d4bbcfa686ef0e13c73706933d7c5d92416a0013d8b71c5d1bf3a",
+      "sha256": "0577aa7f2629c0efaacb6d2655289826306d4e761aafbcd0ef74cc9f417f7cd3",
       "width": 860,
       "height": 502,
-      "bytes": 25194
+      "bytes": 25250
     },
     {
       "id": "project-conflict",
@@ -962,10 +983,10 @@
       "steps": [],
       "scenario": "conflict",
       "path": "docs/assets/screenshots/project-conflict.png",
-      "sha256": "b5378167605580da350673eb8cdad96bf41d1cd14d8a2eba71fca89b8ba3be74",
+      "sha256": "01058eeb0c92ee595d830307a18a5b568dbea0ebe6c1e570c505ff79877ca95c",
       "width": 1440,
       "height": 1000,
-      "bytes": 83916
+      "bytes": 85136
     },
     {
       "id": "projects-empty",
@@ -976,10 +997,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/projects-empty.png",
-      "sha256": "b3883aaa724c0b298da4758a5fd931e8cd9c573b816bde1f274a5a57d4a9873b",
+      "sha256": "a5fa0d108ae2a885990f89d3066e55a55231baba1f8368894d046ae7527372d1",
       "width": 1440,
       "height": 1000,
-      "bytes": 75859
+      "bytes": 76882
     },
     {
       "id": "subscription-edit",
@@ -995,10 +1016,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-edit.png",
-      "sha256": "4075f52e8a4f647758c3a71a414a3bdb4e7aaf2808c3e08a78c238a8075f8b30",
+      "sha256": "2ffe381e1120ea57e575ea32095384f9475ad28a609abdf4abe705f3a6d27e55",
       "width": 860,
       "height": 628,
-      "bytes": 27105
+      "bytes": 27161
     },
     {
       "id": "subscription-usage",
@@ -1014,10 +1035,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-usage.png",
-      "sha256": "ef50dbc3d4d8138079917f334b22ea62c51084385b9f3e2f784fc911cc035201",
+      "sha256": "f293a4b4b830a422c7737b8deea60c9e8a220b85228dfe0e17302b3dd9af6c0b",
       "width": 860,
       "height": 698,
-      "bytes": 31382
+      "bytes": 31440
     },
     {
       "id": "cost-connector",
@@ -1033,10 +1054,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/cost-connector.png",
-      "sha256": "7daa3bb8e2527e6ad54c26b226bd3960b97257eeec5c9a774dee8684427777ed",
+      "sha256": "467acdff2d371f3f4f98c39b2e774c9ff842238bf993693f82968e368b224d02",
       "width": 860,
       "height": 490,
-      "bytes": 26156
+      "bytes": 26215
     },
     {
       "id": "subscription-log",
@@ -1052,10 +1073,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-log.png",
-      "sha256": "1da3b7a85ed45462a19553e7b24f08e7783bfaea70e74a8d315cba6d67b8d687",
+      "sha256": "b4b9801a7f20eabc0577b4d7edc7cc068c7514a5b84aa0088e46f2092d62e49b",
       "width": 860,
       "height": 352,
-      "bytes": 15656
+      "bytes": 15713
     },
     {
       "id": "machine-diagnostics",
@@ -1071,10 +1092,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/machine-diagnostics.png",
-      "sha256": "1e9b1d80305b9060ef86320ae7211134c5052baefa4f4704c088118a36671415",
+      "sha256": "40d859f4796bf0a31cd677ae1d7c11bd04ef153ab42013139366f3d36f455806",
       "width": 860,
       "height": 614,
-      "bytes": 27528
+      "bytes": 27639
     },
     {
       "id": "collector-failure",
@@ -1085,10 +1106,10 @@
       "steps": [],
       "scenario": "collector-failed",
       "path": "docs/assets/screenshots/collector-failure.png",
-      "sha256": "009cf53eb4b3ef172cffbdf45859bdb8c3301a68eef006db0d1ff7e7a03f5804",
+      "sha256": "a74cbe33a7e09cd0f088f1d1e3652608e97fe4a7b5d7e4c398e6bcd3b5a25aa6",
       "width": 1440,
       "height": 1000,
-      "bytes": 93476
+      "bytes": 94826
     },
     {
       "id": "worker-download",
@@ -1104,10 +1125,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/worker-download.png",
-      "sha256": "ecd6ea17344b565e946f14c9e68e4466ba7a05cdb5389cab13471cffd3723168",
+      "sha256": "397a1701447a767b019acaed6c15c75e0e9ee4e88401b592754b5ab7f28f94af",
       "width": 860,
       "height": 408,
-      "bytes": 23444
+      "bytes": 23502
     },
     {
       "id": "worker-windows",
@@ -1128,10 +1149,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-windows.png",
-      "sha256": "54f5a1abcee5e0610817ae66bf2619af44bf868b92a13a428a8725967c158741",
+      "sha256": "541fdd02c1112c9eecfe549fdf1a49e9ad21419cfc5d7c96456dca3e7baa284e",
       "width": 1120,
       "height": 1089,
-      "bytes": 74082
+      "bytes": 74191
     },
     {
       "id": "worker-macos",
@@ -1152,10 +1173,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-macos.png",
-      "sha256": "77724ed7a64c5bea34e8cfbfece3183797aad223e416f7d05a611925ea7103ec",
+      "sha256": "c9782a6b9fa9afaf7cda590edd521fef677016ee964f78fdfda1e3fbf081e909",
       "width": 1120,
       "height": 1007,
-      "bytes": 67911
+      "bytes": 68016
     },
     {
       "id": "worker-linux",
@@ -1176,10 +1197,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-linux.png",
-      "sha256": "df8a0f146e4f689c2b63247a70a86290b78db4ef4e500007202f43cbb5a8510b",
+      "sha256": "cb22159cfbeae6f6cdb0d0cee8b70a7480f77c53fd8c51286e77c11dc51053e6",
       "width": 1120,
       "height": 1007,
-      "bytes": 67701
+      "bytes": 67804
     },
     {
       "id": "worker-maintenance",
@@ -1195,10 +1216,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/worker-maintenance.png",
-      "sha256": "0d81eef38c4c98253fc0af62dd9ccc038abf13cb1564e90a544a1581671a9eb7",
+      "sha256": "d573a095d4e71be950fa5d6ec322abf8d902f63e309388233e11c416fc520a10",
       "width": 860,
       "height": 482,
-      "bytes": 22416
+      "bytes": 22692
     },
     {
       "id": "storage-preview",
@@ -1219,10 +1240,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/storage-preview.png",
-      "sha256": "feaa3552b5b33a625c3c98c3694a8caa2e0fafccd616ae2dbadc0c3394681061",
+      "sha256": "9b69ea5be919562ef297c33114a692ccc7c26e096a4d134f26e28e01293110e3",
       "width": 860,
       "height": 360,
-      "bytes": 20443
+      "bytes": 20502
     },
     {
       "id": "model-storage-copy",
@@ -1238,10 +1259,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/model-storage-copy.png",
-      "sha256": "29c956cd763f4b0c13b002c37e83d9dbe56cc295d28dc12ec338503cde0a66ec",
+      "sha256": "09654a0c5e46bfcd684333a8425a33eb6bfcb94dd60facb3879f02f62136e73f",
       "width": 860,
       "height": 374,
-      "bytes": 22242
+      "bytes": 22299
     },
     {
       "id": "update-release-notes",
@@ -1256,10 +1277,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/update-release-notes.png",
-      "sha256": "455c657c5d47d8203c788aba81a5e7045e822098846be55736f779e3f7919f13",
+      "sha256": "ed3ac981373b37a11053bf442c155d027df940609de41c26d4cb3a81e9c20d48",
       "width": 1440,
       "height": 1000,
-      "bytes": 84330
+      "bytes": 86215
     },
     {
       "id": "update-restart",
@@ -1276,10 +1297,10 @@
       "scenario": "staged",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-restart.png",
-      "sha256": "0672be16ab419a4362e396f927a9a54f478a2eb1217100f3b5b99199963b89ba",
+      "sha256": "1ddf5318c6eba63a03c76b28f437c9526d6cde8485d8bb3aa66b371c6c2bbd30",
       "width": 860,
       "height": 376,
-      "bytes": 19014
+      "bytes": 19072
     },
     {
       "id": "update-blocked",
@@ -1296,10 +1317,10 @@
       "scenario": "blocked",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-blocked.png",
-      "sha256": "ddd05e22a292e03c89dadff639e33ca05e643a085e45e823cc4d6e80e75b0114",
+      "sha256": "fd23df208cab19cf71c8bcd6dc300899ea27e6bf8c50006fe12a401c212cdbc7",
       "width": 860,
       "height": 450,
-      "bytes": 23167
+      "bytes": 23225
     },
     {
       "id": "update-rollback",
@@ -1315,10 +1336,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-rollback.png",
-      "sha256": "5cfb47b51d485a9f2803c8f88abc2449d93ed220a2b9f5b715618c1d0992c493",
+      "sha256": "da138af7464d7035fe2bba16f035595ef67786d792da29e2feb981713d9ef5a8",
       "width": 860,
       "height": 376,
-      "bytes": 19785
+      "bytes": 19844
     },
     {
       "id": "model-inbox-detail",
@@ -1334,10 +1355,10 @@
       ],
       "scope": "#updates-content .panel >> nth=1",
       "path": "docs/assets/screenshots/model-inbox-detail.png",
-      "sha256": "4f3ff01c69d6e97816aba9044432f979837a5ff0b0bc6d0a8577cfc877684347",
+      "sha256": "49ab7448687a2096ca94b198095904433609b7eeebd99df696f1f5a52a91f0b4",
       "width": 1120,
       "height": 869,
-      "bytes": 32814
+      "bytes": 32948
     },
     {
       "id": "model-inbox-apply",
@@ -1353,10 +1374,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/model-inbox-apply.png",
-      "sha256": "dcc3bba5a2dd9016ad4fc04fe200604ad19cb0f3e12a4c7099a8b965e7b1b8c4",
+      "sha256": "7d48de9bae2894b05768e584b9afc5642c4ef015847edad6f465f2117afe6d19",
       "width": 860,
       "height": 336,
-      "bytes": 19883
+      "bytes": 19938
     },
     {
       "id": "performance-empty",
@@ -1367,10 +1388,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/performance-empty.png",
-      "sha256": "8eb840992d9c4db2360b0acd524bec9d7d6e71db44866bedacb8ce3717f77e71",
+      "sha256": "05839fc62013c796ba04a7cbf05ff58d57adf93f8a70298f5f3d4af5f4c64c60",
       "width": 1440,
       "height": 1000,
-      "bytes": 80083
+      "bytes": 82007
     },
     {
       "id": "config-mapping",
@@ -1386,10 +1407,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/config-mapping.png",
-      "sha256": "f0585c8710d28e34492111dd8246c0153cb27e72f6bff39e17f4118174ffbfac",
+      "sha256": "420b0d896b64452445c005c4c3cff5d5dab51041c64ee5ad49194feb2a2a337f",
       "width": 860,
       "height": 576,
-      "bytes": 27655
+      "bytes": 27712
     },
     {
       "id": "backup-preview",
@@ -1405,10 +1426,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-preview.png",
-      "sha256": "a2e60c7344c09cd20eabd1c2ffe4760c68be60b5cea6bfceb2e1abf19b7f2c8b",
+      "sha256": "f021054628cf65fa009366d9b4210d11634f6f123871bb573a05af629ec224ff",
       "width": 860,
       "height": 414,
-      "bytes": 23115
+      "bytes": 23172
     },
     {
       "id": "backup-encryption",
@@ -1424,10 +1445,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-encryption.png",
-      "sha256": "cc47ea571700537c6a2122ce278b88b03583752d77f5a0a553f2cd9c6ed29958",
+      "sha256": "3c344a47c15f45f22181f62a99ba6fdf4da2c83ec8aad7ada50509a39aaf40ce",
       "width": 860,
       "height": 664,
-      "bytes": 32838
+      "bytes": 32893
     },
     {
       "id": "backup-initialize",
@@ -1443,10 +1464,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-initialize.png",
-      "sha256": "045784f25581edca24f0003757107e3df568b74226ea8142a2252f61b2a9a827",
+      "sha256": "2cd4f66cef070525338e4431a7892194efa505f2975e26d0ec99981a5dbfd4cb",
       "width": 860,
       "height": 298,
-      "bytes": 17256
+      "bytes": 17314
     },
     {
       "id": "backup-schedule",
@@ -1462,10 +1483,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-schedule.png",
-      "sha256": "4d974f5a066414f09e17c12e3533279558d511ffc4e090f5358ab97a757a9174",
+      "sha256": "d302a30f45d5cb0ee931aaf638a4a2465a7b84b58189c4a5e9f8fc2f8cff8689",
       "width": 860,
       "height": 466,
-      "bytes": 28554
+      "bytes": 28612
     },
     {
       "id": "backup-retention",
@@ -1481,10 +1502,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-retention.png",
-      "sha256": "7ce3b994bb1bc1e544b3e0b6d301bb78aeb1e322885e3df9771f6058a9683926",
+      "sha256": "aa2753a17dba359460dbed033be32f1a8e70df69e1292943924df3580f8a8415",
       "width": 860,
       "height": 406,
-      "bytes": 18902
+      "bytes": 18960
     },
     {
       "id": "backup-restore",
@@ -1505,10 +1526,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-restore.png",
-      "sha256": "c6b984af355eb52b185c1a4409f9f767919630ad4a0d8b31f889f4ba48c3927f",
+      "sha256": "d585d996d0bd0f2ec5ec0ec0f54724e393f90e573547ec79f11fee1952ab028a",
       "width": 860,
       "height": 428,
-      "bytes": 20562
+      "bytes": 20632
     },
     {
       "id": "backup-restore-preview",
@@ -1533,10 +1554,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-restore-preview.png",
-      "sha256": "d4ed5762601393777cd3c7aa9301f22b96dda41b793b891797446788c36c1e80",
+      "sha256": "d06add36c9de24a6167a42c63b59bff84179574deea1be0e9cc6b45cb0e36c72",
       "width": 860,
       "height": 336,
-      "bytes": 18415
+      "bytes": 18474
     },
     {
       "id": "local-restore-preview",
@@ -1561,10 +1582,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/local-restore-preview.png",
-      "sha256": "d319b8d01956a79d56e780bade859212753a9b882e4620794dbb5c6eaf8bb00a",
+      "sha256": "ef3a407dd7cfd1a9fea9e0ee19e27a7b995a163a552505330ed87fe5b7ef957b",
       "width": 860,
       "height": 360,
-      "bytes": 18315
+      "bytes": 18373
     },
     {
       "id": "notifications",
@@ -1581,10 +1602,10 @@
       "scenario": "failure",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/notifications.png",
-      "sha256": "a7abb72821cb3dfe031dc86fe99fa04d57f22ec1e6c58ba1c8646f5921046305",
+      "sha256": "ac67a611d9bd3a046c23ba260fc75c9468027d64c0c52ffc0c616bae70ec01a2",
       "width": 860,
       "height": 504,
-      "bytes": 22992
+      "bytes": 23051
     },
     {
       "id": "operation-progress",
@@ -1604,10 +1625,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/operation-progress.png",
-      "sha256": "2c8cb27e2250e040f0613499b5f544b0ca8d06754492f2ec19e0beb7a0797de7",
+      "sha256": "a0abd4d8ce4b184f4d77bce3c22155ee96f7d6beafc01149f8a0ad110f344ebd",
       "width": 1440,
       "height": 1000,
-      "bytes": 92775
+      "bytes": 93880
     },
     {
       "id": "support-report",
@@ -1623,10 +1644,10 @@
       ],
       "scope": "#overview .service-panel",
       "path": "docs/assets/screenshots/support-report.png",
-      "sha256": "abce874fee0a0c6cbc0791c1c860d983e0e5e46c8369036aeecff9359d377e57",
+      "sha256": "8c4953199a144a0c0ba72c3e8ecebaf834bdb61c314ba75d06c04c2b21fa8e93",
       "width": 1120,
       "height": 686,
-      "bytes": 30733
+      "bytes": 30904
     },
     {
       "id": "mobile-updates",
@@ -1641,10 +1662,10 @@
       },
       "fullPage": true,
       "path": "docs/assets/screenshots/mobile-updates.png",
-      "sha256": "d3a163c746ecd846770ec765509186bc6b31c8b489b4c07f9d7f4ab2f60fb592",
-      "width": 390,
+      "sha256": "0426d0478db838b0a804f1b877e57bb0d84d97d767fa4f5133ba813a2827771a",
+      "width": 435,
       "height": 1600,
-      "bytes": 70043
+      "bytes": 71332
     },
     {
       "id": "tablet-projects",
@@ -1659,10 +1680,10 @@
       },
       "fullPage": true,
       "path": "docs/assets/screenshots/tablet-projects.png",
-      "sha256": "d29f30c894c33f8efa7f4ffcf9d7d7deeace9bf7b84ad99d01592780dff8cd69",
+      "sha256": "551aae6330db080c557156bf0c663c18cad0436b8070c2c5c0d54f25ccf678d0",
       "width": 820,
       "height": 1367,
-      "bytes": 93159
+      "bytes": 94910
     },
     {
       "id": "toolkit-check",
@@ -1673,10 +1694,10 @@
       "steps": [],
       "transcript": "check",
       "path": "docs/assets/screenshots/toolkit-check.png",
-      "sha256": "58fba72c8f2ab1cd34764ef60c78da37ca0067335ba5456ecd157cbd5a9b42c0",
+      "sha256": "a9eee16dabdce4897e7d171f85dfd781624370edfeb1e72a748d30d62721fbbf",
       "width": 1440,
       "height": 1000,
-      "bytes": 28445
+      "bytes": 28584
     },
     {
       "id": "toolkit-install-preview",
@@ -1687,10 +1708,385 @@
       "steps": [],
       "transcript": "install",
       "path": "docs/assets/screenshots/toolkit-install-preview.png",
-      "sha256": "38bf59dcee944528cbb2bc625c2497834869d3ff1aca65937f9d2d37a443071c",
+      "sha256": "de81cdb65881af9f38c65d7a0a17bddbcb7e0deb6c45172e0ed6e4680c421c06",
       "width": 1440,
       "height": 1000,
-      "bytes": 51541
+      "bytes": 51589
+    },
+    {
+      "id": "workflow-inspector",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Inspect effective setup",
+      "caption": "File verification, client loading, route readiness and performance remain distinct. This evidence is synthetic.",
+      "steps": [
+        [
+          "click",
+          "[data-inspect]"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-inspector.png",
+      "sha256": "d2aac7c33144ebf4fe7e741b0def851c3270469692dea3cb055ce0db56df1ec3",
+      "width": 860,
+      "height": 880,
+      "bytes": 39559
+    },
+    {
+      "id": "workflow-preparation",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Review a preparation recipe",
+      "caption": "Edit the detected recipe, select environment names, and retain its operation ID for an inspected resume.",
+      "steps": [
+        [
+          "click",
+          "[data-prepare]"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-preparation.png",
+      "sha256": "e0f49f5561284cdc822c49d8541363fc7f1e62d6bbfa76952096ead3e0a6c71d",
+      "width": 860,
+      "height": 794,
+      "bytes": 37646
+    },
+    {
+      "id": "workflow-preparation-preview",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Review commands before execution",
+      "caption": "Commands and timeouts are visible; credential values are withheld. This fixture runs nothing.",
+      "steps": [
+        [
+          "click",
+          "[data-prepare]"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-preparation-preview.png",
+      "sha256": "bf15c36d085662010286016907cf0517b56416ac98920c7a973f8c940901df14",
+      "width": 860,
+      "height": 880,
+      "bytes": 28818
+    },
+    {
+      "id": "workflow-launch",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Choose local or hosted launch",
+      "caption": "Usage evidence assists a new launch. Account selection does not authenticate or transfer existing tasks.",
+      "steps": [
+        [
+          "click",
+          "[data-launch-advice]"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-launch.png",
+      "sha256": "871cd98106693a0d6d7aea5fb17b7342aae420a9f3d1cd913764cfce46da2d19",
+      "width": 860,
+      "height": 686,
+      "bytes": 28852
+    },
+    {
+      "id": "workflow-rollout",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Preview a workspace rollout",
+      "caption": "Review individual diffs and respect pinned repositories. Use one canary before broader application.",
+      "steps": [
+        [
+          "click",
+          "#workflow-rollout"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-rollout.png",
+      "sha256": "2d21dd03965a6209151cd77cf34dbe490defa1d94803b81ca25b0d7459ce74bd",
+      "width": 860,
+      "height": 566,
+      "bytes": 24554
+    },
+    {
+      "id": "workflow-canary",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Review one canary",
+      "caption": "The canary receives its own fresh preview. Review its result before applying remaining repositories.",
+      "steps": [
+        [
+          "click",
+          "#workflow-rollout"
+        ],
+        [
+          "click",
+          "#workflow-canary"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-canary.png",
+      "sha256": "139e1f98649afdd6b16fc55d9e0f88a94346233ae38dc852a851721179d62c13",
+      "width": 860,
+      "height": 398,
+      "bytes": 19175
+    },
+    {
+      "id": "workflow-toolkit-library",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Manage agent toolkits",
+      "caption": "Version portable rules, skills, prompt commands and MCP definitions.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"toolkits\"]"
+        ]
+      ],
+      "path": "docs/assets/screenshots/workflow-toolkit-library.png",
+      "sha256": "a767e443b5b85e3b33e5cfba88fc4a4dbe71a661642e4a3d0a1090b7e00aacb6",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 77240
+    },
+    {
+      "id": "workflow-toolkit-edit",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Build a small toolkit",
+      "caption": "Start with a useful focused manifest. Credential inputs are environment references.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"toolkits\"]"
+        ],
+        [
+          "click",
+          "#toolkit-new"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-toolkit-edit.png",
+      "sha256": "09ea0ba0e2d48b648a4ff89977eaefc69e83067299f72676471cc3d923723ce2",
+      "width": 860,
+      "height": 640,
+      "bytes": 31906
+    },
+    {
+      "id": "workflow-toolkit-install",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Review native adapter changes",
+      "caption": "Unrelated client settings are preserved. Installed files do not prove loading.",
+      "steps": [
+        [
+          "click",
+          "[data-project-kits]"
+        ],
+        [
+          "click",
+          "#center-dialog-apply"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-toolkit-install.png",
+      "sha256": "a70e453ce1698ce671bd5543894ad39d687c2e314c2e01770d70ed6378aa8d96",
+      "width": 860,
+      "height": 476,
+      "bytes": 22423
+    },
+    {
+      "id": "workflow-toolkit-import",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Import portable configuration",
+      "caption": "Choose the explicit format and review losses before saving.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"toolkits\"]"
+        ],
+        [
+          "click",
+          "#toolkit-import"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-toolkit-import.png",
+      "sha256": "f837610c95bad980cd98646bc3595d6c34d0d64d4bc0f0637d71686be297df61",
+      "width": 860,
+      "height": 662,
+      "bytes": 28991
+    },
+    {
+      "id": "workflow-controllers",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Connect separate controllers",
+      "caption": "Controller scopes are independent of inference workers. This example connects no machines.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"controllers\"]"
+        ]
+      ],
+      "path": "docs/assets/screenshots/workflow-controllers.png",
+      "sha256": "920a5fb7e5d88efa27129abe084560d4529c7f76ea8202d18a760e54cadfc9bc",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 83768
+    },
+    {
+      "id": "workflow-listener",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Enable a scoped TLS listener",
+      "caption": "Choose this computer’s private IPv4 and port. TLS and firewall prerequisites remain explicit.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"controllers\"]"
+        ],
+        [
+          "click",
+          "#fleet-enable"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-listener.png",
+      "sha256": "30551126b96ec194fa3c38682b66c1ca60658d8c1f00d54472a1be5b3628b886",
+      "width": 860,
+      "height": 488,
+      "bytes": 24422
+    },
+    {
+      "id": "workflow-peer-conflicts",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Review controller conflicts",
+      "caption": "Choose remote content deliberately; staged changes still require a separate project rollout.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"controllers\"]"
+        ],
+        [
+          "click",
+          "[data-peer-review]"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-peer-conflicts.png",
+      "sha256": "07065b40e4f22045eb324dbec572655e741f3520cc7ccd3e469a786168e2d823",
+      "width": 860,
+      "height": 432,
+      "bytes": 22739
+    },
+    {
+      "id": "workflow-recovery",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Prepare another computer",
+      "caption": "Export a recipe, map repositories, restore encrypted configuration separately and re-verify hardware.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"recovery\"]"
+        ]
+      ],
+      "path": "docs/assets/screenshots/workflow-recovery.png",
+      "sha256": "3f0c908f46af1cefc7e4f074ffcdbd7f470e806a00b275fe64868376fbcd841f",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 91312
+    },
+    {
+      "id": "workflow-lab",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Compare bounded local evidence",
+      "caption": "Synthetic repetitions illustrate pass counts, median duration, spread and matched regressions.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"lab\"]"
+        ]
+      ],
+      "path": "docs/assets/screenshots/workflow-lab.png",
+      "sha256": "6652085f2145c63c0cac2983097872ce46fea54993540312fac62f3993aa8c8e",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 77694
+    },
+    {
+      "id": "workflow-lab-preview",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Review an experiment budget",
+      "caption": "Local inference has zero paid budget. The current bounded trial finishes when canceled.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"lab\"]"
+        ],
+        [
+          "click",
+          "#lab-form button"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/workflow-lab-preview.png",
+      "sha256": "9507988357e1c5a3ff68f79d9b8ab0b8fc8c6d746e306372d8df24446077322c",
+      "width": 860,
+      "height": 534,
+      "bytes": 25899
+    },
+    {
+      "id": "workflow-profiles",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Configure resource automation",
+      "caption": "Automation starts disabled. First matching rule wins, manual choices take priority and active work is deferred.",
+      "steps": [
+        [
+          "click",
+          "[data-workflow-tab=\"profiles\"]"
+        ]
+      ],
+      "fullPage": true,
+      "path": "docs/assets/screenshots/workflow-profiles.png",
+      "sha256": "2850dd8bb3361f6343e6a7d08168e2fe3be8f6d74bb05d3c7daf872bac6b0dc4",
+      "width": 1440,
+      "height": 1553,
+      "bytes": 109812
+    },
+    {
+      "id": "workflow-search",
+      "page": "workflows",
+      "chapter": "workflows",
+      "title": "Find workspace metadata",
+      "caption": "Ctrl K or Cmd K opens keyboard search. Credential files and conversation contents are excluded.",
+      "steps": [
+        [
+          "click",
+          "#workspace-search"
+        ],
+        [
+          "fill",
+          "#workspace-query",
+          "orbit"
+        ]
+      ],
+      "scope": "#workspace-palette",
+      "path": "docs/assets/screenshots/workflow-search.png",
+      "sha256": "71d2aa9f46350025d0a5c1147d361b58fa426027292210d8e3d26a868d45c079",
+      "width": 510,
+      "height": 360,
+      "bytes": 11879
     }
   ],
   "external_captures": [

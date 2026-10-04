@@ -18,9 +18,9 @@ Existing personal and project [policy overlays](updates.md) remain in effect. Th
 
 **In the dashboard · Review instruction edits.** Edit your private draft and choose Review & save draft. Validation and generated-file rebuilding happen before saving.
 
-![Review instruction edits — demonstration data, UI 0.3.1](assets/screenshots/constitution-edit.png)
+![Review instruction edits — demonstration data, UI 0.4.0](assets/screenshots/constitution-edit.png)
 
-[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:edit:end -->
 
@@ -41,9 +41,9 @@ Files over 512 KiB are view-only. Text pages are bounded to 64,000 characters an
 
 **In the dashboard · Recover a previous draft.** Draft history retains reviewed saves. Later edits are protected when undoing a save.
 
-![Recover a previous draft — demonstration data, UI 0.3.1](assets/screenshots/constitution-history.png)
+![Recover a previous draft — demonstration data, UI 0.4.0](assets/screenshots/constitution-history.png)
 
-[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.3.1.
+[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.4.0.
 
 <!-- screenshots:history:end -->
 

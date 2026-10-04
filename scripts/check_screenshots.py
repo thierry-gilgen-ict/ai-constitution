@@ -50,7 +50,7 @@ def validate(root=ROOT, *, sources=True, release=True):
     if sources:
         try:
             inputs = manifest['digest_inputs']
-            allowed = ['local_control/web/' + a for a in ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js']] + ['VERSION', 'tests/fixtures/documentation.cjs', 'scripts/documentation_scenarios.cjs', 'scripts/documentation_cli.py', 'scripts/screenshots.cjs', 'templates/architecture-components.json'] + ['templates/architectures/' + a + '.json' for a in ['web-product', 'data-dashboard', 'python-api']] + ['constitution.md', 'engineering.md', 'research.md', 'routing.md', 'registry/routes.json']
+            allowed = ['local_control/web/' + a for a in ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js']] + ['VERSION', 'tests/fixtures/documentation.cjs', 'scripts/documentation_scenarios.cjs', 'scripts/documentation_cli.py', 'scripts/screenshots.cjs', 'templates/architecture-components.json'] + ['templates/architectures/' + a + '.json' for a in ['web-product', 'data-dashboard', 'python-api']] + ['constitution.md', 'engineering.md', 'research.md', 'routing.md', 'registry/routes.json', 'tests/fixtures/workflows.cjs']
             if inputs != allowed:
                 raise ValueError('Screenshot digest inputs must match the capture harness')
             data = b''.join(name.encode() + b'\0' + (root / name).read_bytes().replace(b'\r\n', b'\n') + b'\0' for name in inputs)
@@ -62,10 +62,10 @@ def validate(root=ROOT, *, sources=True, release=True):
     ids = [v['id'] for v in entries]
     if len(set(ids)) != len(ids):
         failures.append('Duplicate screenshot IDs')
-    nav = set(re.findall(r'class="nav[^"\n]*"[^>]*data-page="([a-z-]+)"', (root / 'local_control/web/index.html').read_text()))
+    nav = set(re.findall(r'class="nav[^"\n]*"[^>]*data-page="([a-z-]+)"', (root / 'local_control/web/index.html').read_text(encoding='utf-8')))
     # Attribute order can vary without changing the UI.
     if not nav:
-        nav = set(re.findall(r'data-page="([a-z-]+)"', (root / 'local_control/web/index.html').read_text()))
+        nav = set(re.findall(r'data-page="([a-z-]+)"', (root / 'local_control/web/index.html').read_text(encoding='utf-8')))
     covered = {v['page'] for v in entries if v.get('overview')}
     if nav != covered or nav != set(manifest.get('pages', {})):
         failures.append('Dashboard-page screenshot coverage is incomplete')

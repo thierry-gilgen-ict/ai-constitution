@@ -8,7 +8,7 @@ The community snapshot is source data, not an independent audit of every field. 
 
 <!-- screenshots:capture-summary:begin -->
 
-The current [illustrated manual](manual/README.md) contains **80 captures of UI 0.3.1**. Dashboard images use synthetic data; CLI images render real isolated commands.
+The current [illustrated manual](manual/README.md) contains **99 captures of UI 0.4.0**. Dashboard images use synthetic data; CLI images render real isolated commands.
 
 <!-- screenshots:capture-summary:end -->
 

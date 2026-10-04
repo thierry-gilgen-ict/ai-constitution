@@ -238,7 +238,7 @@ def transaction(state, writes, *, dry_run=False):
         if before == after:
             continue
         prepared.append({"path": str(path), "before": base64.b64encode(before).decode() if before is not None else None,
-                         "after_sha256": digest(after), "data": after})
+                         "after_sha256": digest(after) if after is not None else None, "data": after})
     if dry_run:
         return {"status": "preview", "files": [p["path"] for p in prepared]}
     if not prepared:
@@ -252,7 +252,10 @@ def transaction(state, writes, *, dry_run=False):
     completed = []
     try:
         for item in prepared:
-            atomic_bytes(Path(item["path"]), item["data"])
+            if item['data'] is None:
+                Path(item['path']).unlink(missing_ok=True)
+            else:
+                atomic_bytes(Path(item["path"]), item["data"])
             completed.append(item)
         record["state"] = "applied"
         atomic_bytes(journal, json_bytes(record))
@@ -434,7 +437,7 @@ def _rollback(state, snapshot):
         actual = target.read_bytes() if target.exists() else None
         before = base64.b64decode(item["before"]) if item["before"] is not None else None
         already_restored = record["state"] in ("prepared", "rolling-back") and actual == before
-        if not already_restored and (actual is None or digest(actual) != item["after_sha256"]):
+        if not already_restored and (digest(actual) if actual is not None else None) != item["after_sha256"]:
             raise ValueError("A target changed since this snapshot; rollback refused to preserve later edits")
     record["state"] = "rolling-back"
     atomic_bytes(path, json_bytes(record))

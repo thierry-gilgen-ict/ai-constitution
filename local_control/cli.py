@@ -106,6 +106,8 @@ def main():
     serve.add_argument("--port", type=int, default=8766)
     serve.add_argument("--open", action="store_true")
     serve.add_argument("--no-background-services", action="store_true", help="Run the dashboard without periodic maintenance, for isolated acceptance testing")
+    serve.add_argument('--fleet-address',help='Opt in to separate controller TLS pairing on a private IPv4 address')
+    serve.add_argument('--fleet-port',type=int,default=8768)
     sub.add_parser("open", help="Open the existing dashboard using a private login link")
     updater = sub.add_parser('finish-update', help=argparse.SUPPRESS)
     updater.add_argument('--ticket', required=True)
@@ -314,6 +316,10 @@ def main():
         server.socket = context.wrap_socket(server.socket, server_side=True, do_handshake_on_connect=False)
     else:
         atomic(runtime_path, {"url": url, "pid": os.getpid(), 'process': processes.identity(os.getpid())})
+        if args.fleet_address:
+            from .fleet_server import start as start_peers
+            server.peers=start_peers(control,args.fleet_address,args.fleet_port)
+            control.peer_listener=server.peers
         if not args.no_background_services:
             from .services import Services
             server.services = Services(control)
@@ -333,6 +339,7 @@ def main():
                 except ValueError as error:
                     print(str(error) + '. Service continues; use Gaming mode to free the GPU.', flush=True)
     finally:
+        if getattr(control,'peer_listener',None):control.peer_listener.shutdown();control.peer_listener.server_close()
         if getattr(server, 'services', None): server.services.close()
         server.server_close()
         control.pool.shutdown(wait=False, cancel_futures=True)

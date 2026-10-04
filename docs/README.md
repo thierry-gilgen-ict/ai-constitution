@@ -4,7 +4,7 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 
 <!-- screenshots:manual-summary:begin -->
 
-**[Illustrated manual](manual/README.md)** · 80 images of the actual UI, with fictional data and step-by-step captions.
+**[Illustrated manual](manual/README.md)** · 99 images of the actual UI, with fictional data and step-by-step captions.
 
 <!-- screenshots:manual-summary:end -->
 
@@ -20,6 +20,9 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 | Configure an actual xAI Grok Bot | [Bot onboarding](../onboarding/bot.md) |
 | Find provider/model definitions or refresh them | [Model catalog](models.md) · [Updates](updates.md) |
 | Build or capture a reusable architecture baseline | [Project templates](project-templates.md) |
+| Inspect, prepare, launch or roll out changes to projects | [Workspace workflows](workspace-workflows.md) |
+| Reuse agent toolkits, pair controllers or recover another computer | [Workspace workflows](workspace-workflows.md) |
+| Compare local fixture evidence and automate resource profiles | [Workspace workflows](workspace-workflows.md) |
 | Browse and edit shared instructions privately | [Constitution Studio](constitution-studio.md) |
 | Choose and run a local model | [Local models](local-models.md) · [Local Control](local-control.md) |
 | Free GPU memory or add another machine | [Local Control](local-control.md) · [Windows worker](windows-worker.md) |
