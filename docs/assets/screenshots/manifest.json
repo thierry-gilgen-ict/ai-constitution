@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "ui_version": "0.4.0",
-  "source_digest": "1ea984099b276dd52763ed07e59275b0a95c741500a185f8cefc8e168981cf7a",
+  "source_digest": "230ce98521b2316ba431feea0952e2a2a53678b769d5869af38f6bb9a1d6a32f",
   "digest_format": "UTF-8 with LF newlines; filename + NUL + content + NUL",
   "digest_inputs": [
     "local_control/web/index.html",
@@ -1769,10 +1769,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-preparation-preview.png",
-      "sha256": "bf15c36d085662010286016907cf0517b56416ac98920c7a973f8c940901df14",
+      "sha256": "4d076a1c4e129a97d15600004e3f6dbf27d4b383eeaccce0eadca4992ab18ee7",
       "width": 860,
       "height": 880,
-      "bytes": 28818
+      "bytes": 28868
     },
     {
       "id": "workflow-launch",

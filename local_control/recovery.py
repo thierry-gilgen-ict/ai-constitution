@@ -57,7 +57,7 @@ def recover_workspace(control,body,progress=lambda _:None):
     with kit.state_lock(root/'recovery-lock'),kit.state_lock(studio.guard),kit.state_lock(studio.state),kit.state_lock(root/'toolkit-lock'):
         value=preview(root,body,_locked=True);plans.verify(value,body.get('plan'));manifest=body['manifest'];writes={}
         with tempfile.TemporaryDirectory(prefix='constitution-recovery-') as folder:
-            target=Path(folder)
+            target=Path(folder).resolve(strict=True)
             for name,data in studio.payload().items():kit.atomic_bytes(kit.safe_path(target,name),data)
             for name,text in manifest['library']['files'].items():kit.atomic_bytes(kit.safe_path(target,name),text.encode())
             kit.validate(target);kit.build(target)

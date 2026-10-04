@@ -169,7 +169,7 @@ def stage_apply(root,body,progress=lambda _:None):
         # Validate the entire resulting library in a disposable copy, including
         # regenerated adapters, before touching the editable draft.
         with tempfile.TemporaryDirectory(prefix='constitution-peer-') as folder:
-            target=Path(folder)
+            target=Path(folder).resolve(strict=True)
             for name,data in studio.payload().items():kit.atomic_bytes(kit.safe_path(target,name),data)
             for name,text in bundle['files'].items():kit.atomic_bytes(kit.safe_path(target,name),text.encode())
             kit.validate(target);kit.build(target)

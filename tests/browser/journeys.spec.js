@@ -32,7 +32,7 @@ test('workspace inspector, preparation and toolkit ownership through real APIs',
 test('workspace keyboard palette and opt-in automation remain accessible',async({page})=>{
   await navigate(page,'workflows');await page.keyboard.press('Control+k');
   await expect(page.locator('#workspace-query')).toBeFocused();await page.locator('#workspace-query').fill('Resource');
-  await page.locator('#workspace-query').fill('workflows');await expect(page.locator('.palette-result').first()).toBeVisible();
+  await page.locator('#workspace-query').fill('workflows');await expect(page.locator('.palette-result').first()).toContainText('Workspace workflows');
   await page.keyboard.press('ArrowDown');await expect(page.locator('.palette-result').first()).toBeFocused();await page.keyboard.press('Escape');
   await page.locator('[data-workflow-tab="profiles"]').click();await expect(page.locator('#profiles-enabled')).not.toBeChecked();
   await page.locator('#rule-apps').fill('fixture-game.exe');await page.locator('#rule-add').click();
