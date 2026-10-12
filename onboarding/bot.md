@@ -13,3 +13,5 @@ This is for the actual Grok Bot product. Grok Build and custom xAI API clients a
 Updating shared files does not guarantee every Bot's description, memory, or cached context refreshes. Verify each enrolled Bot. The local CLI exports the bundle; it does not control the Grok Bot UI or upload files automatically.
 
 The export contains instructions and a license, not the Python toolkit or full model catalog. Clone the full repository on the cloud computer if the Bot needs to run catalog refreshes or project installation commands. Keep Bot-specific state and credentials outside that checkout.
+
+Load the security/collaboration/operational modules only when relevant. Existing Bot operator approval, read-only access, private-room isolation and publisher boundaries remain authoritative. An exported bundle does not enroll the Bot, grant outbound/coding authority or prove platform-managed model access; require an operator-run fresh Bot loading/task check.

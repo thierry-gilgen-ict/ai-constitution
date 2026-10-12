@@ -1,6 +1,6 @@
 # Routing
 
-Generated for v0.4.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
+Generated for v0.5.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
 
 These are provisional starting points, not measured rankings. Respect an explicit model choice. Confirm account access and required tools before selecting a model. Reasoning levels and model identifiers can differ between clients.
 
@@ -12,15 +12,18 @@ These are provisional starting points, not measured rankings. Respect an explici
 | codex | implementation | GPT-6.1 Sol | GPT-6 Astra |
 | cursor | implementation | Composer 2.5 | Grok 4.7 |
 | grok-bot | implementation | Platform-managed selection | Platform managed |
-| codex | deep | GPT-6 Astra | GPT-6.1 Sol |
+| codex | deep | GPT-6.1 Sol | GPT-6 Astra |
 | cursor | deep | Grok 4.7 | Composer 2.5 |
 | grok-bot | deep | Platform-managed selection | Platform managed |
-| codex | review | GPT-6 Astra | GPT-6.1 Sol |
+| codex | review | GPT-6.1 Sol | GPT-6 Astra |
 | cursor | review | Grok 4.7 | Composer 2.5 |
 | grok-bot | review | Platform-managed selection | Platform managed |
 | codex | research | GPT-6.1 Sol | GPT-6 Astra |
 | cursor | research | Composer 2.5 | Grok 4.7 |
 | grok-bot | research | Platform-managed selection | Platform managed |
+| codex | operational | GPT-6.1 Sol | GPT-6 Astra |
+| cursor | operational | Composer 2.5 | Grok 4.7 |
+| grok-bot | operational | Platform-managed selection | Platform managed |
 
 ## Selection boundaries
 

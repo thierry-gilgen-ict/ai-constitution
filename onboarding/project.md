@@ -7,3 +7,5 @@ Copy the following prompt into Codex or Cursor in the target project. The same p
 The installer creates a portable bundle and a lock file. It does not infer the project facts for you. Review `.ai/project.md` before considering onboarding complete.
 
 For a reusable stack, first choose a [project template](../docs/project-templates.md) in Local Control. Applying it also performs standard onboarding. Then provide `.ai/architecture-onboarding.md` to the agent; it reads the saved component choices and implements the baseline within the user's authorized scope.
+
+For a governed pilot, retain the project's real task authority, consumed retries and release holds. Put only narrow domain/architecture/command/acceptance references in project.md. Use policy.json schema 2 for stricter limits or source-bound, owner-reviewed expiring route exceptions; never copy a route table. Run doctor/explain and independent exact-revision review. Installation, native loading, model access and owner acceptance need separate evidence. Retain dirty/historical work until separately approved custody and retirement.

@@ -16,3 +16,7 @@ Choose representative tasks from your actual work: one small edit, one implement
 Use an agreed budget before paid evaluations. Keep private tasks and results outside this public repository. Publish sanitized summaries only with authorization. A small sample supports a local decision, not a universal leaderboard.
 
 The initial route table is a useful starting point with source-linked model descriptions. It has not been validated by a comparative task benchmark. Retain the user's chosen model until changing it is part of the request.
+
+## Accepted-outcome economics
+
+Link the private task/PR/revision to attempts, review/rework, integration and owner acceptance. Record requested and runtime-confirmed model/effort, separate cached/uncached/output usage, and actual charges with provider/invoice provenance or UNKNOWN. Fixed subscriptions and token counters are not task-attributed charges. Compare cost per accepted useful outcome, integration lead time, first-pass acceptance, escaped defects and WIP over an agreed 2–4-week window; keep routes provisional until matched fixtures and accepted outcomes justify promotion.

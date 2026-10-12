@@ -30,3 +30,13 @@ Then request a small, harmless task in a disposable project. Check that project-
 - Run the built-in `scan` and a dedicated secret scanner over the repository/history.
 - Include no local paths, credentials, account inventories, conversation exports, or private project facts.
 - Record the exact commit and CI results. Keep any live-client limitations explicit.
+
+## Shared contract and bounded routing
+
+- Verify all six task classes and independent risk tiers; unknown risk stays unknown.
+- Correct governance example: operational/high with caller-reported balanced availability returns a provisional recommendation, requested high effort, actual model/effort unknown and applied:false.
+- Intentionally failing governance example: the same request with missing deployment authorization must refuse even when an expensive model is listed. No model substitution repairs missing authority.
+- Verify stricter limits, cross-platform/unknown route rejection, exception expiry and private-layer exclusion from portable bundles.
+- Adopt a legacy six-module lock; upgrade through managed ownership without losing project context or pin. Reject widened module/file allowlists and same-version source drift.
+- Doctor file verification never proves client loading or business acceptance. A job marked completed with missing financial snapshots remains semantically unverified; test that real project boundary before accepting a research outcome.
+- Preserve current product attempts, held gates and dirty work throughout an isolated governance migration. Record an accepted harmless real task separately from installation and CI.

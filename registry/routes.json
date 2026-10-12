@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "routes": [
     {
       "platform": "codex",
@@ -9,7 +9,13 @@
       "fallbacks": [
         "codex:balanced"
       ],
-      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately.",
+      "effort": "low",
+      "risk_efforts": {
+        "high": "high",
+        "critical": "high"
+      },
+      "escalation_only": []
     },
     {
       "platform": "cursor",
@@ -37,7 +43,15 @@
       "fallbacks": [
         "codex:deep"
       ],
-      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately.",
+      "effort": "medium",
+      "risk_efforts": {
+        "high": "high",
+        "critical": "high"
+      },
+      "escalation_only": [
+        "codex:deep"
+      ]
     },
     {
       "platform": "cursor",
@@ -61,11 +75,19 @@
       "platform": "codex",
       "task": "deep",
       "description": "Difficult debugging and architecture",
-      "preferred": "codex:deep",
+      "preferred": "codex:balanced",
       "fallbacks": [
-        "codex:balanced"
+        "codex:deep"
       ],
-      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately.",
+      "effort": "high",
+      "risk_efforts": {
+        "high": "high",
+        "critical": "high"
+      },
+      "escalation_only": [
+        "codex:deep"
+      ]
     },
     {
       "platform": "cursor",
@@ -89,11 +111,19 @@
       "platform": "codex",
       "task": "review",
       "description": "Review correctness and regressions",
-      "preferred": "codex:deep",
+      "preferred": "codex:balanced",
       "fallbacks": [
-        "codex:balanced"
+        "codex:deep"
       ],
-      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately.",
+      "effort": "medium",
+      "risk_efforts": {
+        "high": "high",
+        "critical": "high"
+      },
+      "escalation_only": [
+        "codex:deep"
+      ]
     },
     {
       "platform": "cursor",
@@ -121,7 +151,15 @@
       "fallbacks": [
         "codex:deep"
       ],
-      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately.",
+      "effort": "medium",
+      "risk_efforts": {
+        "high": "high",
+        "critical": "high"
+      },
+      "escalation_only": [
+        "codex:deep"
+      ]
     },
     {
       "platform": "cursor",
@@ -137,6 +175,42 @@
       "platform": "grok-bot",
       "task": "research",
       "description": "Evidence gathering with appropriate tools",
+      "preferred": "grok-bot:managed",
+      "fallbacks": [],
+      "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."
+    },
+    {
+      "platform": "codex",
+      "task": "operational",
+      "description": "Authorized bounded operational work",
+      "preferred": "codex:balanced",
+      "fallbacks": [
+        "codex:deep"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately.",
+      "effort": "medium",
+      "risk_efforts": {
+        "high": "high",
+        "critical": "high"
+      },
+      "escalation_only": [
+        "codex:deep"
+      ]
+    },
+    {
+      "platform": "cursor",
+      "task": "operational",
+      "description": "Authorized bounded operational work",
+      "preferred": "cursor:fast",
+      "fallbacks": [
+        "cursor:deep"
+      ],
+      "note": "Use the supported model picker. This guide does not override Cursor Auto or its managed routing pool."
+    },
+    {
+      "platform": "grok-bot",
+      "task": "operational",
+      "description": "Authorized bounded operational work",
       "preferred": "grok-bot:managed",
       "fallbacks": [],
       "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."

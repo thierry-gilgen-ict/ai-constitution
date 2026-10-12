@@ -30,7 +30,7 @@ class Workspace(unittest.TestCase):
         self.base = Path(self.temp.name).resolve()
         self.root = self.base / "kit"
         self.root.mkdir()
-        for name in ["VERSION", "constitution.md", "engineering.md", "research.md", "maintenance.md"]:
+        for name in ["VERSION", "constitution.md", "engineering.md", "research.md", "maintenance.md", "security.md", "collaboration.md", "operational.md"]:
             shutil.copy2(ROOT / name, self.root / name)
         for name in ["registry", "templates", "skills"]:
             shutil.copytree(ROOT / name, self.root / name)

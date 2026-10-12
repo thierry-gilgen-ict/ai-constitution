@@ -37,7 +37,7 @@ else:
 ROOT = Path(__file__).resolve().parents[1]
 BEGIN = "<!-- ai-constitution:begin -->"
 END = "<!-- ai-constitution:end -->"
-MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "VERSION")
+MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "security.md", "collaboration.md", "operational.md", "VERSION")
 
 
 @contextmanager
@@ -123,6 +123,12 @@ def state_load(state):
 
 def validate(root):
     errors = []
+    for name in policy.MODULES:
+        path = root / name
+        if not path.is_file():
+            errors.append("Required module missing: " + name)
+        elif path.stat().st_size > (8192 if name == "constitution.md" else 6144):
+            errors.append("Active policy exceeds byte budget: " + name)
     for path in (root / 'templates/architectures').glob('*.json'):
         architecture.validate(read_json(path))
     version = text(root / "VERSION").strip()
@@ -141,6 +147,7 @@ def validate(root):
         dt.date.fromisoformat(model["verified_at"])
         if model["selection"] == "managed" and model["selector"] is not None:
             errors.append("Managed platform must not declare a selectable model")
+    policy.validate_routes(read_json(root / "registry/routes.json"), {m["key"]: m for m in models})
     seen = set()
     for route in read_json(root / "registry/routes.json")["routes"]:
         identity = (route["platform"], route["task"])
@@ -193,7 +200,7 @@ def render(root, preferences=None):
     common = f"AI Constitution v{version}\n\n{core}\n\n"
     common += ("For an onboarded project, use its `.ai/shared/` bundle and `.ai/project.md`; its scoped defaults refine the global baseline. "
                "Read `.ai/architecture.md` when present for the selected project baseline. "
-               "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, or `routing.md` only when relevant. "
+               "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, `routing.md`, `security.md`, `collaboration.md`, or `operational.md` only when relevant. "
                "If the library is inaccessible, use this embedded core and report any task-relevant missing guidance.\n")
     bot_description = (f"Use AI Constitution v{version} from BUNDLE_ROOT. Read its constitution.md when starting substantive work, and specialized modules only as needed. "
                        "Use the current project bundle when present. Keep your role and project knowledge separate. Model selection is platform managed. "
@@ -202,7 +209,7 @@ def render(root, preferences=None):
                  "# Load the shared constitution\n\nLocate BUNDLE_ROOT from this Bot's description. Read VERSION and constitution.md there. "
                  "If working in an onboarded project, prefer its .ai/shared bundle and .ai/project.md for scoped defaults. "
                  "Read .ai/architecture.md when present for the selected baseline and its implementation handoff. "
-                 "Read engineering.md for code work, research.md for source verification, and routing.md when selecting tools or recommending a handoff. "
+                 "Read engineering.md for code work, research.md for source verification, routing.md for route recommendations, and security.md, collaboration.md or operational.md only when relevant. "
                  "Report missing files precisely. Do not assume a cloud Bot can read a local Windows path. "
                  "Never claim to change the platform-managed underlying model.\n")
     return {
@@ -360,14 +367,15 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         if (target_root / "AGENTS.override.md").exists() and (target_root / "AGENTS.override.md").stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile the override before onboarding")
         core = preferences["instructions"]["constitution.md"].strip()
-        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, and `.ai/shared/routing.md`, loaded when relevant.\n"
+        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, `.ai/shared/routing.md`, `.ai/shared/security.md`, `.ai/shared/collaboration.md`, and `.ai/shared/operational.md`, loaded when relevant.\n"
         add("AGENTS.md", body.encode(), block=True)
         for name in MODULES:
             add(".ai/shared/" + name, module_bytes(name))
         add(".ai/project.md", (root / "templates/project.md").read_bytes(), create_only=True)
         # Project context belongs to the user, not to the managed bundle.
         tracked.pop(".ai/project.md", None)
-        lock = {"schema_version": 1, "version": version, "pinned": pin,
+        lock = {"schema_version": 2, "version": version, "pinned": pin,
+                "modules": list(MODULES), "release_sha256": preferences["release_sha256"],
                 "source": "https://github.com/thierry-gilgen-ict/ai-constitution",
                 "files": {k: v for k, v in tracked.items()}}
         add(".ai/constitution.lock.json", json_bytes(lock))
@@ -380,6 +388,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
             add(f".config/ai-constitution/libraries/{platform}/{name}", module_bytes(name))
         add(f".config/ai-constitution/libraries/{platform}/installation.json", json_bytes({
             "schema_version": 1, "source_root": str(source_reference), "version": version, "platform": platform,
+            "release_sha256": preferences["release_sha256"],
         }))
         if platform == "codex":
             # Respect CODEX_HOME only for the actual default home, not fixture homes.
@@ -395,7 +404,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
             skill = text(root / f"skills/{name}/SKILL.md") + f"\nInstalled source checkout: `{source_reference.as_posix()}`.\n"
             add(f".{platform}/skills/{name}/SKILL.md", skill.encode())
     db["targets"][identity] = {"kind": "project" if project else platform, "root": str(target_root),
-                               "version": version, "pinned": pin, "files": tracked}
+                               "version": version, "pinned": pin, "files": tracked, "release_sha256": preferences["release_sha256"]}
     if cursor_dir is not None:
         db["targets"][identity]["cursor_dir"] = str(cursor_dir)
     writes[state / "installations.json"] = json_bytes(db)
@@ -474,8 +483,12 @@ def doctor(root, state, project=None):
         override = Path(target["root"]) / (".codex/AGENTS.override.md" if target["kind"] == "codex" else "AGENTS.override.md")
         if target["kind"] != "cursor" and override.exists() and override.stat().st_size:
             problems.append("AGENTS.override.md shadows the installed entry point")
+        if target.get("release_sha256") and target["version"] == text(root / "VERSION").strip() and target["release_sha256"] != policy.release_identity(root):
+            problems.append("same-version instruction source changed; preview synchronization")
+        findings = policy.authority_findings(Path(target["root"])) if target["kind"] == "project" else []
         observations.append({"target": target["root"], "kind": target["kind"], "version": target["version"],
                              "status": "drift" if problems else "files-verified", "problems": problems,
+                             "authority_findings": findings, "release_sha256": target.get("release_sha256", "unknown"),
                              "activation": "Verify loading in a fresh client session; file checks do not prove model behavior."})
     return observations
 
@@ -540,6 +553,8 @@ def explain(root, state, project=None):
             "catalog": str(catalog.catalog_path(root, state)),
             "effective_sha256": selected["effective_sha256"], "layers": selected["layer_hashes"],
             "route_sources": selected["provenance"], "routes": selected["routes"]["routes"],
+            "release_sha256": selected["release_sha256"], "constraints": selected["constraints"],
+            "exceptions": selected["exceptions"], "legacy_exceptions": selected["legacy_exceptions"],
             "installation": doctor(root, state, project),
             "portable_bundle": "Personal prose and routes stay private; project policy is rendered into project bundles.",
             "host_loading": "unverified; file ownership checks do not establish client instruction loading"}
@@ -660,9 +675,12 @@ def main(argv=None):
     sub.add_parser("providers", help="List every catalog provider and its model count")
     route_parser = sub.add_parser("route")
     route_parser.add_argument("--platform", choices=["codex", "cursor", "grok-bot"], required=True)
-    route_parser.add_argument("--task", choices=["small", "implementation", "deep", "review", "research"], default="implementation")
-    route_parser.add_argument("--available", action="append", help="Eligible registry key; repeat to supply account-verified availability")
+    route_parser.add_argument("--task", choices=policy.TASKS, default="implementation")
+    route_parser.add_argument("--available", action="append", help="Caller-reported eligible registry key; not independent account proof")
     route_parser.add_argument("--project", type=Path)
+    route_parser.add_argument("--risk", choices=policy.RISKS)
+    route_parser.add_argument("--missing-capability", action="append", default=[])
+    route_parser.add_argument("--escalation-reason", help="Recorded reason; separate authorization still required")
     local = sub.add_parser("local", help="Discover models on an explicitly selected local server")
     local.add_argument("--kind", choices=["ollama", "openai-compatible"], default="ollama")
     local.add_argument("--url")
@@ -766,18 +784,9 @@ def main(argv=None):
             result = {"matches": len(rows), "showing": min(len(rows), args.limit), "models": rows[:args.limit]}
     elif args.command == "route":
         preferences = policy.resolve(root, state, args.project)
-        routes = preferences["routes"]["routes"]
-        models = {m["key"]: m for m in read_json(root / "registry/models.json")["models"]}
-        route = next(r for r in routes if r["platform"] == args.platform and r["task"] == args.task)
-        candidates = [route["preferred"], *route["fallbacks"]]
-        candidates = [c for c in candidates if args.available is None or c in args.available]
-        if not candidates:
-            raise ValueError("No eligible route or fallback; retain the current configuration and verify availability")
-        selected = models[candidates[0]]
-        age = (dt.datetime.now(dt.timezone.utc).date() - dt.date.fromisoformat(selected["verified_at"])).days
-        result = {"recommendation": selected, "note": route["note"], "account_verified": args.available is not None,
-                  "preference_source": preferences["provenance"][args.platform + "/" + args.task],
-                  "stale": age > read_json(root / "registry/models.json")["max_age_days"], "applied": False}
+        result = policy.select_route(root, preferences, args.platform, args.task, risk=args.risk,
+                                     available=args.available, missing_capabilities=args.missing_capability,
+                                     escalation_reason=args.escalation_reason)
     elif args.command == "local":
         url = args.url or ("http://127.0.0.1:11434" if args.kind == "ollama" else "http://127.0.0.1:1234/v1")
         inventory = discover_local(url, args.kind, allow_remote=args.allow_remote, key_env=args.api_key_env)
