@@ -295,8 +295,8 @@ class ContractRouting(unittest.TestCase):
             policy.select_route(self.root, layered, "codex", "implementation")
         value["routes"][0]["task"] = "small"
         self.put_policy(value)
-        with self.assertRaisesRegex(ValueError, "No eligible"):
-            policy.select_route(self.root, policy.resolve(self.root, self.state, self.project), "codex", "small")
+        safe = policy.select_route(self.root, policy.resolve(self.root, self.state, self.project), "codex", "small")
+        self.assertEqual(safe["recommendation"]["key"], "codex:balanced")
         value["routes"][0]["task"] = "implementation"
         self.put_policy(value)
         with mock.patch.object(policy.dt, "datetime") as clock:
@@ -347,6 +347,81 @@ class ContractRouting(unittest.TestCase):
         for path in ("docs/CON.md", "docs/name. /file.md"):
             with self.assertRaisesRegex(ValueError, "portable"):
                 releases.destination_keys([path])
+
+
+class ReviewBoundaries(unittest.TestCase):
+    setUp = fixtures.Workspace.setUp
+
+    def test_export_checks_inputs_before_creating_output(self):
+        output = self.base / 'out/bundle.zip'
+        original = kit.no_links
+        def reject(path):
+            if path == self.root / 'engineering.md':
+                raise ValueError('fixture input link')
+            return original(path)
+        with mock.patch.object(kit, 'no_links', side_effect=reject):
+            with self.assertRaisesRegex(ValueError, 'input link'):
+                kit.export_bundle(self.root, output)
+        self.assertFalse(output.parent.exists())
+
+    def test_extra_cached_file_prevents_activation(self):
+        payload = releases.public_files(self.root)
+        _, destination = releases.prepare(payload, self.state)
+        catalog.atomic_bytes(destination / 'docs/extra.md', b'later evidence')
+        with self.assertRaisesRegex(ValueError, 'unexpected files'):
+            kit.upgrade(self.root, self.state)
+        self.assertFalse((self.state / 'active-release.json').exists())
+        self.assertEqual((destination / 'docs/extra.md').read_bytes(), b'later evidence')
+
+    def test_error_recovery_preserves_concurrent_edit(self):
+        first, second = self.project / 'first.txt', self.project / 'second.txt'
+        first.write_bytes(b'original')
+        original = kit.atomic_bytes
+        def write(path, data):
+            if path == second:
+                first.write_bytes(b'concurrent edit')
+                raise PermissionError('fixture failure')
+            return original(path, data)
+        with mock.patch.object(kit, 'atomic_bytes', side_effect=write):
+            with self.assertRaises(PermissionError):
+                kit.transaction(self.state, {first: b'managed', second: b'next'})
+        self.assertEqual(first.read_bytes(), b'concurrent edit')
+        journal = kit.read_json(next((self.state / 'transactions').glob('*.json')))
+        self.assertEqual(journal['state'], 'prepared')
+        self.assertEqual(journal['recovery_conflicts'], [str(first)])
+
+    def test_alias_enrollment_reuses_owner_and_duplicate_legacy_state_blocks(self):
+        kit.install(self.root, self.state, project=self.project)
+        alias = self.project / '..' / self.project.name
+        self.assertEqual(kit.adopt(self.state, alias)['status'], 'unchanged')
+        db = kit.state_load(self.state)
+        self.assertEqual(len(db['targets']), 1)
+        target = next(iter(db['targets'].values()))
+        db['targets']['legacy-alias'] = {**target, 'root': str(alias)}
+        catalog.atomic_bytes(self.state / 'installations.json', catalog.json_bytes(db))
+        with self.assertRaisesRegex(ValueError, 'Duplicate physical'):
+            kit.state_load(self.state)
+
+    def test_exception_identity_review_requirement_and_malformed_fields(self):
+        path = self.project / '.ai/policy.json'
+        value = {'schema_version': 2,
+                 'routes': [{'platform': 'codex', 'task': 'small', 'preferred': 'codex:balanced', 'exception': 'x'}],
+                 'exceptions': [{'id': 'x', 'owner': 'Fixture owner', 'reason': 'Test', 'expires': '2099-12-31', 'evidence': 'fixture'}]}
+        catalog.atomic_bytes(path, catalog.json_bytes(value))
+        first = policy.resolve(self.root, self.state, self.project)
+        value['exceptions'][0]['expires'] = '2000-01-01'
+        catalog.atomic_bytes(path, catalog.json_bytes(value))
+        second = policy.resolve(self.root, self.state, self.project)
+        self.assertNotEqual(first['effective_sha256'], second['effective_sha256'])
+        route = policy.select_route(self.root, first, 'codex', 'deep', risk='medium')
+        self.assertTrue(route['independent_review'])
+        self.assertEqual(policy.select_route(self.root, first, 'codex', 'research')['independent_review'], 'unknown')
+        for field, bad in (('fallbacks', None), ('exception', [])):
+            malformed = copy.deepcopy(value)
+            malformed['routes'][0][field] = bad
+            catalog.atomic_bytes(path, catalog.json_bytes(malformed))
+            with self.assertRaises(ValueError):
+                policy.resolve(self.root, self.state, self.project)
 
 
 class Metadata(unittest.TestCase):

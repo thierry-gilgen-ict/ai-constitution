@@ -161,6 +161,9 @@ def prepare(payload, state, *, preview=False):
     document = manifest(payload)
     identity = document['version'] + '-' + digest(json_bytes(document))[:16]
     destination = state.parent / 'releases' / identity
+    no_links(destination)
+    if destination.exists() and set(files(destination)) - set(payload):
+        raise ValueError('Immutable release destination has unexpected files; preserve and reconcile it')
     if not preview:
         for name, data in payload.items():
             path = destination / name
@@ -169,6 +172,8 @@ def prepare(payload, state, *, preview=False):
         for name, data in payload.items():
             atomic_bytes(destination / name, data)
         atomic_bytes(destination / 'release-manifest.json', json_bytes(document))
+        if files(destination) != payload:
+            raise ValueError('Immutable release destination does not match the complete payload')
     return identity, destination
 
 

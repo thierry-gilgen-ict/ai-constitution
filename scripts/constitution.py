@@ -44,7 +44,7 @@ MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md",
 def state_lock(state):
     """Serialize read/modify/write operations across CLI processes; OS releases on exit."""
     no_links(state)
-    lock_path = state.parent / (".constitution-" + digest(str(state.absolute()).encode())[:16] + ".lock")
+    lock_path = state.resolve().parent / (".constitution-" + digest(os.path.normcase(str(state.resolve())).encode())[:16] + ".lock")
     no_links(lock_path)
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     stream = open(lock_path, "a+b")
@@ -113,12 +113,22 @@ def managed_hash(body):
     return digest(value[start:stop].replace("\r\n", "\n").encode())
 
 
+def target_identity(kind, root):
+    return kind + ":" + os.path.normcase(str(Path(root).resolve()))
+
+
 def state_load(state):
     path = state / "installations.json"
     result = read_json(path) if path.exists() else {"schema_version": 1, "targets": {}}
     if result.get("schema_version") != 1 or not isinstance(result.get("targets"), dict):
         raise ValueError("Unsupported installation-state schema; migrate state before continuing")
-    return result
+    targets = {}
+    for target in result["targets"].values():
+        identity = target_identity(target["kind"], target["root"])
+        if identity in targets:
+            raise ValueError("Duplicate physical enrollment target; preserve and reconcile private state")
+        targets[identity] = target
+    return {**result, "targets": targets}
 
 
 def private_state_boundary(root, state, project=None):
@@ -296,13 +306,31 @@ def transaction(state, writes, *, dry_run=False):
         record["state"] = "applied"
         atomic_bytes(journal, json_bytes(record))
     except Exception:
+        conflicts = []
         for item in reversed(completed):
             path = Path(item["path"])
-            if item["before"] is None:
-                path.unlink()
-            else:
-                atomic_bytes(path, base64.b64decode(item["before"]))
-        record["state"] = "reverted-on-error"
+            try:
+                no_links(path)
+                actual = path.read_bytes() if path.exists() else None
+            except OSError:
+                conflicts.append(str(path))
+                continue
+            except ValueError:
+                conflicts.append(str(path))
+                continue
+            if (digest(actual) if actual is not None else None) != item["after_sha256"]:
+                conflicts.append(str(path))
+                continue
+            try:
+                if item["before"] is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    atomic_bytes(path, base64.b64decode(item["before"]))
+            except OSError:
+                conflicts.append(str(path))
+        record["state"] = "prepared" if conflicts else "reverted-on-error"
+        if conflicts:
+            record["recovery_conflicts"] = conflicts
         atomic_bytes(journal, json_bytes(record))
         raise
     return {"status": "installed", "snapshot": snapshot, "files": [p["path"] for p in prepared]}
@@ -326,7 +354,9 @@ def adopt(state, project, dry_run=False):
         if override.exists() and override.stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
         db = state_load(state)
-        identity = "project:" + str(project)
+        identity = target_identity("project", project)
+        if identity in db["targets"]:
+            record["root"] = db["targets"][identity]["root"]
         if identity in db["targets"] and db["targets"][identity] != record:
             raise ValueError("Project already enrolled with different evidence; run doctor")
         db["targets"][identity] = record
@@ -348,8 +378,11 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
     no_links(target_root)
     if project and not target_root.is_dir():
         raise ValueError("Project directory must already exist")
-    identity = ("project:" if project else platform + ":") + str(target_root)
+    identity = target_identity("project" if project else platform, target_root)
     previous = db["targets"].get(identity, {})
+    if previous:
+        target_root = Path(previous["root"])
+        no_links(target_root)
     if project and not previous and safe_path(target_root, ".ai/constitution.lock.json").exists():
         raise ValueError("Existing project lock: run onboard --adopt to verify and enroll this bundle first")
     if pin is None:
@@ -642,11 +675,16 @@ def scan(root):
 
 
 def export_bundle(root, output):
+    no_links(root)
+    for relative in [*MODULES, "registry/models.json", "registry/routes.json", "registry/sources.json"]:
+        no_links(root / relative)
     validate(root)
     build(root, check=True)
     files = list(MODULES) + ["LICENSE", "onboarding/bot.md", "onboarding/project.md", "docs/updates.md", "checks/acceptance.md", "checks/evaluation.md"]
     files += list(render(root))
     files += ["registry/models.json", "registry/routes.json", "registry/sources.json"]
+    for relative in files:
+        no_links(root / relative)
     no_links(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     # Explicit allowlist excludes local state, full catalog, credentials, and project facts.

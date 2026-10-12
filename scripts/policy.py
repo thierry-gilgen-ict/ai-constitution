@@ -150,6 +150,8 @@ def resolve(root, state, project=None, *, portable=False):
             if identity not in by_key or identity in seen:
                 raise ValueError("Unknown or duplicate policy route")
             seen.add(identity)
+            if "exception" in override and not isinstance(override["exception"], str):
+                raise ValueError("Invalid policy exception reference")
             chosen = {k: override[k] for k in ("preferred", "fallbacks", "effort") if k in override}
             candidate = {**by_key[identity], **chosen}
             if "preferred" in chosen and "fallbacks" not in chosen:
@@ -175,7 +177,8 @@ def resolve(root, state, project=None, *, portable=False):
     for name, body in instructions.items():
         if len(body.encode("utf-8")) > (8192 if name == "constitution.md" else 6144):
             raise ValueError("Active policy exceeds byte budget: " + name)
-    effective = {"routes": routes, "instructions": instructions, "constraints": constraints}
+    effective = {"routes": routes, "instructions": instructions, "constraints": constraints,
+                 "exceptions": exceptions, "legacy_exceptions": legacy}
     return {**effective, "provenance": provenance, "layer_hashes": hashes, "exceptions": exceptions,
             "legacy_exceptions": legacy, "release_sha256": release_identity(root),
             "effective_sha256": digest(json_bytes(effective))}
@@ -211,7 +214,7 @@ def select_route(root, selected, platform, task, *, risk=None, available=None, m
             "preference_source": selected["provenance"][platform + "/" + task],
             "release_sha256": selected["release_sha256"], "effective_sha256": selected["effective_sha256"],
             "constraints": selected["constraints"], "escalation_reason": escalation_reason,
-            "independent_review": risk in ("high", "critical") or task == "review",
+            "independent_review": True if risk in ("high", "critical") or task in ("implementation", "deep", "review", "operational") else False if task == "small" and risk == "low" else "unknown",
             "stale": age > json.loads((root / "registry/models.json").read_text(encoding="utf-8"))["max_age_days"]}
 
 
