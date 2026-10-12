@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "ui_version": "0.5.0",
-  "source_digest": "c3ac504f9c1c2b9b684786cf7555ab404c7de3821ed8faf35cb4e2276566d782",
+  "source_digest": "8927d5f9c8379c2f671851f9b6b54f2f13a2e6118ba8365f756f091b106e55ce",
   "digest_format": "UTF-8 with LF newlines; filename + NUL + content + NUL",
   "digest_inputs": [
     "local_control/web/index.html",
@@ -1625,7 +1625,7 @@
         ]
       ],
       "path": "docs/assets/screenshots/operation-progress.png",
-      "sha256": "7d622d903c44b9e81d0ffee3a45a643959bf9d6618f5dbb461a0339a92f6e412",
+      "sha256": "a24a9b48d1f5d937370df13df4b206255e3f7b6afd3ddf3cc3a9f6c551faa8b9",
       "width": 1440,
       "height": 1000,
       "bytes": 93864
@@ -1708,10 +1708,10 @@
       "steps": [],
       "transcript": "install",
       "path": "docs/assets/screenshots/toolkit-install-preview.png",
-      "sha256": "b274a76322a9d4c05366a091f4d38fd7780cb0bae66f85d9dc4264fc3cc16d40",
+      "sha256": "a0636953af5ebfc86c2027603de91267cb83b66551f3ddfb0a3274117963b986",
       "width": 1440,
       "height": 1000,
-      "bytes": 51526
+      "bytes": 51826
     },
     {
       "id": "workflow-inspector",
@@ -1769,10 +1769,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-preparation-preview.png",
-      "sha256": "f6447d9055904aa6904db6a875f08576b7432a008e315181e6daa9e031d5e000",
+      "sha256": "1ed619183d230882c7e8ed9db6a34cc10a8c31b9fa072e42b4ff6fe35aeea30f",
       "width": 860,
       "height": 880,
-      "bytes": 28742
+      "bytes": 28754
     },
     {
       "id": "workflow-launch",
