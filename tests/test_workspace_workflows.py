@@ -21,7 +21,7 @@ class Fixture(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.base=Path(self.temp.name).resolve();self.root=self.base/'control';self.library=self.base/'library'
         self.library.mkdir();self.project=self.base/'project';self.project.mkdir()
-        for name in ('VERSION','constitution.md','engineering.md','research.md','maintenance.md','security.md','collaboration.md','operational.md'):
+        for name in ('VERSION','constitution.md','engineering.md','research.md','maintenance.md','security-guidance.md','collaboration.md','operational.md'):
             shutil.copy2(ROOT/name,self.library/name)
         for name in ('registry','templates'):shutil.copytree(ROOT/name,self.library/name)
         kit.build(self.library)

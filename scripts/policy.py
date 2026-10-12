@@ -9,7 +9,7 @@ else:
     from catalog import digest, json_bytes
 
 MODULES = {"constitution.md", "engineering.md", "research.md", "maintenance.md",
-           "security.md", "collaboration.md", "operational.md"}
+           "security-guidance.md", "collaboration.md", "operational.md"}
 TASKS = ("small", "implementation", "deep", "review", "research", "operational")
 RISKS = ("low", "medium", "high", "critical")
 EFFORTS = ("low", "medium", "high")

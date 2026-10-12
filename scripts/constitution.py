@@ -37,7 +37,7 @@ else:
 ROOT = Path(__file__).resolve().parents[1]
 BEGIN = "<!-- ai-constitution:begin -->"
 END = "<!-- ai-constitution:end -->"
-MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "security.md", "collaboration.md", "operational.md", "VERSION")
+MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "security-guidance.md", "collaboration.md", "operational.md", "VERSION")
 
 
 @contextmanager
@@ -123,6 +123,9 @@ def state_load(state):
 
 def validate(root):
     errors = []
+    authored_names = [p.name.casefold() for p in root.glob("*.md")]
+    if len(authored_names) != len(set(authored_names)):
+        errors.append("Authored file names collide on case-insensitive systems")
     for name in policy.MODULES:
         path = root / name
         if not path.is_file():
@@ -200,7 +203,7 @@ def render(root, preferences=None):
     common = f"AI Constitution v{version}\n\n{core}\n\n"
     common += ("For an onboarded project, use its `.ai/shared/` bundle and `.ai/project.md`; its scoped defaults refine the global baseline. "
                "Read `.ai/architecture.md` when present for the selected project baseline. "
-               "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, `routing.md`, `security.md`, `collaboration.md`, or `operational.md` only when relevant. "
+               "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, `routing.md`, `security-guidance.md`, `collaboration.md`, or `operational.md` only when relevant. "
                "If the library is inaccessible, use this embedded core and report any task-relevant missing guidance.\n")
     bot_description = (f"Use AI Constitution v{version} from BUNDLE_ROOT. Read its constitution.md when starting substantive work, and specialized modules only as needed. "
                        "Use the current project bundle when present. Keep your role and project knowledge separate. Model selection is platform managed. "
@@ -209,7 +212,7 @@ def render(root, preferences=None):
                  "# Load the shared constitution\n\nLocate BUNDLE_ROOT from this Bot's description. Read VERSION and constitution.md there. "
                  "If working in an onboarded project, prefer its .ai/shared bundle and .ai/project.md for scoped defaults. "
                  "Read .ai/architecture.md when present for the selected baseline and its implementation handoff. "
-                 "Read engineering.md for code work, research.md for source verification, routing.md for route recommendations, and security.md, collaboration.md or operational.md only when relevant. "
+                 "Read engineering.md for code work, research.md for source verification, routing.md for route recommendations, and security-guidance.md, collaboration.md or operational.md only when relevant. "
                  "Report missing files precisely. Do not assume a cloud Bot can read a local Windows path. "
                  "Never claim to change the platform-managed underlying model.\n")
     return {
@@ -367,7 +370,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         if (target_root / "AGENTS.override.md").exists() and (target_root / "AGENTS.override.md").stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile the override before onboarding")
         core = preferences["instructions"]["constitution.md"].strip()
-        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, `.ai/shared/routing.md`, `.ai/shared/security.md`, `.ai/shared/collaboration.md`, and `.ai/shared/operational.md`, loaded when relevant.\n"
+        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, `.ai/shared/routing.md`, `.ai/shared/security-guidance.md`, `.ai/shared/collaboration.md`, and `.ai/shared/operational.md`, loaded when relevant.\n"
         add("AGENTS.md", body.encode(), block=True)
         for name in MODULES:
             add(".ai/shared/" + name, module_bytes(name))

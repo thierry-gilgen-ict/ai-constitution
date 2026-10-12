@@ -165,6 +165,8 @@ class ContractRouting(unittest.TestCase):
     setUp = fixtures.Workspace.setUp
 
     def models(self):
+        self.assertNotIn("security.md", kit.MODULES)
+        self.assertIn("security-guidance.md", kit.MODULES)
         return {m["key"]: m for m in kit.read_json(self.root / "registry/models.json")["models"]}
 
     def put_policy(self, value, personal=False):
@@ -243,7 +245,7 @@ class ContractRouting(unittest.TestCase):
         lock["schema_version"], lock["version"] = 1, "0.4.0"
         lock.pop("modules")
         lock.pop("release_sha256")
-        for name in ("security.md", "collaboration.md", "operational.md"):
+        for name in ("security-guidance.md", "collaboration.md", "operational.md"):
             lock["files"].pop(".ai/shared/" + name)
             (self.project / ".ai/shared" / name).unlink()
         version_path = self.project / ".ai/shared/VERSION"
@@ -255,7 +257,7 @@ class ContractRouting(unittest.TestCase):
         self.assertEqual(result["version"], "0.4.0")
         self.assertEqual(kit.sync(self.root, new_state)[0]["status"], "installed")
         self.assertEqual(kit.read_json(lock_path)["schema_version"], 2)
-        self.assertTrue((self.project / ".ai/shared/security.md").exists())
+        self.assertTrue((self.project / ".ai/shared/security-guidance.md").exists())
 
     def test_release_identity_and_known_authority_findings_are_distinct(self):
         kit.install(self.root, self.state, project=self.project)

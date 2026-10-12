@@ -256,6 +256,7 @@
     "scripts/smoke_local_package.py",
     "scripts/soak_local.py",
     "scripts/source_review.py",
+    "security-guidance.md",
     "skills/constitution-maintenance/SKILL.md",
     "skills/constitution-onboarding/SKILL.md",
     "templates/architecture-components.json",
