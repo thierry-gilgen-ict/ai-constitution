@@ -40,6 +40,19 @@ class Fixture(unittest.TestCase):
 
 
 class Foundations(Fixture):
+    def test_pinned_adoption_checks_shadow_and_private_state(self):
+        from local_control import workspace
+        target = self.base / 'pinned-adoption'; target.mkdir()
+        kit.install(self.library, self.base / 'other-state', project=target, pin=True)
+        (target / 'AGENTS.override.md').write_text('shadow fixture')
+        studio = Studio(self.root); studio.initialize()
+        value, _ = workspace.plan(studio, {'projects': [{'project': str(target), 'adopt': True}]})
+        self.assertEqual(value['projects'][0]['status'], 'conflict')
+        self.assertIn('shadows', value['projects'][0]['detail'])
+        value, _ = workspace.plan(studio, {'projects': [{'project': str(self.base)}]})
+        self.assertEqual(value['projects'][0]['status'], 'conflict')
+        self.assertIn('outside', value['projects'][0]['detail'])
+
     def test_enrolled_alias_preserves_selection_and_pause_ownership(self):
         from local_control import synchronization, workspace
         alias = str(self.project / '..' / self.project.name)
@@ -130,6 +143,14 @@ class Preparation(Fixture):
 
 
 class Toolkits(Fixture):
+    def test_colliding_selected_asset_paths_are_rejected(self):
+        for identity, asset in (('a', 'b-c'), ('a-b', 'c')):
+            toolkits.save(self.root, {'schema':1,'id':identity,'name':'Fixture','version':'1.0.0',
+                'skills':[{'id':asset,'description':'Fixture asset','content':'Fixture guidance'}]})
+        with self.assertRaisesRegex(ValueError, 'collide'):
+            toolkits.preview(self.root, {'project':str(self.project),'kits':['a','a-b']})
+        self.assertFalse((self.project / '.agents').exists())
+
     def value(self):return {'schema':1,'id':'quality','name':'Quality','version':'1.0.0',
         'rules':[{'id':'verify','description':'Verify changes','content':'Run documented checks.'}],
         'skills':[{'id':'review','description':'Review changes','content':'Inspect the diff.'}],
@@ -209,6 +230,18 @@ class FleetRecovery(Fixture):
         value=recovery.preview(self.root,body);self.assertEqual(value['projects'][0]['status'],'ready')
         recovery.recover_workspace(control,{**body,'plan':value['plan']});self.assertTrue((new/'.ai/constitution.lock.json').is_file())
         self.assertEqual(recovery.preview(self.root,body)['projects'][0]['status'],'already-enrolled')
+
+    def test_recovery_plan_binds_project_policy_before_staging(self):
+        control = self.control(); manifest = recovery.export(control)
+        target = self.base / 'fresh-recovery'; target.mkdir()
+        body = {'manifest': manifest, 'mapping': {manifest['projects'][0]['id']: str(target)}}
+        before = recovery.preview(self.root, body)
+        policy_path = target / '.ai/policy.json'; policy_path.parent.mkdir()
+        policy_path.write_text(json.dumps({'schema_version': 2, 'constraints': {'max_workers': 1}}))
+        self.assertNotEqual(before['plan'], recovery.preview(self.root, body)['plan'])
+        with self.assertRaisesRegex(ValueError, 'changed since review'):
+            recovery.recover_workspace(control, {**body, 'plan': before['plan']})
+        self.assertFalse((target / 'AGENTS.md').exists())
 
     def test_peer_cannot_stage_executable_or_release_inventory(self):
         studio=Studio(self.root);studio.initialize();bundle=fleet.portable(self.root)

@@ -344,15 +344,20 @@ def install(root, state, **kwargs):
         return _install(root, state, **kwargs)
 
 
+def project_evidence(root, state, project):
+    private_state_boundary(root, state, project)
+    override = safe_path(project, "AGENTS.override.md")
+    if override.exists() and override.stat().st_size:
+        raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
+    return project_record(project, modules=MODULES, safe_path=safe_path,
+                          managed_hash=managed_hash, digest=digest)
+
+
 def adopt(state, project, dry_run=False):
     private_state_boundary(ROOT, state, project)
     project = project.absolute()
     def apply():
-        record = project_record(project, modules=MODULES, safe_path=safe_path,
-                                managed_hash=managed_hash, digest=digest)
-        override = safe_path(project, "AGENTS.override.md")
-        if override.exists() and override.stat().st_size:
-            raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
+        record = project_evidence(ROOT, state, project)
         db = state_load(state)
         identity = target_identity("project", project)
         if identity in db["targets"]:
@@ -371,6 +376,7 @@ def adopt(state, project, dry_run=False):
 
 
 def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=None, planned=None, database=None, source_reference=None):
+    private_state_boundary(root, state, project)
     validate(root)
     build(root, check=True)
     db = database if database is not None else state_load(state)
@@ -519,6 +525,13 @@ def _rollback(state, snapshot):
     atomic_bytes(path, json_bytes(record))
     for item in reversed(record["files"]):
         target = Path(item["path"])
+        no_links(target)
+        actual = target.read_bytes() if target.exists() else None
+        before = base64.b64decode(item["before"]) if item["before"] is not None else None
+        if actual == before:
+            continue
+        if (digest(actual) if actual is not None else None) != item["after_sha256"]:
+            raise ValueError("A target changed during rollback; preserve later edits and reconcile the journal")
         if item["before"] is None:
             target.unlink(missing_ok=True)
         else:

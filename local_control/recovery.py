@@ -42,11 +42,13 @@ def preview(root,body,*,_locked=False):
         if not path:rows.append({**p,'status':'unmapped'});continue
         if not isinstance(path,str) or not Path(path).expanduser().is_absolute():raise ValueError('Use an absolute checkout path')
         target=Path(path).expanduser().absolute();kit.no_links(target)
+        kit.private_state_boundary(studio.draft,studio.state,target)
         if str(target).casefold() in seen:raise ValueError('Each checkout may only be mapped once')
         seen.add(str(target).casefold())
         if not target.is_dir():raise ValueError('Clone or open the existing repository first; recovery does not execute URLs')
         status='already-enrolled' if kit.target_identity('project',target) in db['targets'] else 'adoption-required' if (target/'.ai/constitution.lock.json').exists() else 'ready'
-        rows.append({**p,'project':str(target),'status':status,'agents_hash':plans.fingerprint(target/'AGENTS.md'),'project_hash':plans.fingerprint(target/'.ai/project.md')})
+        rows.append({**p,'project':str(target),'status':status,'agents_hash':plans.fingerprint(target/'AGENTS.md'),'project_hash':plans.fingerprint(target/'.ai/project.md'),
+            'policy_hash':plans.fingerprint(target/'.ai/policy.json'),'override_hash':plans.fingerprint(target/'AGENTS.override.md')})
     return plans.seal({'schema':1,'manifest_hash':digest(json_bytes(manifest)),'local_hash':digest(json_bytes(fleet.portable(root,_locked=_locked))),
         'enrollment':digest(json_bytes(db)),'projects':rows,'replacements':[{'path':n,'before':plans.fingerprint(kit.safe_path(studio.draft,n)),'after':digest(t.encode())} for n,t in manifest['library']['files'].items()],
         'note':'Replaces the reviewed editable library and enrolls mapped fresh checkouts. Existing bundles require verified adoption. Restore secrets from encrypted backup to a new private folder; re-pair workers and re-test hardware and model routes.'})
@@ -70,7 +72,7 @@ def recover_workspace(control,body,progress=lambda _:None):
         for p in value['projects']:
             if p['status']!='ready':results.append(p);continue
             progress('Enrolling mapped recovery project');path=Path(p['project'])
-            if plans.fingerprint(path/'AGENTS.md')!=p['agents_hash'] or plans.fingerprint(path/'.ai/project.md')!=p['project_hash']:results.append({**p,'status':'needs-review'});continue
+            if any(plans.fingerprint(path/name)!=p[key] for name,key in (('AGENTS.md','agents_hash'),('.ai/project.md','project_hash'),('.ai/policy.json','policy_hash'),('AGENTS.override.md','override_hash'))):results.append({**p,'status':'needs-review'});continue
             try:
                 planned={};baseline=p.get('architecture',{})
                 if baseline:

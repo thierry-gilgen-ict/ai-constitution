@@ -352,6 +352,42 @@ class ContractRouting(unittest.TestCase):
 class ReviewBoundaries(unittest.TestCase):
     setUp = fixtures.Workspace.setUp
 
+    def test_internal_install_checks_boundary_and_release_paths_before_writes(self):
+        with self.assertRaisesRegex(ValueError, 'outside'):
+            kit._install(self.root, self.project / 'private-state', project=self.project, planned={})
+        for name in ('../escape.md', '/escape.md', 'C:/escape.md'):
+            with self.assertRaisesRegex(ValueError, 'Unsafe'):
+                releases.prepare({'VERSION': b'0.5.0', name: b'fixture'}, self.state)
+        self.assertFalse(self.state.exists())
+
+    def test_rollback_rechecks_each_target_after_preflight(self):
+        first, second = self.project / 'first.txt', self.project / 'second.txt'
+        first.write_bytes(b'old first'); second.write_bytes(b'old second')
+        result = kit.transaction(self.state, {first: b'new first', second: b'new second'})
+        original = kit.atomic_bytes
+        def write(path, data):
+            if path == second:
+                first.write_bytes(b'concurrent edit')
+            return original(path, data)
+        with mock.patch.object(kit, 'atomic_bytes', side_effect=write):
+            with self.assertRaisesRegex(ValueError, 'during rollback'):
+                kit.rollback(self.state, result['snapshot'])
+        self.assertEqual(first.read_bytes(), b'concurrent edit')
+        self.assertEqual(second.read_bytes(), b'old second')
+        journal = kit.read_json(self.state / 'transactions' / (result['snapshot']+'.json'))
+        self.assertEqual(journal['state'], 'rolling-back')
+
+    def test_renderer_identity_and_missing_route_note_are_checked(self):
+        first = policy.release_identity(self.root)
+        path = self.root / 'scripts/architecture.py'
+        catalog.atomic_bytes(path, b'fixture renderer')
+        self.assertNotEqual(policy.release_identity(self.root), first)
+        routes = kit.read_json(self.root / 'registry/routes.json')
+        routes['routes'][0].pop('note')
+        models = {m['key']: m for m in kit.read_json(self.root / 'registry/models.json')['models']}
+        with self.assertRaisesRegex(ValueError, 'string note'):
+            policy.validate_routes(routes, models)
+
     def test_export_checks_inputs_before_creating_output(self):
         output = self.base / 'out/bundle.zip'
         original = kit.no_links

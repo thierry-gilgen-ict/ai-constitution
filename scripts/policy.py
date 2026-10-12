@@ -82,6 +82,8 @@ def validate_routes(document, models):
             allowed |= {"effort", "risk_efforts", "escalation_only"}
         if set(route) - allowed or not isinstance(route.get("preferred"), str) or not isinstance(route.get("fallbacks"), list):
             raise ValueError("Invalid route fields")
+        if not isinstance(route.get("note"), str):
+            raise ValueError("Route needs a string note")
         candidates = [route["preferred"], *route["fallbacks"]]
         if not all(isinstance(k, str) for k in candidates) or len(candidates) != len(set(candidates)):
             raise ValueError("Invalid or duplicate model candidate")
@@ -105,7 +107,8 @@ def validate_routes(document, models):
 def release_identity(root):
     # Bind instruction sources/renderers, not publisher authenticity.
     names = sorted(MODULES | {"VERSION", "registry/models.json", "registry/routes.json", "registry/sources.json"})
-    names += ["scripts/constitution.py", "scripts/policy.py", "scripts/adoption.py", "scripts/releases.py"]
+    names += ["scripts/constitution.py", "scripts/policy.py", "scripts/adoption.py", "scripts/releases.py", "scripts/architecture.py"]
+    names += [p.relative_to(root).as_posix() for p in sorted((root / "templates/architectures").glob("*.json"))]
     names += ["templates/project.md", "skills/constitution-onboarding/SKILL.md", "skills/constitution-maintenance/SKILL.md"]
     return digest(json_bytes({name: digest((root / name).read_bytes()) if (root / name).is_file() else "missing" for name in names}))
 

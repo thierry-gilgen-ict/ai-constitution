@@ -3,7 +3,6 @@ import copy
 import os
 from pathlib import Path
 from scripts import constitution as kit
-from scripts.adoption import project_record
 from scripts.catalog import digest, json_bytes
 from . import synchronization, project_vault, monitoring
 from .studio import Studio, difference
@@ -81,10 +80,10 @@ def plan(studio, body):
             project = Path(database['targets'][identity]['root'])
         before = copy.deepcopy(database); draft = {}
         try:
+            kit.private_state_boundary(studio.draft, studio.state, project)
             if identity not in database['targets'] and (project / '.ai/constitution.lock.json').exists():
                 if entry.get('adopt') is not True: raise ValueError('Select adoption to verify the existing portable bundle')
-                database['targets'][identity] = project_record(project, modules=kit.MODULES, safe_path=kit.safe_path,
-                    managed_hash=kit.managed_hash, digest=digest)
+                database['targets'][identity] = kit.project_evidence(studio.draft,studio.state,project)
             if not database['targets'].get(identity, {}).get('pinned'):
                 kit._install(studio.draft, studio.state, project=project, planned=draft, database=database)
             config_id = entry.get('configuration')

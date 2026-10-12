@@ -158,10 +158,17 @@ def _unpack(data, expected):
 
 
 def prepare(payload, state, *, preview=False):
+    if any(not allowed(name) for name in payload):
+        raise ValueError('Unsafe release payload path')
     document = manifest(payload)
     identity = document['version'] + '-' + digest(json_bytes(document))[:16]
     destination = state.parent / 'releases' / identity
     no_links(destination)
+    for name in payload:
+        path = destination / name
+        no_links(path)
+        if not path.resolve().is_relative_to(destination.resolve()):
+            raise ValueError('Release destination escapes selected root')
     if destination.exists() and set(files(destination)) - set(payload):
         raise ValueError('Immutable release destination has unexpected files; preserve and reconcile it')
     if not preview:
