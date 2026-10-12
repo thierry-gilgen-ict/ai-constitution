@@ -26,14 +26,15 @@ def preview(root, selected=None, *, _locked=False):
         db = kit.state_load(studio.state); preferences = synchronization.settings(root)
         if selected is not None and (not isinstance(selected,list) or len(selected)>200 or not all(isinstance(s,str) for s in selected)):
             raise ValueError('Select up to 200 enrolled projects')
-        if selected is not None and any('project:' + s not in db['targets'] for s in selected):
+        selected_ids = None if selected is None else {kit.target_identity('project', s) for s in selected}
+        if selected_ids is not None and any(s not in db['targets'] for s in selected_ids):
             raise ValueError('Choose enrolled projects')
         path = studio.state / 'architectures.json'; kit.no_links(path)
         baselines = kit.read_json(path).get('projects', {}) if path.exists() else {}
         identity, source = releases.prepare(studio.payload(), studio.state, preview=True)
         rows = []; signatures = {}
         for target in db['targets'].values():
-            if target['kind'] != 'project' or selected is not None and target['root'] not in selected: continue
+            if target['kind'] != 'project' or selected_ids is not None and kit.target_identity('project',target['root']) not in selected_ids: continue
             project = Path(target['root']); row = {'project': str(project), 'changes': []}
             if target['pinned'] or str(project) in preferences['paused_projects']:
                 row['status'] = 'pinned' if target['pinned'] else 'paused'

@@ -57,7 +57,7 @@ def discover(root, body):
             if name in seen: continue
             seen.add(name)
             lock = path / '.ai/constitution.lock.json'; kit.no_links(lock)
-            projects.append({'project': name, 'name': path.name, 'enrolled': 'project:' + name in enrolled,
+            projects.append({'project': name, 'name': path.name, 'enrolled': kit.target_identity('project',path) in enrolled,
                 'portable_bundle': lock.is_file(), 'has_instructions': (path / 'AGENTS.md').is_file()})
     return {'projects': projects, 'truncated': truncated, 'directories_inspected': min(visited, 5000),
             'note': 'Discovery reads names only, to depth four. Select projects to preview; no source or environment values are collected.'}
@@ -74,8 +74,11 @@ def plan(studio, body):
         project = Path(entry.get('project', '')).expanduser()
         if not project.is_absolute() or not project.is_dir(): raise ValueError('Select an existing absolute project path')
         kit.no_links(project); project = project.absolute()
-        if str(project) in seen: raise ValueError('Project selected more than once')
-        seen.add(str(project)); identity = 'project:' + str(project)
+        identity = kit.target_identity('project',project)
+        if identity in seen: raise ValueError('Project selected more than once')
+        seen.add(identity)
+        if identity in database['targets']:
+            project = Path(database['targets'][identity]['root'])
         before = copy.deepcopy(database); draft = {}
         try:
             if identity not in database['targets'] and (project / '.ai/constitution.lock.json').exists():

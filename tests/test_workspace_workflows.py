@@ -40,6 +40,18 @@ class Fixture(unittest.TestCase):
 
 
 class Foundations(Fixture):
+    def test_enrolled_alias_preserves_selection_and_pause_ownership(self):
+        from local_control import synchronization, workspace
+        alias = str(self.project / '..' / self.project.name)
+        self.assertEqual(plans.project(self.root, alias), self.project)
+        rows = rollouts.preview(self.root, [alias])['projects']
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['project'], str(self.project))
+        setting = synchronization.configure(self.root, {'project': alias, 'paused': True})
+        self.assertEqual(setting['paused_projects'], [str(self.project)])
+        with self.assertRaisesRegex(ValueError, 'more than once'):
+            workspace.plan(Studio(self.root), {'projects': [{'project': str(self.project)}, {'project': alias}]})
+
     def test_checkpoint_refuses_uncertain_replay_and_changed_evidence(self):
         journal=plans.Checkpoints(self.root,'a'*12,'fixture')
         with self.assertRaises(RuntimeError):journal.step('download',lambda:(_ for _ in ()).throw(RuntimeError()))

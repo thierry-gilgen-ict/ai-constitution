@@ -45,7 +45,7 @@ def preview(root,body,*,_locked=False):
         if str(target).casefold() in seen:raise ValueError('Each checkout may only be mapped once')
         seen.add(str(target).casefold())
         if not target.is_dir():raise ValueError('Clone or open the existing repository first; recovery does not execute URLs')
-        status='already-enrolled' if 'project:'+str(target) in db['targets'] else 'adoption-required' if (target/'.ai/constitution.lock.json').exists() else 'ready'
+        status='already-enrolled' if kit.target_identity('project',target) in db['targets'] else 'adoption-required' if (target/'.ai/constitution.lock.json').exists() else 'ready'
         rows.append({**p,'project':str(target),'status':status,'agents_hash':plans.fingerprint(target/'AGENTS.md'),'project_hash':plans.fingerprint(target/'.ai/project.md')})
     return plans.seal({'schema':1,'manifest_hash':digest(json_bytes(manifest)),'local_hash':digest(json_bytes(fleet.portable(root,_locked=_locked))),
         'enrollment':digest(json_bytes(db)),'projects':rows,'replacements':[{'path':n,'before':plans.fingerprint(kit.safe_path(studio.draft,n)),'after':digest(t.encode())} for n,t in manifest['library']['files'].items()],

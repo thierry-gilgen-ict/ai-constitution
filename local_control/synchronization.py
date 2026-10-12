@@ -24,7 +24,9 @@ def configure(root, body):
         if 'project' in body:
             project = body['project']
             db = kit.state_load(locations.folder(root, 'constitution_state'))
-            if 'project:' + str(project) not in db['targets']: raise ValueError('Choose an enrolled project')
+            identity = kit.target_identity('project',project)
+            if identity not in db['targets']: raise ValueError('Choose an enrolled project')
+            project = db['targets'][identity]['root']
             if type(body.get('paused')) is not bool: raise ValueError('Choose follow or pause')
             paused = set(value['paused_projects'])
             if body['paused']: paused.add(project)

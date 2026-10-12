@@ -220,7 +220,7 @@ def synchronize_toolkits(control,progress=lambda _:None):
     from . import synchronization
     db=overview(control.root);targets=kit.state_load(Studio(control.root).state)['targets'];paused=synchronization.settings(control.root)['paused_projects'];rows=[]
     for project,value in db['projects'].items():
-        target=targets.get('project:'+project)
+        target=targets.get(kit.target_identity('project',project))
         if not target or target['pinned'] or project in paused:continue
         try:
             body={'project':project,'kits':value['kits']};previewed=preview(control.root,body)

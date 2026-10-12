@@ -241,7 +241,7 @@ def plan(kit, root, state, project, value, project_name, policy=None):
         raise ValueError('Save this template before choosing follow latest, or pin the unsaved revision')
     writes = {}
     # One transaction owns onboarding, baseline output, enrollment and rollback.
-    enrolled = kit.state_load(state)['targets'].get('project:' + str(project), {})
+    enrolled = kit.state_load(state)['targets'].get(kit.target_identity('project', project), {})
     if not enrolled.get('pinned'):
         kit._install(root, state, project=project, planned=writes)
     tracked = dict(old.get('files', {}))
