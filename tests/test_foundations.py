@@ -289,6 +289,16 @@ class ContractRouting(unittest.TestCase):
         self.assertIn("Escalation-only models", guide)
         self.assertIn("expires 2099-12-31 UTC", guide)
         self.assertIn("at most 1 active workers, 2 total attempts", collaboration)
+        self.put_policy({"schema_version": 1, "routes": [{"platform": "codex", "task": "implementation", "fallbacks": []}]}, personal=True)
+        layered = policy.resolve(self.root, self.state, self.project)
+        with self.assertRaisesRegex(ValueError, "No eligible"):
+            policy.select_route(self.root, layered, "codex", "implementation")
+        value["routes"][0]["task"] = "small"
+        self.put_policy(value)
+        with self.assertRaisesRegex(ValueError, "No eligible"):
+            policy.select_route(self.root, policy.resolve(self.root, self.state, self.project), "codex", "small")
+        value["routes"][0]["task"] = "implementation"
+        self.put_policy(value)
         with mock.patch.object(policy.dt, "datetime") as clock:
             clock.now.return_value.date.return_value = policy.dt.date(2100, 1, 1)
             with self.assertRaisesRegex(ValueError, "expired"):

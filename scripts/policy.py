@@ -114,6 +114,9 @@ def resolve(root, state, project=None, *, portable=False):
     models = {m["key"]: m for m in json.loads((root / "registry/models.json").read_text(encoding="utf-8"))["models"]}
     routes = copy.deepcopy(json.loads((root / "registry/routes.json").read_text(encoding="utf-8")))
     validate_routes(routes, models)
+    fixed_guards = {}
+    for route in routes["routes"]:
+        fixed_guards.setdefault(route["platform"], set()).update(route.get("escalation_only", []))
     by_key = {(r["platform"], r["task"]): r for r in routes["routes"]}
     provenance = {f"{p}/{t}": "release" for p, t in by_key}
     instructions = {name: (root / name).read_text(encoding="utf-8") for name in MODULES}
@@ -151,8 +154,10 @@ def resolve(root, state, project=None, *, portable=False):
             candidate = {**by_key[identity], **chosen}
             if "preferred" in chosen and "fallbacks" not in chosen:
                 candidate["fallbacks"] = [k for k in candidate["fallbacks"] if k != candidate["preferred"]]
-            candidate["escalation_only"] = [k for k in candidate.get("escalation_only", []) if k in [candidate["preferred"], *candidate["fallbacks"]]]
+            candidate["escalation_only"] = []
             validate_routes({"schema_version": 2, "routes": [candidate]}, models)
+            candidate["escalation_only"] = [k for k in [candidate["preferred"], *candidate["fallbacks"]]
+                                              if k in fixed_guards.get(identity[0], set())]
             if layer["schema_version"] == 2 and chosen:
                 item = records.get(override.get("exception"))
                 if item is None:
