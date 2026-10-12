@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "ui_version": "0.5.0",
-  "source_digest": "8927d5f9c8379c2f671851f9b6b54f2f13a2e6118ba8365f756f091b106e55ce",
+  "source_digest": "fa62497fa3483edc5f1523eff056d11178b29b6663babbc2f5281b9cc4d19ae7",
   "digest_format": "UTF-8 with LF newlines; filename + NUL + content + NUL",
   "digest_inputs": [
     "local_control/web/index.html",
@@ -1625,7 +1625,7 @@
         ]
       ],
       "path": "docs/assets/screenshots/operation-progress.png",
-      "sha256": "a24a9b48d1f5d937370df13df4b206255e3f7b6afd3ddf3cc3a9f6c551faa8b9",
+      "sha256": "bafd943e58d6d31f73a67c75050c37015fbb3878d503106439b797450aaf2923",
       "width": 1440,
       "height": 1000,
       "bytes": 93864
@@ -1769,10 +1769,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-preparation-preview.png",
-      "sha256": "1ed619183d230882c7e8ed9db6a34cc10a8c31b9fa072e42b4ff6fe35aeea30f",
+      "sha256": "47cd30362075349864ce9c4f243476d1e822382de159745f07b62fa307c85932",
       "width": 860,
       "height": 880,
-      "bytes": 28754
+      "bytes": 28716
     },
     {
       "id": "workflow-launch",

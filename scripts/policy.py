@@ -98,7 +98,7 @@ def validate_routes(document, models):
         escalation = route.get("escalation_only", [])
         if (not isinstance(escalation, list) or not all(isinstance(k, str) for k in escalation)
                 or len(escalation) != len(set(escalation))
-                or any(k not in route["fallbacks"] for k in escalation)):
+                or any(k not in candidates for k in escalation)):
             raise ValueError("Invalid escalation-only candidates")
 
 
@@ -106,7 +106,8 @@ def release_identity(root):
     # Bind instruction sources/renderers, not publisher authenticity.
     names = sorted(MODULES | {"VERSION", "registry/models.json", "registry/routes.json", "registry/sources.json"})
     names += ["scripts/constitution.py", "scripts/policy.py", "scripts/adoption.py", "scripts/releases.py"]
-    return digest(json_bytes({name: digest((root / name).read_bytes()) for name in names if (root / name).is_file()}))
+    names += ["templates/project.md", "skills/constitution-onboarding/SKILL.md", "skills/constitution-maintenance/SKILL.md"]
+    return digest(json_bytes({name: digest((root / name).read_bytes()) if (root / name).is_file() else "missing" for name in names}))
 
 
 def resolve(root, state, project=None, *, portable=False):
@@ -150,14 +151,12 @@ def resolve(root, state, project=None, *, portable=False):
             candidate = {**by_key[identity], **chosen}
             if "preferred" in chosen and "fallbacks" not in chosen:
                 candidate["fallbacks"] = [k for k in candidate["fallbacks"] if k != candidate["preferred"]]
-            candidate["escalation_only"] = [k for k in candidate.get("escalation_only", []) if k in candidate["fallbacks"]]
+            candidate["escalation_only"] = [k for k in candidate.get("escalation_only", []) if k in [candidate["preferred"], *candidate["fallbacks"]]]
             validate_routes({"schema_version": 2, "routes": [candidate]}, models)
             if layer["schema_version"] == 2 and chosen:
                 item = records.get(override.get("exception"))
                 if item is None:
                     raise ValueError("Route exception needs owner, reason, expiry and evidence")
-                if dt.date.fromisoformat(item["expires"]) < dt.datetime.now(dt.timezone.utc).date():
-                    raise ValueError("Route exception expired; affected new work is blocked")
                 if not private:
                     exceptions.append({"layer": label, "route": "/".join(identity), **item,
                                        "authority": "metadata only; verify human authorization separately"})
@@ -166,6 +165,8 @@ def resolve(root, state, project=None, *, portable=False):
             if not private:
                 by_key[identity].update(candidate)
                 provenance["/".join(identity)] = label
+    instructions["collaboration.md"] += ("\n## Effective scope limits\n\n"
+        f"Use at most {constraints['max_workers']} active workers, {constraints['max_attempts']} total attempts and {constraints['max_wip']} unfinished candidates. Existing stricter or consumed allowances remain binding.\n")
     for name, body in instructions.items():
         if len(body.encode("utf-8")) > (8192 if name == "constitution.md" else 6144):
             raise ValueError("Active policy exceeds byte budget: " + name)
@@ -176,6 +177,9 @@ def resolve(root, state, project=None, *, portable=False):
 
 
 def select_route(root, selected, platform, task, *, risk=None, available=None, missing_capabilities=(), escalation_reason=None):
+    for item in selected.get("exceptions", []):
+        if item["route"] == platform + "/" + task and dt.date.fromisoformat(item["expires"]) < dt.datetime.now(dt.timezone.utc).date():
+            raise ValueError("Route exception expired; affected new work is blocked")
     if risk is not None and risk not in RISKS:
         raise ValueError("Unknown risk")
     if missing_capabilities:

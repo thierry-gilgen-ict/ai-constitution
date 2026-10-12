@@ -50,6 +50,20 @@ def allowed(name):
                  and path.suffix in SUFFIXES)))
 
 
+def destination_keys(names):
+    seen = set()
+    reserved = {"CON", "PRN", "AUX", "NUL", *("COM" + str(i) for i in range(1, 10)), *("LPT" + str(i) for i in range(1, 10))}
+    for name in names:
+        parts = PurePosixPath(name).parts
+        if any(p.rstrip(" .") != p or p.split(".")[0].upper() in reserved
+               or any(c in p for c in '<>:"|?*') or any(ord(v) < 32 for v in p) for p in parts):
+            raise ValueError("Unsafe release path is not portable")
+        key = "/".join(p.casefold() for p in parts)
+        if key in seen:
+            raise ValueError("Case-colliding release paths")
+        seen.add(key)
+
+
 def files(root):
     result = {}
     # Never traverse unrelated trees such as Git, local build outputs or private
@@ -66,6 +80,7 @@ def files(root):
             if path.is_symlink() or any(is_link(p) for p in (path, *path.parents)):
                 raise ValueError('Release sources must not traverse links')
             result[name] = path.read_bytes()
+    destination_keys(result)
     return result
 
 
@@ -95,6 +110,7 @@ def public_files(root):
 
 
 def manifest(payload):
+    destination_keys(payload)
     version = payload.get('VERSION', b'').decode().strip()
     if not re.fullmatch(r'\d+\.\d+\.\d+', version):
         raise ValueError('Release VERSION must be numeric')
@@ -115,11 +131,19 @@ def export(root, output):
 
 
 def unpack(data, expected):
+    try:
+        return _unpack(data, expected)
+    except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, EOFError, KeyError, UnicodeError) as error:
+        raise ValueError("Release archive is malformed or unreadable") from error
+
+
+def _unpack(data, expected):
     if not re.fullmatch(r'[a-f0-9]{64}', expected) or digest(data) != expected:
         raise ValueError('Release archive checksum mismatch')
     payload = {}
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
         entries = archive.infolist()
+        destination_keys([item.filename for item in entries])
         if len(entries) > 1000 or sum(i.file_size for i in entries) > 64 * 1024 * 1024:
             raise ValueError('Release archive exceeds limits')
         for item in entries:

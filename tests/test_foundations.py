@@ -198,7 +198,7 @@ class ContractRouting(unittest.TestCase):
         base["exceptions"][0]["expires"] = "2000-01-01"
         self.put_policy(base)
         with self.assertRaisesRegex(ValueError, "expired"):
-            policy.resolve(self.root, self.state, self.project)
+            policy.select_route(self.root, policy.resolve(self.root, self.state, self.project), "codex", "small")
         base["exceptions"][0]["expires"] = "2099-12-31"
         base["routes"][0]["preferred"] = "cursor:fast"
         self.put_policy(base)
@@ -270,6 +270,73 @@ class ContractRouting(unittest.TestCase):
         (self.project / "STATE.md").write_text("x" * 65537, encoding="utf-8")
         findings = policy.authority_findings(self.project)
         self.assertEqual({f["rule"] for f in findings}, {"project-model-table", "oversized-active-authority"})
+
+
+
+    def test_installed_guards_match_effective_policy_and_escalation_survives_override(self):
+        value = {"schema_version": 2, "constraints": {"max_workers": 1, "max_attempts": 2},
+                 "routes": [{"platform": "codex", "task": "implementation", "preferred": "codex:deep", "exception": "x"}],
+                 "exceptions": [{"id": "x", "owner": "Fixture owner", "reason": "Bounded test",
+                                 "expires": "2099-12-31", "evidence": "synthetic receipt"}]}
+        self.put_policy(value)
+        selected = policy.resolve(self.root, self.state, self.project)
+        with self.assertRaisesRegex(ValueError, "No eligible"):
+            policy.select_route(self.root, selected, "codex", "implementation")
+        kit.install(self.root, self.state, project=self.project)
+        guide = (self.project / ".ai/shared/routing.md").read_text()
+        collaboration = (self.project / ".ai/shared/collaboration.md").read_text()
+        self.assertIn("1 active workers", guide)
+        self.assertIn("Escalation-only models", guide)
+        self.assertIn("expires 2099-12-31 UTC", guide)
+        self.assertIn("at most 1 active workers, 2 total attempts", collaboration)
+        with mock.patch.object(policy.dt, "datetime") as clock:
+            clock.now.return_value.date.return_value = policy.dt.date(2100, 1, 1)
+            with self.assertRaisesRegex(ValueError, "expired"):
+                policy.select_route(self.root, selected, "codex", "implementation")
+        expired = copy.deepcopy(value)
+        expired["exceptions"][0]["expires"] = "2000-01-01"
+        self.put_policy(expired)
+        selected = policy.resolve(self.root, self.state, self.project)
+        self.assertEqual(policy.select_route(self.root, selected, "codex", "research")["recommendation"]["key"], "codex:balanced")
+
+    def test_missing_global_enrollment_does_not_overwrite_edited_block(self):
+        kit.install(self.root, self.state, platform="codex", home=self.home)
+        path = self.home / ".codex/AGENTS.md"
+        path.write_bytes(path.read_bytes().replace(b"AI Constitution", b"Edited Constitution"))
+        before = path.read_bytes()
+        (self.state / "installations.json").unlink()
+        with self.assertRaisesRegex(ValueError, "without enrollment"):
+            kit.install(self.root, self.state, platform="codex", home=self.home)
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_private_state_boundary_and_preview_plan_are_enforced(self):
+        for state in (self.root / "docs/private-state", self.project / "private-state"):
+            with self.assertRaisesRegex(ValueError, "outside"):
+                kit.install(self.root, state, project=self.project)
+            self.assertFalse(state.exists())
+        kit.install(self.root, self.state, project=self.project)
+        preview = kit.upgrade(self.root, self.state, dry_run=True)
+        p = self.root / "research.md"
+        p.write_text(p.read_text() + "\nNew source fact.\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Preview"):
+            kit.upgrade(self.root, self.state, expected_plan=preview["plan"])
+        with self.assertRaisesRegex(ValueError, "--plan"):
+            kit.main(["--root", str(self.root), "--state-dir", str(self.state), "upgrade", "--source", str(self.root)])
+
+    def test_skill_source_identity_and_malformed_collision_archives(self):
+        kit.install(self.root, self.state, platform="codex", home=self.home)
+        p = self.root / "skills/constitution-maintenance/SKILL.md"
+        p.write_text(p.read_text() + "\nChanged skill.\n", encoding="utf-8")
+        self.assertEqual(kit.doctor(self.root, self.state)[0]["status"], "drift")
+        data = b"not a zip"
+        with self.assertRaisesRegex(ValueError, "malformed"):
+            releases.unpack(data, catalog.digest(data))
+        payload = {"VERSION": b"0.5.0", "docs/A.md": b"a", "docs/a.md": b"b"}
+        with self.assertRaisesRegex(ValueError, "Case-colliding"):
+            releases.prepare(payload, self.state)
+        for path in ("docs/CON.md", "docs/name. /file.md"):
+            with self.assertRaisesRegex(ValueError, "portable"):
+                releases.destination_keys([path])
 
 
 class Metadata(unittest.TestCase):

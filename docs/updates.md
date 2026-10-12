@@ -74,7 +74,7 @@ Activate a reviewed local source checkout without changing its Git state:
 
 ```sh
 python scripts/constitution.py upgrade --source /path/to/reviewed/checkout --dry-run
-python scripts/constitution.py upgrade --source /path/to/reviewed/checkout
+python scripts/constitution.py upgrade --source /path/to/reviewed/checkout --plan EXACT_PREVIEW_PLAN
 ```
 
 The command stages a content-verified immutable library under `~/.config/ai-constitution/releases/`, preflights every eligible target, then activates the release and changes those targets in one recoverable transaction. It skips pins and preserves personal policy, catalog snapshots and unrelated checkout edits. Drift in any eligible target prevents activation. Unreferenced staged releases may remain after a failed preflight; they are never silently selected.

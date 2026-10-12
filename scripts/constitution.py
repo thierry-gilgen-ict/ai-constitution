@@ -121,6 +121,16 @@ def state_load(state):
     return result
 
 
+def private_state_boundary(root, state, project=None):
+    roots = [Path(root)]
+    if project is not None:
+        roots.append(Path(project))
+    roots += [Path(t["root"]) for t in state_load(state)["targets"].values() if t["kind"] == "project"]
+    resolved = Path(state).resolve()
+    if any(resolved.is_relative_to(p.resolve()) for p in roots):
+        raise ValueError("Private state must remain outside source and project checkouts")
+
+
 def validate(root):
     errors = []
     authored_names = [p.name.casefold() for p in root.glob("*.md")]
@@ -190,12 +200,28 @@ def render(root, preferences=None):
     for route in routes:
         lines.append(f"| {route['platform']} | {route['task']} | {models[route['preferred']]['name']} | "
                      + (", ".join(models[k]["name"] for k in route["fallbacks"]) or "Platform managed") + " |")
+    limits = preferences["constraints"] if preferences else policy.CONSTRAINTS
+    lines += ["", "## Effective guards", "",
+              "Risk is independent of complexity. Unknown risk/access stays unknown. Recommendations never dispatch.",
+              f"Limits: {limits['max_workers']} active workers; {limits['max_attempts']} total attempts; {limits['max_wip']} unfinished candidates. Stricter or consumed task allowances still apply.",
+              "Escalation-only models need a recorded reason and separately verified authorization; availability alone never enables them. Missing capability or permission blocks affected work.", "",
+              "| Platform | Task | Requested effort | High / critical | Escalation only |",
+              "| --- | --- | --- | --- | --- |"]
+    for route in routes:
+        risks = route.get("risk_efforts", {})
+        lines.append(f"| {route['platform']} | {route['task']} | {route.get('effort') or 'Native / unknown'} | {risks.get('high', 'Native / unknown')} / {risks.get('critical', 'Native / unknown')} | "
+                     + (", ".join(models[k]["name"] for k in route.get("escalation_only", [])) or "None") + " |")
+    if preferences:
+        for item in preferences.get("exceptions", []):
+            lines.append(f"- Exception {item['id']} for {item['route']}: owner {item['owner']}; expires {item['expires']} UTC; reason {item['reason']}; evidence {item['evidence']}. Metadata is not authorization; expired affected routes are blocked.")
+        for item in preferences.get("legacy_exceptions", []):
+            lines.append(f"- {item['route']}: legacy exception metadata unverified; reconcile with its owner.")
     lines += ["", "## Selection boundaries", "",
               "- Codex: use supported settings or the model picker. This guide never rewrites your active model settings.",
               "- Cursor: use the model picker or supported SDK. Native Auto remains managed by Cursor.",
               "- Grok Bot: there is no model picker. Routing describes task/tool selection and authorized handoffs.",
               "- Local servers: discover installed models explicitly with `local`. Tool calling, context, and reasoning support must be tested on that server; model names are insufficient.",
-              "- When a candidate is unavailable, use an available listed fallback. If none fits, state the limitation.",
+              "- Only eligible non-escalation fallbacks may be used for unavailable candidates. Preserve escalation and expiry guards; if none fits, state the limitation.",
               "- Keep source verification dates separate from catalog download dates. Review stale recommendations before selecting them.", "", "## Evidence", ""]
     for model in models.values():
         source = sources[model["source"]]
@@ -283,6 +309,7 @@ def transaction(state, writes, *, dry_run=False):
 
 
 def install(root, state, **kwargs):
+    private_state_boundary(root, state, kwargs.get("project"))
     if kwargs.get("dry_run"):
         return _install(root, state, **kwargs)
     with state_lock(state):
@@ -290,6 +317,7 @@ def install(root, state, **kwargs):
 
 
 def adopt(state, project, dry_run=False):
+    private_state_boundary(ROOT, state, project)
     project = project.absolute()
     def apply():
         record = project_record(project, modules=MODULES, safe_path=safe_path,
@@ -354,6 +382,8 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         if create_only and path.exists():
             return
         old = previous.get("files", {}).get(relative)
+        if block and not old and (BEGIN.encode() in existing or END.encode() in existing):
+            raise ValueError("Managed markers exist without enrollment evidence; preserve and reconcile before reinstalling")
         if old and path.exists():
             actual = managed_hash(existing) if old["managed"] else digest(existing)
             if actual != old["sha256"]:
@@ -418,6 +448,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
 
 
 def sync(root, state, include_pinned=False, dry_run=False):
+    private_state_boundary(root, state)
     results = []
     for target in state_load(state)["targets"].values():
         if target["pinned"] and not include_pinned:
@@ -502,6 +533,7 @@ def source_check(root, state):
 
 def upgrade(source, state, dry_run=False, payload=None, expected_plan=None):
     """Stage an immutable library and update eligible targets in one transaction."""
+    private_state_boundary(source, state)
     import tempfile
     with tempfile.TemporaryDirectory() as folder:
         candidate = Path(folder).resolve()
@@ -636,6 +668,7 @@ def main(argv=None):
     upgrading.add_argument("--archive", type=Path)
     upgrading.add_argument("--sha256")
     upgrading.add_argument("--dry-run", action="store_true")
+    upgrading.add_argument("--plan", help="Exact preview plan required for CLI activation")
     release = sub.add_parser("release", help="Export a managed-upgrade archive")
     release.add_argument("--output", type=Path, required=True)
     explaining = sub.add_parser("explain")
@@ -700,6 +733,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     root = args.root.absolute()
     state = (args.state_dir or Path(os.environ.get("AI_CONSTITUTION_STATE_DIR", str(Path.home() / ".config/ai-constitution/state")))).absolute()
+    private_state_boundary(root, state, getattr(args, "project", None))
     if args.command not in {"build", "check", "scan", "release", "upgrade", "architecture"} and not getattr(args, "source_checkout", False):
         root = releases.selected(state, root)
     if args.command not in {"build", "check", "scan", "models", "providers", "route", "export"}:
@@ -799,10 +833,12 @@ def main(argv=None):
     elif args.command == "export":
         result = export_bundle(root, args.output)
     elif args.command == "upgrade":
+        if not args.dry_run and not args.plan:
+            raise ValueError("Preview upgrade first, then activate with --plan PLAN_HASH")
         if args.source and args.archive or bool(args.archive) != bool(args.sha256):
             raise ValueError("Use --source or --archive with --sha256")
         payload = releases.unpack(args.archive.read_bytes(), args.sha256) if args.archive else None if args.source else releases.latest()
-        result = upgrade(args.source or root, state, args.dry_run, payload)
+        result = upgrade(args.source or root, state, args.dry_run, payload, expected_plan=args.plan)
     elif args.command == "release":
         validate(root)
         build(root, check=True)
