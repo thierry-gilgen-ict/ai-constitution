@@ -74,7 +74,7 @@ Activate a reviewed local source checkout without changing its Git state:
 
 ```sh
 python scripts/constitution.py upgrade --source /path/to/reviewed/checkout --dry-run
-python scripts/constitution.py upgrade --source /path/to/reviewed/checkout
+python scripts/constitution.py upgrade --source /path/to/reviewed/checkout --plan EXACT_PREVIEW_PLAN
 ```
 
 The command stages a content-verified immutable library under `~/.config/ai-constitution/releases/`, preflights every eligible target, then activates the release and changes those targets in one recoverable transaction. It skips pins and preserves personal policy, catalog snapshots and unrelated checkout edits. Drift in any eligible target prevents activation. Unreferenced staged releases may remain after a failed preflight; they are never silently selected.
@@ -113,8 +113,26 @@ The dashboard now provides an **Update available** notification, public release 
 
 **In the dashboard · Review an update restart.** After verification, restart only when tracked and external clients are idle. Private settings and model storage are retained.
 
-![Review an update restart — demonstration data, UI 0.4.0](assets/screenshots/update-restart.png)
+![Review an update restart — demonstration data, UI 0.5.0](assets/screenshots/update-restart.png)
 
-[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.4.0.
+[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.5.0.
 
 <!-- screenshots:restart:end -->
+
+## Organisation-wide contract in 0.5
+
+Keep the existing installer, private enrollment, pins and guarded rollback. New project locks use schema 2 with a versioned module allowlist and instruction-source digest; older six-module locks remain adoptable. A digest proves content identity, not publisher authenticity or client loading.
+
+Policy schema 1 remains readable and legacy route overrides are reported as unverified exceptions. Schema 2 accepts stricter max_workers, max_attempts and max_wip constraints. A route override requires a named exception with owner, reason, ISO expiry and evidence. Metadata is not human authorization. Expired exceptions block affected new work; attempts never reset.
+
+```json
+{"schema_version":2,"constraints":{"max_workers":2,"max_attempts":2,"max_wip":1}}
+```
+
+Core and project contracts are bounded; specialized security, collaboration and operational guidance loads only when relevant. Keep current state in the project's established issue/PR record, and archive superseded authority only after preserving exact uncommitted evidence. Governance must not silently convert a project's live tracker or change domain/deployment constraints.
+
+Pilot one clean isolated project with separately reviewed source changes. Use --state-dir for a private pilot enrollment database. A real sync --all or upgrade can affect multiple eligible targets; never mistake it for a single-project command. Global activation, branch rules and deployment are separately scoped decisions.
+
+Enrollment identities resolve path aliases and Windows case equivalence. Existing records retain their original target paths; conflicting duplicate owners stop reconciliation without discarding private state. Automatic transaction recovery preserves later edits and leaves a journal for conflicts. Immutable release activation refuses unexpected cached files. Portable exports refuse linked inputs, and CLI upgrade requires the exact reviewed --plan.
+
+Use a quiescent target for rollback. State locks coordinate Constitution processes, not external editors; rollback rechecks each target immediately before restoration and preserves observed drift, but cannot promise filesystem-wide exclusion of unrelated writers. Local Control adoption uses the same private-state and entry-point guards. Recovery plans bind the project policy and override inputs; selected toolkit assets must have distinct output paths.

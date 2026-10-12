@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "ui_version": "0.4.0",
-  "source_digest": "230ce98521b2316ba431feea0952e2a2a53678b769d5869af38f6bb9a1d6a32f",
+  "ui_version": "0.5.0",
+  "source_digest": "fa62497fa3483edc5f1523eff056d11178b29b6663babbc2f5281b9cc4d19ae7",
   "digest_format": "UTF-8 with LF newlines; filename + NUL + content + NUL",
   "digest_inputs": [
     "local_control/web/index.html",
@@ -137,10 +137,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/setup.png",
-      "sha256": "969af05cae4132d2a1dbd93aa629d2b7bee7c619bb068e4acd17bcf7132d6c49",
+      "sha256": "98a9322d8478e5b102da40abacc57f2a288ca9fb6678ac1ce4e862f8466f1f10",
       "width": 1440,
       "height": 1218,
-      "bytes": 110374
+      "bytes": 110315
     },
     {
       "id": "overview",
@@ -151,10 +151,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/overview.png",
-      "sha256": "712394312843c68be4167de01af3ca37877241c722317d50683ed94768f1ca8d",
+      "sha256": "7871054c35fa011cd9c2a2840b7d41d0c21d1dd12d918b64b163846795c1b0c7",
       "width": 1440,
       "height": 1507,
-      "bytes": 138035
+      "bytes": 138003
     },
     {
       "id": "models",
@@ -165,10 +165,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/models.png",
-      "sha256": "410e7dbe953bf6b9b63e249feddfc87197ad4317abe42ae6b9f2ad6be0a13604",
+      "sha256": "d68d38fd2ac36f585582e8ebeef1307289ac8cd883979c366945191053042e71",
       "width": 1440,
       "height": 1130,
-      "bytes": 91271
+      "bytes": 91243
     },
     {
       "id": "machines",
@@ -179,10 +179,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/machines.png",
-      "sha256": "c27b5d37e029929daff07b7a31d7989c9f1fb33051ac045303e9354164cfabbd",
+      "sha256": "6c93d924d845cc5bcbe01804c34c8c7db7b47916fd1c878343ae463e892806b3",
       "width": 1440,
       "height": 3025,
-      "bytes": 193708
+      "bytes": 193684
     },
     {
       "id": "connect",
@@ -193,10 +193,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/connect.png",
-      "sha256": "cadc92542d991713e9e62898a53a2a7bcbec923147183cad876b68bfaf2ded62",
+      "sha256": "c266ea77b3400a82808662f13e9e62d59f90bf06f9d7a953f1472923457b8a09",
       "width": 1440,
       "height": 1621,
-      "bytes": 129225
+      "bytes": 129206
     },
     {
       "id": "architectures",
@@ -207,10 +207,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/architectures.png",
-      "sha256": "666be5d7955be7d419c1c5f36d68c4e3c35e23474b40644f4190a9c6dba46a16",
+      "sha256": "9f255b317748b79da243f6679b62b38e70223241b68fc15fe5b2e38b6e521929",
       "width": 1440,
       "height": 1000,
-      "bytes": 95478
+      "bytes": 95450
     },
     {
       "id": "constitution",
@@ -221,10 +221,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/constitution.png",
-      "sha256": "b6e5be51ad4072ebbd4594b3b23cc0b2b98911ea58207dbdb0d7ed4468ac3bf6",
+      "sha256": "351f05da1e962bb304db29c5c4c86b25aba23720b073559fd747db81c15ceefe",
       "width": 1440,
       "height": 1259,
-      "bytes": 124528
+      "bytes": 124503
     },
     {
       "id": "projects",
@@ -235,10 +235,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/projects.png",
-      "sha256": "87acc2f5b1d4205d5436d89b4729dfee4a5165899558e6fa5b09bcdd5c00d5a0",
+      "sha256": "d6722a6fb43ec35479c6d4a54e7192b442b945bdd1f59f7eacc2f44397dee285",
       "width": 1440,
       "height": 1189,
-      "bytes": 91758
+      "bytes": 91730
     },
     {
       "id": "accounts",
@@ -249,10 +249,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/accounts.png",
-      "sha256": "a4eccfbd692121350a2aa67320234450501fd9f3c8a5fb3610a1e9a9810aae42",
+      "sha256": "cb48d98db3f65193f49960b201db9602810db78a3213591102474f57877bdc90",
       "width": 1440,
       "height": 2336,
-      "bytes": 165092
+      "bytes": 165065
     },
     {
       "id": "workers",
@@ -263,10 +263,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/workers.png",
-      "sha256": "8f4dc167a8591ab3dded5b2c525749858687b497b65850f438d286db9a9abe88",
+      "sha256": "fe6afc41ae0d77e3535b7c40f3de38a27e63928441f8257578814d60c9034fcd",
       "width": 1440,
       "height": 2382,
-      "bytes": 182572
+      "bytes": 182540
     },
     {
       "id": "storage",
@@ -277,10 +277,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/storage.png",
-      "sha256": "44aa94038936999b322b291bfb6b33aca1708b2d7f34d1fc450b8e4ae042135a",
+      "sha256": "f5a71c21c476d367f79cf905e477030d12474e49e049e8666646a1efd16a692b",
       "width": 1440,
       "height": 1496,
-      "bytes": 112520
+      "bytes": 112492
     },
     {
       "id": "updates",
@@ -291,10 +291,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/updates.png",
-      "sha256": "45decd84eba6088705ebf23b1f709f5bf4d8a6515cd3b6924c61a0375c08e22d",
+      "sha256": "b4dd3bdf82352e7bf357f80bf55efeb28372061d9dedb1ffc1848e6f1b064730",
       "width": 1440,
       "height": 1321,
-      "bytes": 94990
+      "bytes": 94959
     },
     {
       "id": "insights",
@@ -305,10 +305,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/insights.png",
-      "sha256": "bfc8589dbc10c01b2cc9aeecaa450fdcfc79ba1e0a976628bec9725756b0775b",
+      "sha256": "80b0b02578b0ad9a476c6c1c15624e6d6c9bf5ac5c55f9cdb996cb34bc68c829",
       "width": 1440,
       "height": 1040,
-      "bytes": 86460
+      "bytes": 86440
     },
     {
       "id": "vault",
@@ -319,10 +319,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/vault.png",
-      "sha256": "0d47d1cf019f838e1ecca1eb5d719b57fc6f844be2498c3b079edeea726159d7",
+      "sha256": "4b5547d754bd65c8b8d6dc875dc4518285b4d77c405455119bb3a6d3e4a2fbe7",
       "width": 1440,
       "height": 1675,
-      "bytes": 112403
+      "bytes": 112374
     },
     {
       "id": "workflows",
@@ -333,10 +333,10 @@
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/workflows.png",
-      "sha256": "d77a9a46323ca9aef9f28466315403b3ab3e0b1d6ee07221eab575751015f009",
+      "sha256": "bbb3d9893d2b5e7f70ae11d1443b7bd85eec9e21f80d93799b69aa3c27dc21f7",
       "width": 1440,
       "height": 1000,
-      "bytes": 72718
+      "bytes": 72690
     },
     {
       "id": "welcome",
@@ -348,10 +348,10 @@
       "scenario": "login",
       "scope": "#login",
       "path": "docs/assets/screenshots/welcome.png",
-      "sha256": "268e7cefcc8739ecd82f8abd10dcd8922354387b0c6d1e0776bbefd3138aa0a2",
+      "sha256": "e801dc46acfbe61166d28082f673486ae17bc5acb850bbeb2f311a0807383361",
       "width": 510,
       "height": 308,
-      "bytes": 16236
+      "bytes": 16213
     },
     {
       "id": "gpu-gaming",
@@ -362,10 +362,10 @@
       "steps": [],
       "scenario": "gaming",
       "path": "docs/assets/screenshots/gpu-gaming.png",
-      "sha256": "b4fd78096e70237301599e784c1bb59098025ca986b950cc87636e8c22fbe894",
+      "sha256": "f163a4c093d39ae6ced36075435f9f40e4c024f5c44c062ea91db15444207daa",
       "width": 1440,
       "height": 1000,
-      "bytes": 114519
+      "bytes": 114489
     },
     {
       "id": "gpu-draining",
@@ -376,10 +376,10 @@
       "steps": [],
       "scenario": "draining",
       "path": "docs/assets/screenshots/gpu-draining.png",
-      "sha256": "d55c1c8cf5cd52fdfb52f151a2c1a3bf281cbc9c9748ce723ba766d690be67e9",
+      "sha256": "5bd12ea42b1433a459747ea11f850790742aa427bd69bbeff8c3af9c48fa0983",
       "width": 1440,
       "height": 1000,
-      "bytes": 114574
+      "bytes": 114545
     },
     {
       "id": "model-fit",
@@ -395,10 +395,10 @@
       ],
       "scope": "#recommendations",
       "path": "docs/assets/screenshots/model-fit.png",
-      "sha256": "1255ab2d206332af7a84fe0b73863ba865a03bfc325bfa06b0c94f528d990944",
+      "sha256": "4b04b88c78c21c917cbf5eff6d558fec0ec47353fc7a248abb17af5fce992b06",
       "width": 1120,
       "height": 355,
-      "bytes": 18593
+      "bytes": 18536
     },
     {
       "id": "hugging-face",
@@ -423,10 +423,10 @@
       ],
       "scope": "#models .panel:has(#hf-form)",
       "path": "docs/assets/screenshots/hugging-face.png",
-      "sha256": "cabd3051cec4cc4b85166228207b4e6abdf064224e8fa6b502032516af62789d",
+      "sha256": "6ff56ea16ada46c154afaaa85ca3a7d1944b6b85d7eaee2c1c2a2f805039b11e",
       "width": 1120,
       "height": 425,
-      "bytes": 25194
+      "bytes": 25136
     },
     {
       "id": "model-route",
@@ -442,10 +442,10 @@
       ],
       "scope": "#configure-dialog",
       "path": "docs/assets/screenshots/model-route.png",
-      "sha256": "036026b16563fddb93a1130c4649349569c8c7906b50fb5d49fd94a9f88eb315",
+      "sha256": "7b6e78e4a2e79ffa3397e61591ad947336a25ad518f83cea8784ae53f82da287",
       "width": 510,
       "height": 400,
-      "bytes": 17736
+      "bytes": 17710
     },
     {
       "id": "models-empty",
@@ -456,10 +456,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/models-empty.png",
-      "sha256": "a710c6c25a2147bfeb4ed1efec7e7844db9e5548ec45f9f3d635baa84399f990",
+      "sha256": "4212e8635cb59c3c52341aee78dd1d6f503b74868712cfbe48f9826159b80301",
       "width": 1440,
       "height": 1000,
-      "bytes": 83586
+      "bytes": 83585
     },
     {
       "id": "driver-update",
@@ -475,10 +475,10 @@
       ],
       "scope": "#driver-dialog",
       "path": "docs/assets/screenshots/driver-update.png",
-      "sha256": "fcf91aba82cbf6a1b9329d81929ee7390e6579eda2c92a3b915c25ba6337b566",
+      "sha256": "7c5e6c97d894eef7f038a780f4e419c0ad88ed33eb726f351bbbde88ad93bf4d",
       "width": 510,
       "height": 616,
-      "bytes": 35708
+      "bytes": 35683
     },
     {
       "id": "machine-pairing",
@@ -495,10 +495,10 @@
       ],
       "scope": "#pair-form",
       "path": "docs/assets/screenshots/machine-pairing.png",
-      "sha256": "8b0ddc930996e2eea4e914e73a2587dc2f194399423d501bcf5de6bfce0e7971",
+      "sha256": "a1322efe433604cbd5ff0491a9920a0e905c9de0d99f350ab4133e36b20ccb1e",
       "width": 1070,
       "height": 287,
-      "bytes": 9677
+      "bytes": 9620
     },
     {
       "id": "connect-launch",
@@ -520,10 +520,10 @@
       ],
       "scope": "#launch-form",
       "path": "docs/assets/screenshots/connect-launch.png",
-      "sha256": "2c1c076cb5052c7c64519af9dafde45a662441e1cc69d3ce00aad874b5a4bd94",
+      "sha256": "ca0e4a1bb0070ae22bcfc2b630d483b3bd3b68cd5597c47c297f9f9e55a5dbef",
       "width": 1120,
       "height": 408,
-      "bytes": 17421
+      "bytes": 17365
     },
     {
       "id": "cursor-task",
@@ -534,10 +534,10 @@
       "steps": [],
       "scope": "#connect .connect-grid",
       "path": "docs/assets/screenshots/cursor-task.png",
-      "sha256": "b3094bdfcff0fa3c4976458af44e304c3ddab3ec75de02720fecdbbf4c8e44af",
+      "sha256": "ba02e4fc181c6ca37f003241c781f7cf2454f2103d499e1c8908cbedae4687de",
       "width": 1120,
       "height": 648,
-      "bytes": 35280
+      "bytes": 35221
     },
     {
       "id": "coding-evaluation",
@@ -553,10 +553,10 @@
       ],
       "scope": "#connect .panel:has(#evaluation-results)",
       "path": "docs/assets/screenshots/coding-evaluation.png",
-      "sha256": "cad99bf4427c4626db755596191c1c62b59340cdb9ec9915e922c70f8373c9a8",
+      "sha256": "2d18a203a24d63078c9da4913ca97f84e0c7952dbabf639e0fb5a30bcde878d2",
       "width": 1120,
       "height": 542,
-      "bytes": 32331
+      "bytes": 32271
     },
     {
       "id": "template-editor",
@@ -572,10 +572,10 @@
       ],
       "scope": "#template-workbench",
       "path": "docs/assets/screenshots/template-editor.png",
-      "sha256": "326a0c913561d47219d68d1b1b1dafd5371f26e591225852cf87dfc6b883bb7b",
+      "sha256": "6f2e988a70bf0782642878a97c3ea399b04a6bc0a0baaa4468e24aedcba95eda",
       "width": 1120,
       "height": 2100,
-      "bytes": 105405
+      "bytes": 105347
     },
     {
       "id": "template-component",
@@ -595,10 +595,10 @@
       ],
       "scope": "#component-dialog",
       "path": "docs/assets/screenshots/template-component.png",
-      "sha256": "749e2b270e25639a51a164b3022199232fa26ae425d4b5eb62d388d5c384dacd",
+      "sha256": "0169a9a974b57d88b349eeeb574644158939cfe393d4d1821ea7a263c48fc208",
       "width": 860,
       "height": 880,
-      "bytes": 38966
+      "bytes": 38908
     },
     {
       "id": "template-environment",
@@ -628,10 +628,10 @@
       ],
       "scope": "#component-dialog",
       "path": "docs/assets/screenshots/template-environment.png",
-      "sha256": "f99c23f12bab7a41a402f49fa10f5528f88168904c8aef065d72ef3b79754e12",
+      "sha256": "db3090d6d400ced440164404c7ae56f5331cd131916c9d8533fe376c94efd5fd",
       "width": 860,
       "height": 880,
-      "bytes": 36887
+      "bytes": 36860
     },
     {
       "id": "template-revisions",
@@ -651,10 +651,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-revisions.png",
-      "sha256": "db227bca887ecea002654e82076f4517ec6b350d3ebf13ab9dce35bdb3b00cdd",
+      "sha256": "c411ca94b0416ce9a5ab76f79641d60efa82cb777fffda4523158db80acec2d8",
       "width": 860,
       "height": 626,
-      "bytes": 33425
+      "bytes": 33401
     },
     {
       "id": "template-capture",
@@ -680,10 +680,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-capture.png",
-      "sha256": "6ac237991279e009edba49621cb6b1dce9cf8eb9b5d04cd280305d15da876087",
+      "sha256": "827b2f533f8e988b45dbb8c58f525a9f46b52c0a9ed3d5f0610327bca2bec0af",
       "width": 860,
       "height": 648,
-      "bytes": 32747
+      "bytes": 32720
     },
     {
       "id": "template-capture-review",
@@ -708,10 +708,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-capture-review.png",
-      "sha256": "48dca29a9132a3c06e9e5623c054e4bd7ef95176837be2a948d56fd882540320",
+      "sha256": "3fbc2d2bf5e1f1c9b7c5a1b69c347c9a2da4916e11d63c389f47a69cd8870280",
       "width": 860,
       "height": 474,
-      "bytes": 24434
+      "bytes": 24408
     },
     {
       "id": "template-save",
@@ -735,10 +735,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/template-save.png",
-      "sha256": "e4f17b1c2b5f19a873a79691385842932b6b624d45171dbb2b77edba843ad4d6",
+      "sha256": "372222e94f660d23b601c8e603a75157fa958a0e0411f17e318754f7c5a7b107",
       "width": 860,
       "height": 556,
-      "bytes": 25576
+      "bytes": 25549
     },
     {
       "id": "template-apply",
@@ -777,10 +777,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/template-apply.png",
-      "sha256": "43e781e576f42d7286dd1c6239871d630c16e1e1a03e75e08732442c8192557d",
+      "sha256": "bc51cae6b9ac5eed411b08063440f259f5d8772e37e6c002f0ba30f197ea3640",
       "width": 860,
       "height": 598,
-      "bytes": 28689
+      "bytes": 28662
     },
     {
       "id": "constitution-edit",
@@ -805,10 +805,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-edit.png",
-      "sha256": "4340c5da1e9e89bfa28b8378c10d5ea31b8b31818184ee8fcba82a2cd6866bfa",
+      "sha256": "be7304d4aea97221e10828e5082ef1750b6f72e33f59ee528ddd190ed88ca5cf",
       "width": 860,
       "height": 598,
-      "bytes": 26995
+      "bytes": 26969
     },
     {
       "id": "constitution-generated",
@@ -824,10 +824,10 @@
       ],
       "scope": "#constitution .file-workspace",
       "path": "docs/assets/screenshots/constitution-generated.png",
-      "sha256": "222d038136f06b82af76b8fc591c7a7282cd439ee1596fa969a83f11f3134632",
+      "sha256": "9aa4aeb034314d9dec54e371d875d3e8d34ab22ed276577b29a84c4ea8877c0f",
       "width": 1120,
       "height": 1357,
-      "bytes": 50011
+      "bytes": 49958
     },
     {
       "id": "constitution-activation",
@@ -843,10 +843,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-activation.png",
-      "sha256": "b1b0704f790401ae11780f24ca3123d2b0623367486839e22806b5cdc8502359",
+      "sha256": "59bb3c8197831a2622e372ea8891208bf8050ced5aa72403e480b60934308ba2",
       "width": 860,
       "height": 476,
-      "bytes": 26259
+      "bytes": 26230
     },
     {
       "id": "constitution-history",
@@ -862,10 +862,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-history.png",
-      "sha256": "35f37edc8e3a19f4fe0f1b66f57e3e5c9dd3f62d1ac1d872ee824fb622c14d06",
+      "sha256": "bca15dced224a9c070484648da8229bedfe658b28fe24cfaf9524621c68a48ff",
       "width": 860,
       "height": 422,
-      "bytes": 18845
+      "bytes": 18818
     },
     {
       "id": "constitution-refresh",
@@ -885,10 +885,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-refresh.png",
-      "sha256": "2a01e005702a20da2055ad2563f1e243bf7409ebb57f3206e956faf2e87f3ec0",
+      "sha256": "2046455fda6c9dc5a1876e2804d84cc3ca5a1f37cfa2a5067c9d33bda800a421",
       "width": 860,
       "height": 534,
-      "bytes": 23675
+      "bytes": 23648
     },
     {
       "id": "project-discovery",
@@ -909,10 +909,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-discovery.png",
-      "sha256": "42382df0146cc9ecd11ab98d793b2edebfb07e85669f4604ff89841b2f01404c",
+      "sha256": "6d1e77b7054dcec1b64bc470a393a5555fab810a7cc37409b4b84eb7bf8dc55a",
       "width": 860,
       "height": 414,
-      "bytes": 19678
+      "bytes": 19652
     },
     {
       "id": "project-selection",
@@ -937,10 +937,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-selection.png",
-      "sha256": "6c15fa37dcc48608bb3b0fd8ecf42b483062f815c04bcac9575ba975e6cae4a0",
+      "sha256": "07a0ce30fa07ac115af509094211469423ea41754239137596784f76ec46bb6a",
       "width": 860,
       "height": 776,
-      "bytes": 28334
+      "bytes": 28308
     },
     {
       "id": "project-preview",
@@ -969,10 +969,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-preview.png",
-      "sha256": "0577aa7f2629c0efaacb6d2655289826306d4e761aafbcd0ef74cc9f417f7cd3",
+      "sha256": "3e69ee99d8898e73e975764a90f6b390807f981367ff9a4006762e29382868b9",
       "width": 860,
       "height": 502,
-      "bytes": 25250
+      "bytes": 25224
     },
     {
       "id": "project-conflict",
@@ -983,10 +983,10 @@
       "steps": [],
       "scenario": "conflict",
       "path": "docs/assets/screenshots/project-conflict.png",
-      "sha256": "01058eeb0c92ee595d830307a18a5b568dbea0ebe6c1e570c505ff79877ca95c",
+      "sha256": "f1b5f0d4c325a37e911a22b8215215fe214b8466867dfd0636d908b438819238",
       "width": 1440,
       "height": 1000,
-      "bytes": 85136
+      "bytes": 85115
     },
     {
       "id": "projects-empty",
@@ -997,10 +997,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/projects-empty.png",
-      "sha256": "a5fa0d108ae2a885990f89d3066e55a55231baba1f8368894d046ae7527372d1",
+      "sha256": "5d01828271b4cdfcec90d1c5c9841f3aa8713472c999d2ef842b8f7fa4f4d255",
       "width": 1440,
       "height": 1000,
-      "bytes": 76882
+      "bytes": 76853
     },
     {
       "id": "subscription-edit",
@@ -1016,10 +1016,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-edit.png",
-      "sha256": "2ffe381e1120ea57e575ea32095384f9475ad28a609abdf4abe705f3a6d27e55",
+      "sha256": "da752d85d766a96d03723dc26dcdabc01ebdf3f1a4e866335fc54aa525cb0d0e",
       "width": 860,
       "height": 628,
-      "bytes": 27161
+      "bytes": 27135
     },
     {
       "id": "subscription-usage",
@@ -1035,10 +1035,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-usage.png",
-      "sha256": "f293a4b4b830a422c7737b8deea60c9e8a220b85228dfe0e17302b3dd9af6c0b",
+      "sha256": "6221fa3c6b46c41c7e814834bd197c090583ed30bdf23ddef88c5befeea1f376",
       "width": 860,
       "height": 698,
-      "bytes": 31440
+      "bytes": 31413
     },
     {
       "id": "cost-connector",
@@ -1054,10 +1054,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/cost-connector.png",
-      "sha256": "467acdff2d371f3f4f98c39b2e774c9ff842238bf993693f82968e368b224d02",
+      "sha256": "12096cdaa673e8df26cb92d8006cb9001afd27dfc9a9dddf2948a78fc8abea4c",
       "width": 860,
       "height": 490,
-      "bytes": 26215
+      "bytes": 26188
     },
     {
       "id": "subscription-log",
@@ -1073,10 +1073,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-log.png",
-      "sha256": "b4b9801a7f20eabc0577b4d7edc7cc068c7514a5b84aa0088e46f2092d62e49b",
+      "sha256": "e92c460271cfe38071d66ccdf598ee8c7e4959eee35a95582be2db374cf09369",
       "width": 860,
       "height": 352,
-      "bytes": 15713
+      "bytes": 15686
     },
     {
       "id": "machine-diagnostics",
@@ -1092,10 +1092,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/machine-diagnostics.png",
-      "sha256": "40d859f4796bf0a31cd677ae1d7c11bd04ef153ab42013139366f3d36f455806",
+      "sha256": "25475f6b0ddb7216ec3d0b93e0676c0db4a4f1a7bf091bda75255964657e3971",
       "width": 860,
       "height": 614,
-      "bytes": 27639
+      "bytes": 27603
     },
     {
       "id": "collector-failure",
@@ -1106,10 +1106,10 @@
       "steps": [],
       "scenario": "collector-failed",
       "path": "docs/assets/screenshots/collector-failure.png",
-      "sha256": "a74cbe33a7e09cd0f088f1d1e3652608e97fe4a7b5d7e4c398e6bcd3b5a25aa6",
+      "sha256": "0ed050d98ecaeb19b4b0f2a95ebafa19a28eaa0e67633a1db586ed222b41cb43",
       "width": 1440,
       "height": 1000,
-      "bytes": 94826
+      "bytes": 94799
     },
     {
       "id": "worker-download",
@@ -1125,10 +1125,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/worker-download.png",
-      "sha256": "397a1701447a767b019acaed6c15c75e0e9ee4e88401b592754b5ab7f28f94af",
+      "sha256": "c77aabdb0b0f1a3cbd24ed0c96f02d74bb81b858d5696e1df3a622c5edb917ff",
       "width": 860,
       "height": 408,
-      "bytes": 23502
+      "bytes": 23476
     },
     {
       "id": "worker-windows",
@@ -1149,10 +1149,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-windows.png",
-      "sha256": "541fdd02c1112c9eecfe549fdf1a49e9ad21419cfc5d7c96456dca3e7baa284e",
+      "sha256": "241176a9d10528b7d74bc1d7bd80f87192b4c1e7419221c85e919f535c734dc3",
       "width": 1120,
       "height": 1089,
-      "bytes": 74191
+      "bytes": 74126
     },
     {
       "id": "worker-macos",
@@ -1173,10 +1173,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-macos.png",
-      "sha256": "c9782a6b9fa9afaf7cda590edd521fef677016ee964f78fdfda1e3fbf081e909",
+      "sha256": "1a9f67f9ecfb961105a41ea3bd9859d17481668fe49b51c5f70b0bdbc7bfa6d1",
       "width": 1120,
       "height": 1007,
-      "bytes": 68016
+      "bytes": 67957
     },
     {
       "id": "worker-linux",
@@ -1197,10 +1197,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-linux.png",
-      "sha256": "cb22159cfbeae6f6cdb0d0cee8b70a7480f77c53fd8c51286e77c11dc51053e6",
+      "sha256": "99b699819d6dfb88696763f4e3d57d36adf85066e8a56fc7f3607387298a343d",
       "width": 1120,
       "height": 1007,
-      "bytes": 67804
+      "bytes": 67745
     },
     {
       "id": "worker-maintenance",
@@ -1216,10 +1216,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/worker-maintenance.png",
-      "sha256": "d573a095d4e71be950fa5d6ec322abf8d902f63e309388233e11c416fc520a10",
+      "sha256": "db738ad4318b24a654cf58e5db14d982e24df594e9c87dcb025499ff4019411d",
       "width": 860,
       "height": 482,
-      "bytes": 22692
+      "bytes": 22635
     },
     {
       "id": "storage-preview",
@@ -1240,10 +1240,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/storage-preview.png",
-      "sha256": "9b69ea5be919562ef297c33114a692ccc7c26e096a4d134f26e28e01293110e3",
+      "sha256": "61d812dee03c195f64c76970f4fee68dba8db8e3edea2cbe900bd772a6a6630a",
       "width": 860,
       "height": 360,
-      "bytes": 20502
+      "bytes": 20475
     },
     {
       "id": "model-storage-copy",
@@ -1259,10 +1259,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/model-storage-copy.png",
-      "sha256": "09654a0c5e46bfcd684333a8425a33eb6bfcb94dd60facb3879f02f62136e73f",
+      "sha256": "26042151af2280f6cb13fe9edc00c5993589e5954ee7fd9737d44a03bba75d74",
       "width": 860,
       "height": 374,
-      "bytes": 22299
+      "bytes": 22272
     },
     {
       "id": "update-release-notes",
@@ -1277,10 +1277,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/update-release-notes.png",
-      "sha256": "ed3ac981373b37a11053bf442c155d027df940609de41c26d4cb3a81e9c20d48",
+      "sha256": "0d280a1e096b04f9f9e760ac5b90418a48871f0eec47ab13057d54f7edba6cd0",
       "width": 1440,
       "height": 1000,
-      "bytes": 86215
+      "bytes": 86188
     },
     {
       "id": "update-restart",
@@ -1297,10 +1297,10 @@
       "scenario": "staged",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-restart.png",
-      "sha256": "1ddf5318c6eba63a03c76b28f437c9526d6cde8485d8bb3aa66b371c6c2bbd30",
+      "sha256": "26a50e99a86623018d775006f05c994cb9aa19cb7984f5d6b6352b4679a9b19d",
       "width": 860,
       "height": 376,
-      "bytes": 19072
+      "bytes": 19047
     },
     {
       "id": "update-blocked",
@@ -1317,10 +1317,10 @@
       "scenario": "blocked",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-blocked.png",
-      "sha256": "fd23df208cab19cf71c8bcd6dc300899ea27e6bf8c50006fe12a401c212cdbc7",
+      "sha256": "128d6cb0eadc8dff47cbe1919cf1a7e9985737afb89a0f2d1bd0236c353d4a3e",
       "width": 860,
       "height": 450,
-      "bytes": 23225
+      "bytes": 23201
     },
     {
       "id": "update-rollback",
@@ -1336,10 +1336,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-rollback.png",
-      "sha256": "da138af7464d7035fe2bba16f035595ef67786d792da29e2feb981713d9ef5a8",
+      "sha256": "1662a9cfcdbdc38e775f002da8a8ec964b51f82c0b20f65c9c551c5f0f5717b4",
       "width": 860,
       "height": 376,
-      "bytes": 19844
+      "bytes": 19818
     },
     {
       "id": "model-inbox-detail",
@@ -1355,10 +1355,10 @@
       ],
       "scope": "#updates-content .panel >> nth=1",
       "path": "docs/assets/screenshots/model-inbox-detail.png",
-      "sha256": "49ab7448687a2096ca94b198095904433609b7eeebd99df696f1f5a52a91f0b4",
+      "sha256": "203aeaae4fa20983a4d3219f4e121c1672bace9e0af5895ba6283dc1bdbf668c",
       "width": 1120,
       "height": 869,
-      "bytes": 32948
+      "bytes": 32865
     },
     {
       "id": "model-inbox-apply",
@@ -1374,10 +1374,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/model-inbox-apply.png",
-      "sha256": "7d48de9bae2894b05768e584b9afc5642c4ef015847edad6f465f2117afe6d19",
+      "sha256": "49a8a018046e88bcb923b9489e3375b32c42cf1256adc5a534c5dbf36b9a60fb",
       "width": 860,
       "height": 336,
-      "bytes": 19938
+      "bytes": 19912
     },
     {
       "id": "performance-empty",
@@ -1388,10 +1388,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/performance-empty.png",
-      "sha256": "05839fc62013c796ba04a7cbf05ff58d57adf93f8a70298f5f3d4af5f4c64c60",
+      "sha256": "8f4b75403718990931a7b2ebdec16bd9879415faa59c82d39fb1ed092b6ce441",
       "width": 1440,
       "height": 1000,
-      "bytes": 82007
+      "bytes": 81978
     },
     {
       "id": "config-mapping",
@@ -1407,10 +1407,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/config-mapping.png",
-      "sha256": "420b0d896b64452445c005c4c3cff5d5dab51041c64ee5ad49194feb2a2a337f",
+      "sha256": "2b67a5006b4fdc59b2f4eaa914a165327a810f4cbf9f2279a52f018aa130fbcc",
       "width": 860,
       "height": 576,
-      "bytes": 27712
+      "bytes": 27687
     },
     {
       "id": "backup-preview",
@@ -1426,10 +1426,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-preview.png",
-      "sha256": "f021054628cf65fa009366d9b4210d11634f6f123871bb573a05af629ec224ff",
+      "sha256": "8a2476183cce5412db5624169dfab355f70dcd5e37505ecb296284a5f85a9a03",
       "width": 860,
       "height": 414,
-      "bytes": 23172
+      "bytes": 23146
     },
     {
       "id": "backup-encryption",
@@ -1445,10 +1445,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-encryption.png",
-      "sha256": "3c344a47c15f45f22181f62a99ba6fdf4da2c83ec8aad7ada50509a39aaf40ce",
+      "sha256": "fcd43f2aef4827c69cdfbfb570e0e843a042ff81f70f3df98cf2255add49cef8",
       "width": 860,
       "height": 664,
-      "bytes": 32893
+      "bytes": 32868
     },
     {
       "id": "backup-initialize",
@@ -1464,10 +1464,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-initialize.png",
-      "sha256": "2cd4f66cef070525338e4431a7892194efa505f2975e26d0ec99981a5dbfd4cb",
+      "sha256": "f6b7106f897e70f20d51123977de71e20067e942533015db955668153372c285",
       "width": 860,
       "height": 298,
-      "bytes": 17314
+      "bytes": 17289
     },
     {
       "id": "backup-schedule",
@@ -1483,10 +1483,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-schedule.png",
-      "sha256": "d302a30f45d5cb0ee931aaf638a4a2465a7b84b58189c4a5e9f8fc2f8cff8689",
+      "sha256": "c5a0a043c5906c93d4b186b20965405128b21745db4e8bbeab6eb5dbbb776f09",
       "width": 860,
       "height": 466,
-      "bytes": 28612
+      "bytes": 28586
     },
     {
       "id": "backup-retention",
@@ -1502,10 +1502,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-retention.png",
-      "sha256": "aa2753a17dba359460dbed033be32f1a8e70df69e1292943924df3580f8a8415",
+      "sha256": "d48fd4668a18ae6cc7b15d3e65230e49106c09ee2b605947633b9cb86ca5ce67",
       "width": 860,
       "height": 406,
-      "bytes": 18960
+      "bytes": 18936
     },
     {
       "id": "backup-restore",
@@ -1526,10 +1526,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-restore.png",
-      "sha256": "d585d996d0bd0f2ec5ec0ec0f54724e393f90e573547ec79f11fee1952ab028a",
+      "sha256": "e93b75ea9d51bab3425fe6baadefe5b3e70045885658b113a4391080e744f558",
       "width": 860,
       "height": 428,
-      "bytes": 20632
+      "bytes": 20595
     },
     {
       "id": "backup-restore-preview",
@@ -1554,10 +1554,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-restore-preview.png",
-      "sha256": "d06add36c9de24a6167a42c63b59bff84179574deea1be0e9cc6b45cb0e36c72",
+      "sha256": "1f5a2b2f04ade88b0eaace15b065a57875c1846065916562a39e4f40c597aaf2",
       "width": 860,
       "height": 336,
-      "bytes": 18474
+      "bytes": 18448
     },
     {
       "id": "local-restore-preview",
@@ -1582,10 +1582,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/local-restore-preview.png",
-      "sha256": "ef3a407dd7cfd1a9fea9e0ee19e27a7b995a163a552505330ed87fe5b7ef957b",
+      "sha256": "4aa28197b97bfa5d661c0f318b088e73a4ffe3b9817473c9feb5dc968cae8218",
       "width": 860,
       "height": 360,
-      "bytes": 18373
+      "bytes": 18349
     },
     {
       "id": "notifications",
@@ -1602,10 +1602,10 @@
       "scenario": "failure",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/notifications.png",
-      "sha256": "ac67a611d9bd3a046c23ba260fc75c9468027d64c0c52ffc0c616bae70ec01a2",
+      "sha256": "f14980a51acdea4de215b3f72251e3be8bf6994512e5682e0ba5c18104f81b0d",
       "width": 860,
       "height": 504,
-      "bytes": 23051
+      "bytes": 23026
     },
     {
       "id": "operation-progress",
@@ -1625,10 +1625,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/operation-progress.png",
-      "sha256": "a0abd4d8ce4b184f4d77bce3c22155ee96f7d6beafc01149f8a0ad110f344ebd",
+      "sha256": "bafd943e58d6d31f73a67c75050c37015fbb3878d503106439b797450aaf2923",
       "width": 1440,
       "height": 1000,
-      "bytes": 93880
+      "bytes": 93864
     },
     {
       "id": "support-report",
@@ -1644,10 +1644,10 @@
       ],
       "scope": "#overview .service-panel",
       "path": "docs/assets/screenshots/support-report.png",
-      "sha256": "8c4953199a144a0c0ba72c3e8ecebaf834bdb61c314ba75d06c04c2b21fa8e93",
+      "sha256": "ec4205692e0feccef30659670c5769ae7fba5303fd35dd20c2556f3751950fd1",
       "width": 1120,
       "height": 686,
-      "bytes": 30904
+      "bytes": 30840
     },
     {
       "id": "mobile-updates",
@@ -1662,10 +1662,10 @@
       },
       "fullPage": true,
       "path": "docs/assets/screenshots/mobile-updates.png",
-      "sha256": "0426d0478db838b0a804f1b877e57bb0d84d97d767fa4f5133ba813a2827771a",
+      "sha256": "34a41a6e67d193281cfdfe30bcd15e71d3858e8bf1c32698328c8b6d5d899be6",
       "width": 435,
       "height": 1600,
-      "bytes": 71332
+      "bytes": 71303
     },
     {
       "id": "tablet-projects",
@@ -1680,10 +1680,10 @@
       },
       "fullPage": true,
       "path": "docs/assets/screenshots/tablet-projects.png",
-      "sha256": "551aae6330db080c557156bf0c663c18cad0436b8070c2c5c0d54f25ccf678d0",
+      "sha256": "74ba48f007ad1bbdb2fbb7e04ca07542087a68940c7c52e0bdefab05ebfe2b5b",
       "width": 820,
       "height": 1367,
-      "bytes": 94910
+      "bytes": 94883
     },
     {
       "id": "toolkit-check",
@@ -1694,10 +1694,10 @@
       "steps": [],
       "transcript": "check",
       "path": "docs/assets/screenshots/toolkit-check.png",
-      "sha256": "a9eee16dabdce4897e7d171f85dfd781624370edfeb1e72a748d30d62721fbbf",
+      "sha256": "59f3ae8b666877d3ba92be207250bcd00f19c624fed85886af86d456d1240a6c",
       "width": 1440,
       "height": 1000,
-      "bytes": 28584
+      "bytes": 28577
     },
     {
       "id": "toolkit-install-preview",
@@ -1708,10 +1708,10 @@
       "steps": [],
       "transcript": "install",
       "path": "docs/assets/screenshots/toolkit-install-preview.png",
-      "sha256": "de81cdb65881af9f38c65d7a0a17bddbcb7e0deb6c45172e0ed6e4680c421c06",
+      "sha256": "a0636953af5ebfc86c2027603de91267cb83b66551f3ddfb0a3274117963b986",
       "width": 1440,
       "height": 1000,
-      "bytes": 51589
+      "bytes": 51826
     },
     {
       "id": "workflow-inspector",
@@ -1727,10 +1727,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-inspector.png",
-      "sha256": "d2aac7c33144ebf4fe7e741b0def851c3270469692dea3cb055ce0db56df1ec3",
+      "sha256": "ffbea2eb9f15e8a0f44e1ff4f9a3ba5548dd9f327dce820631baea8827bcfe5b",
       "width": 860,
       "height": 880,
-      "bytes": 39559
+      "bytes": 39505
     },
     {
       "id": "workflow-preparation",
@@ -1746,10 +1746,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-preparation.png",
-      "sha256": "e0f49f5561284cdc822c49d8541363fc7f1e62d6bbfa76952096ead3e0a6c71d",
+      "sha256": "a7b91c0d2b768fbd0176c02a5e50e08336bb430d696ef77031edcbd260876f66",
       "width": 860,
       "height": 794,
-      "bytes": 37646
+      "bytes": 37621
     },
     {
       "id": "workflow-preparation-preview",
@@ -1769,10 +1769,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-preparation-preview.png",
-      "sha256": "4d076a1c4e129a97d15600004e3f6dbf27d4b383eeaccce0eadca4992ab18ee7",
+      "sha256": "47cd30362075349864ce9c4f243476d1e822382de159745f07b62fa307c85932",
       "width": 860,
       "height": 880,
-      "bytes": 28868
+      "bytes": 28716
     },
     {
       "id": "workflow-launch",
@@ -1788,10 +1788,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-launch.png",
-      "sha256": "871cd98106693a0d6d7aea5fb17b7342aae420a9f3d1cd913764cfce46da2d19",
+      "sha256": "b0785910dcaa0d51dc24cd2da05bf2160ddaaca0a975746a2a3d6da43bab5b3a",
       "width": 860,
       "height": 686,
-      "bytes": 28852
+      "bytes": 28816
     },
     {
       "id": "workflow-rollout",
@@ -1807,10 +1807,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-rollout.png",
-      "sha256": "2d21dd03965a6209151cd77cf34dbe490defa1d94803b81ca25b0d7459ce74bd",
+      "sha256": "bcba48666c73f5dd0350f5b0a0ee8dab2a85a8a371fd108ec23e35a5cd314633",
       "width": 860,
       "height": 566,
-      "bytes": 24554
+      "bytes": 24527
     },
     {
       "id": "workflow-canary",
@@ -1830,10 +1830,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-canary.png",
-      "sha256": "139e1f98649afdd6b16fc55d9e0f88a94346233ae38dc852a851721179d62c13",
+      "sha256": "54ab134650b02822bb2b883dafb0f2c047ff8cb1af525317df5fb235287ca9d2",
       "width": 860,
       "height": 398,
-      "bytes": 19175
+      "bytes": 19149
     },
     {
       "id": "workflow-toolkit-library",
@@ -1848,10 +1848,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-toolkit-library.png",
-      "sha256": "a767e443b5b85e3b33e5cfba88fc4a4dbe71a661642e4a3d0a1090b7e00aacb6",
+      "sha256": "4a337698bec3842f32d95d281c763d4c589bb31fea412ba10053f3df1905bee9",
       "width": 1440,
       "height": 1000,
-      "bytes": 77240
+      "bytes": 77210
     },
     {
       "id": "workflow-toolkit-edit",
@@ -1871,10 +1871,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-toolkit-edit.png",
-      "sha256": "09ea0ba0e2d48b648a4ff89977eaefc69e83067299f72676471cc3d923723ce2",
+      "sha256": "04b6b683fbf581feee8a7f9505424b0ff1b9ff7d89f9f929e965c6ad74b24967",
       "width": 860,
       "height": 640,
-      "bytes": 31906
+      "bytes": 31880
     },
     {
       "id": "workflow-toolkit-install",
@@ -1894,10 +1894,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-toolkit-install.png",
-      "sha256": "a70e453ce1698ce671bd5543894ad39d687c2e314c2e01770d70ed6378aa8d96",
+      "sha256": "988f0064fa137dbc0c2e047274b298b273248ec1d1ebc84f3d37f011292eafa8",
       "width": 860,
       "height": 476,
-      "bytes": 22423
+      "bytes": 22396
     },
     {
       "id": "workflow-toolkit-import",
@@ -1917,10 +1917,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-toolkit-import.png",
-      "sha256": "f837610c95bad980cd98646bc3595d6c34d0d64d4bc0f0637d71686be297df61",
+      "sha256": "842de7a894a5080e241ccf6b96c7e4ffbcb240d5f40768fdf50e4567ef97e362",
       "width": 860,
       "height": 662,
-      "bytes": 28991
+      "bytes": 28968
     },
     {
       "id": "workflow-controllers",
@@ -1935,10 +1935,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-controllers.png",
-      "sha256": "920a5fb7e5d88efa27129abe084560d4529c7f76ea8202d18a760e54cadfc9bc",
+      "sha256": "329f4467617c1b96b56527717546a2e49d468626e7352d944b4bad560ee543c9",
       "width": 1440,
       "height": 1000,
-      "bytes": 83768
+      "bytes": 83745
     },
     {
       "id": "workflow-listener",
@@ -1958,10 +1958,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-listener.png",
-      "sha256": "30551126b96ec194fa3c38682b66c1ca60658d8c1f00d54472a1be5b3628b886",
+      "sha256": "d818dee52f499eea821c1db452abb24b2d84fcac4b28d9852c8440102c86a6c8",
       "width": 860,
       "height": 488,
-      "bytes": 24422
+      "bytes": 24395
     },
     {
       "id": "workflow-peer-conflicts",
@@ -1981,10 +1981,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-peer-conflicts.png",
-      "sha256": "07065b40e4f22045eb324dbec572655e741f3520cc7ccd3e469a786168e2d823",
+      "sha256": "405a4c4a5c495ff872cceaaf7f2bb3f4e2b5de689d2ec258a1e8943078f98a7b",
       "width": 860,
       "height": 432,
-      "bytes": 22739
+      "bytes": 22713
     },
     {
       "id": "workflow-recovery",
@@ -1999,10 +1999,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-recovery.png",
-      "sha256": "3f0c908f46af1cefc7e4f074ffcdbd7f470e806a00b275fe64868376fbcd841f",
+      "sha256": "9c386caf66892ab4bbc49f24deb8ed57bb7cba35cad9c9323686132cbb83693e",
       "width": 1440,
       "height": 1000,
-      "bytes": 91312
+      "bytes": 91282
     },
     {
       "id": "workflow-lab",
@@ -2017,10 +2017,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-lab.png",
-      "sha256": "6652085f2145c63c0cac2983097872ce46fea54993540312fac62f3993aa8c8e",
+      "sha256": "7328c48868910a24762a98337660d4da6b6a607a86abf037d9954c7865980912",
       "width": 1440,
       "height": 1000,
-      "bytes": 77694
+      "bytes": 77674
     },
     {
       "id": "workflow-lab-preview",
@@ -2040,10 +2040,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-lab-preview.png",
-      "sha256": "9507988357e1c5a3ff68f79d9b8ab0b8fc8c6d746e306372d8df24446077322c",
+      "sha256": "e96af2e7ffb412152fe713014abc48555d233935e0e0f5d5cf47bcc512abf95e",
       "width": 860,
       "height": 534,
-      "bytes": 25899
+      "bytes": 25874
     },
     {
       "id": "workflow-profiles",
@@ -2059,10 +2059,10 @@
       ],
       "fullPage": true,
       "path": "docs/assets/screenshots/workflow-profiles.png",
-      "sha256": "2850dd8bb3361f6343e6a7d08168e2fe3be8f6d74bb05d3c7daf872bac6b0dc4",
+      "sha256": "72e1a04a49cead13a120da446b2a3ee829e367b903edde5937759897093530ad",
       "width": 1440,
       "height": 1553,
-      "bytes": 109812
+      "bytes": 109782
     },
     {
       "id": "workflow-search",
@@ -2083,10 +2083,10 @@
       ],
       "scope": "#workspace-palette",
       "path": "docs/assets/screenshots/workflow-search.png",
-      "sha256": "71d2aa9f46350025d0a5c1147d361b58fa426027292210d8e3d26a868d45c079",
+      "sha256": "9016ff139d8ff917a6672cab5d4e2f648f2a01a50a6d9930ab04752e10604802",
       "width": 510,
       "height": 360,
-      "bytes": 11879
+      "bytes": 11854
     }
   ],
   "external_captures": [

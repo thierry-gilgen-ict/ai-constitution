@@ -34,9 +34,9 @@ If your `.cursor` directory is a junction or symlink to a relocated profile, fir
 
 **In the dashboard · Verify the instruction toolkit.** A rendered transcript of a real isolated CLI check. This image is not a screenshot of a terminal application.
 
-![Verify the instruction toolkit — demonstration data, UI 0.4.0](assets/screenshots/toolkit-check.png)
+![Verify the instruction toolkit — demonstration data, UI 0.5.0](assets/screenshots/toolkit-check.png)
 
-[Illustrated walkthrough](manual/toolkit.md) · Fictional data; UI 0.4.0.
+[Illustrated walkthrough](manual/toolkit.md) · Fictional data; UI 0.5.0.
 
 <!-- screenshots:check:end -->
 
@@ -68,12 +68,21 @@ Commit the portable project files only if appropriate for that repository. They 
 
 **In the dashboard · Review enrollment.** The enrollment preview lists proposed managed-file changes. Only ready repositories are enrolled when you apply.
 
-![Review enrollment — demonstration data, UI 0.4.0](assets/screenshots/project-preview.png)
+![Review enrollment — demonstration data, UI 0.5.0](assets/screenshots/project-preview.png)
 
-[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.4.0.
+[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.5.0.
 
 <!-- screenshots:onboard:end -->
 
 ## Grok Bots
 
 Use [Bot onboarding](../onboarding/bot.md). `export --output dist/grok-bot.zip` makes a small, allowlisted instruction bundle. Uploading it and enrolling the Bot are separate, visible steps.
+
+## Route and risk separately
+
+```sh
+python scripts/constitution.py route --platform codex --task operational --risk high --available codex:balanced
+python scripts/constitution.py explain --project /path/to/project
+```
+
+The first command is a provisional recommendation, with no dispatch or entitlement claim. --missing-capability refuses a dependent route; --escalation-reason records why an escalation is considered but does not grant authority. Inspect generated, installed, loaded, account-access, route and acceptance evidence separately. New sessions must verify their actual native instruction chain and any overrides.

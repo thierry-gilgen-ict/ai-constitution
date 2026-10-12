@@ -145,6 +145,7 @@ def _writes(root,body):
     chosen=[validate(db['kits'][i]) for i in ids];old=db['projects'].get(str(project),{'files':{},'mcp':{}});writes={};owned={}
     def file(relative,text):
         path=kit.safe_path(project,relative);before=plans.fingerprint(path)
+        if path in writes:raise ValueError('Selected toolkit assets collide at one output path')
         if before is not None and before!=old['files'].get(relative):raise ValueError('Toolkit file has local edits or another owner')
         data=text.encode();writes[path]=data;owned[relative]=digest(data)
     servers={};codex=[];rules=[]
@@ -159,6 +160,7 @@ def _writes(root,body):
                     if group=='commands':file('.cursor/commands/'+name+'.md',header+a['content']+'\n')
         for s in value['mcp']:
             name='ai_constitution__'+value['id'].replace('-','_')+'__'+s['id'].replace('-','_')
+            if name in servers:raise ValueError('Selected toolkit MCP names collide')
             codex.append('[mcp_servers.'+name+']')
             if 'url' in s:
                 servers[name]={'url':s['url']};codex.append('url = '+json.dumps(s['url']))
@@ -220,7 +222,7 @@ def synchronize_toolkits(control,progress=lambda _:None):
     from . import synchronization
     db=overview(control.root);targets=kit.state_load(Studio(control.root).state)['targets'];paused=synchronization.settings(control.root)['paused_projects'];rows=[]
     for project,value in db['projects'].items():
-        target=targets.get('project:'+project)
+        target=targets.get(kit.target_identity('project',project))
         if not target or target['pinned'] or project in paused:continue
         try:
             body={'project':project,'kits':value['kits']};previewed=preview(control.root,body)

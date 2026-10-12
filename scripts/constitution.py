@@ -37,14 +37,14 @@ else:
 ROOT = Path(__file__).resolve().parents[1]
 BEGIN = "<!-- ai-constitution:begin -->"
 END = "<!-- ai-constitution:end -->"
-MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "VERSION")
+MODULES = ("constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "security-guidance.md", "collaboration.md", "operational.md", "VERSION")
 
 
 @contextmanager
 def state_lock(state):
     """Serialize read/modify/write operations across CLI processes; OS releases on exit."""
     no_links(state)
-    lock_path = state.parent / (".constitution-" + digest(str(state.absolute()).encode())[:16] + ".lock")
+    lock_path = state.resolve().parent / (".constitution-" + digest(os.path.normcase(str(state.resolve())).encode())[:16] + ".lock")
     no_links(lock_path)
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     stream = open(lock_path, "a+b")
@@ -113,16 +113,45 @@ def managed_hash(body):
     return digest(value[start:stop].replace("\r\n", "\n").encode())
 
 
+def target_identity(kind, root):
+    return kind + ":" + os.path.normcase(str(Path(root).resolve()))
+
+
 def state_load(state):
     path = state / "installations.json"
     result = read_json(path) if path.exists() else {"schema_version": 1, "targets": {}}
     if result.get("schema_version") != 1 or not isinstance(result.get("targets"), dict):
         raise ValueError("Unsupported installation-state schema; migrate state before continuing")
-    return result
+    targets = {}
+    for target in result["targets"].values():
+        identity = target_identity(target["kind"], target["root"])
+        if identity in targets:
+            raise ValueError("Duplicate physical enrollment target; preserve and reconcile private state")
+        targets[identity] = target
+    return {**result, "targets": targets}
+
+
+def private_state_boundary(root, state, project=None):
+    roots = [Path(root)]
+    if project is not None:
+        roots.append(Path(project))
+    roots += [Path(t["root"]) for t in state_load(state)["targets"].values() if t["kind"] == "project"]
+    resolved = Path(state).resolve()
+    if any(resolved.is_relative_to(p.resolve()) for p in roots):
+        raise ValueError("Private state must remain outside source and project checkouts")
 
 
 def validate(root):
     errors = []
+    authored_names = [p.name.casefold() for p in root.glob("*.md")]
+    if len(authored_names) != len(set(authored_names)):
+        errors.append("Authored file names collide on case-insensitive systems")
+    for name in policy.MODULES:
+        path = root / name
+        if not path.is_file():
+            errors.append("Required module missing: " + name)
+        elif path.stat().st_size > (8192 if name == "constitution.md" else 6144):
+            errors.append("Active policy exceeds byte budget: " + name)
     for path in (root / 'templates/architectures').glob('*.json'):
         architecture.validate(read_json(path))
     version = text(root / "VERSION").strip()
@@ -141,6 +170,7 @@ def validate(root):
         dt.date.fromisoformat(model["verified_at"])
         if model["selection"] == "managed" and model["selector"] is not None:
             errors.append("Managed platform must not declare a selectable model")
+    policy.validate_routes(read_json(root / "registry/routes.json"), {m["key"]: m for m in models})
     seen = set()
     for route in read_json(root / "registry/routes.json")["routes"]:
         identity = (route["platform"], route["task"])
@@ -180,12 +210,28 @@ def render(root, preferences=None):
     for route in routes:
         lines.append(f"| {route['platform']} | {route['task']} | {models[route['preferred']]['name']} | "
                      + (", ".join(models[k]["name"] for k in route["fallbacks"]) or "Platform managed") + " |")
+    limits = preferences["constraints"] if preferences else policy.CONSTRAINTS
+    lines += ["", "## Effective guards", "",
+              "Risk is independent of complexity. Unknown risk/access stays unknown. Recommendations never dispatch.",
+              f"Limits: {limits['max_workers']} active workers; {limits['max_attempts']} total attempts; {limits['max_wip']} unfinished candidates. Stricter or consumed task allowances still apply.",
+              "Escalation-only models need a recorded reason and separately verified authorization; availability alone never enables them. Missing capability or permission blocks affected work.", "",
+              "| Platform | Task | Requested effort | High / critical | Escalation only |",
+              "| --- | --- | --- | --- | --- |"]
+    for route in routes:
+        risks = route.get("risk_efforts", {})
+        lines.append(f"| {route['platform']} | {route['task']} | {route.get('effort') or 'Native / unknown'} | {risks.get('high', 'Native / unknown')} / {risks.get('critical', 'Native / unknown')} | "
+                     + (", ".join(models[k]["name"] for k in route.get("escalation_only", [])) or "None") + " |")
+    if preferences:
+        for item in preferences.get("exceptions", []):
+            lines.append(f"- Exception {item['id']} for {item['route']}: owner {item['owner']}; expires {item['expires']} UTC; reason {item['reason']}; evidence {item['evidence']}. Metadata is not authorization; expired affected routes are blocked.")
+        for item in preferences.get("legacy_exceptions", []):
+            lines.append(f"- {item['route']}: legacy exception metadata unverified; reconcile with its owner.")
     lines += ["", "## Selection boundaries", "",
               "- Codex: use supported settings or the model picker. This guide never rewrites your active model settings.",
               "- Cursor: use the model picker or supported SDK. Native Auto remains managed by Cursor.",
               "- Grok Bot: there is no model picker. Routing describes task/tool selection and authorized handoffs.",
               "- Local servers: discover installed models explicitly with `local`. Tool calling, context, and reasoning support must be tested on that server; model names are insufficient.",
-              "- When a candidate is unavailable, use an available listed fallback. If none fits, state the limitation.",
+              "- Only eligible non-escalation fallbacks may be used for unavailable candidates. Preserve escalation and expiry guards; if none fits, state the limitation.",
               "- Keep source verification dates separate from catalog download dates. Review stale recommendations before selecting them.", "", "## Evidence", ""]
     for model in models.values():
         source = sources[model["source"]]
@@ -193,7 +239,7 @@ def render(root, preferences=None):
     common = f"AI Constitution v{version}\n\n{core}\n\n"
     common += ("For an onboarded project, use its `.ai/shared/` bundle and `.ai/project.md`; its scoped defaults refine the global baseline. "
                "Read `.ai/architecture.md` when present for the selected project baseline. "
-               "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, or `routing.md` only when relevant. "
+               "Otherwise locate the library through `AI_CONSTITUTION_HOME` or `~/.config/ai-constitution`. Read `engineering.md`, `research.md`, `routing.md`, `security-guidance.md`, `collaboration.md`, or `operational.md` only when relevant. "
                "If the library is inaccessible, use this embedded core and report any task-relevant missing guidance.\n")
     bot_description = (f"Use AI Constitution v{version} from BUNDLE_ROOT. Read its constitution.md when starting substantive work, and specialized modules only as needed. "
                        "Use the current project bundle when present. Keep your role and project knowledge separate. Model selection is platform managed. "
@@ -202,7 +248,7 @@ def render(root, preferences=None):
                  "# Load the shared constitution\n\nLocate BUNDLE_ROOT from this Bot's description. Read VERSION and constitution.md there. "
                  "If working in an onboarded project, prefer its .ai/shared bundle and .ai/project.md for scoped defaults. "
                  "Read .ai/architecture.md when present for the selected baseline and its implementation handoff. "
-                 "Read engineering.md for code work, research.md for source verification, and routing.md when selecting tools or recommending a handoff. "
+                 "Read engineering.md for code work, research.md for source verification, routing.md for route recommendations, and security-guidance.md, collaboration.md or operational.md only when relevant. "
                  "Report missing files precisely. Do not assume a cloud Bot can read a local Windows path. "
                  "Never claim to change the platform-managed underlying model.\n")
     return {
@@ -260,35 +306,62 @@ def transaction(state, writes, *, dry_run=False):
         record["state"] = "applied"
         atomic_bytes(journal, json_bytes(record))
     except Exception:
+        conflicts = []
         for item in reversed(completed):
             path = Path(item["path"])
-            if item["before"] is None:
-                path.unlink()
-            else:
-                atomic_bytes(path, base64.b64decode(item["before"]))
-        record["state"] = "reverted-on-error"
+            try:
+                no_links(path)
+                actual = path.read_bytes() if path.exists() else None
+            except OSError:
+                conflicts.append(str(path))
+                continue
+            except ValueError:
+                conflicts.append(str(path))
+                continue
+            if (digest(actual) if actual is not None else None) != item["after_sha256"]:
+                conflicts.append(str(path))
+                continue
+            try:
+                if item["before"] is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    atomic_bytes(path, base64.b64decode(item["before"]))
+            except OSError:
+                conflicts.append(str(path))
+        record["state"] = "prepared" if conflicts else "reverted-on-error"
+        if conflicts:
+            record["recovery_conflicts"] = conflicts
         atomic_bytes(journal, json_bytes(record))
         raise
     return {"status": "installed", "snapshot": snapshot, "files": [p["path"] for p in prepared]}
 
 
 def install(root, state, **kwargs):
+    private_state_boundary(root, state, kwargs.get("project"))
     if kwargs.get("dry_run"):
         return _install(root, state, **kwargs)
     with state_lock(state):
         return _install(root, state, **kwargs)
 
 
+def project_evidence(root, state, project):
+    private_state_boundary(root, state, project)
+    override = safe_path(project, "AGENTS.override.md")
+    if override.exists() and override.stat().st_size:
+        raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
+    return project_record(project, modules=MODULES, safe_path=safe_path,
+                          managed_hash=managed_hash, digest=digest)
+
+
 def adopt(state, project, dry_run=False):
+    private_state_boundary(ROOT, state, project)
     project = project.absolute()
     def apply():
-        record = project_record(project, modules=MODULES, safe_path=safe_path,
-                                managed_hash=managed_hash, digest=digest)
-        override = safe_path(project, "AGENTS.override.md")
-        if override.exists() and override.stat().st_size:
-            raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
+        record = project_evidence(ROOT, state, project)
         db = state_load(state)
-        identity = "project:" + str(project)
+        identity = target_identity("project", project)
+        if identity in db["targets"]:
+            record["root"] = db["targets"][identity]["root"]
         if identity in db["targets"] and db["targets"][identity] != record:
             raise ValueError("Project already enrolled with different evidence; run doctor")
         db["targets"][identity] = record
@@ -303,6 +376,7 @@ def adopt(state, project, dry_run=False):
 
 
 def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=None, planned=None, database=None, source_reference=None):
+    private_state_boundary(root, state, project)
     validate(root)
     build(root, check=True)
     db = database if database is not None else state_load(state)
@@ -310,8 +384,11 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
     no_links(target_root)
     if project and not target_root.is_dir():
         raise ValueError("Project directory must already exist")
-    identity = ("project:" if project else platform + ":") + str(target_root)
+    identity = target_identity("project" if project else platform, target_root)
     previous = db["targets"].get(identity, {})
+    if previous:
+        target_root = Path(previous["root"])
+        no_links(target_root)
     if project and not previous and safe_path(target_root, ".ai/constitution.lock.json").exists():
         raise ValueError("Existing project lock: run onboard --adopt to verify and enroll this bundle first")
     if pin is None:
@@ -344,6 +421,8 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         if create_only and path.exists():
             return
         old = previous.get("files", {}).get(relative)
+        if block and not old and (BEGIN.encode() in existing or END.encode() in existing):
+            raise ValueError("Managed markers exist without enrollment evidence; preserve and reconcile before reinstalling")
         if old and path.exists():
             actual = managed_hash(existing) if old["managed"] else digest(existing)
             if actual != old["sha256"]:
@@ -360,14 +439,15 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         if (target_root / "AGENTS.override.md").exists() and (target_root / "AGENTS.override.md").stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile the override before onboarding")
         core = preferences["instructions"]["constitution.md"].strip()
-        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, and `.ai/shared/routing.md`, loaded when relevant.\n"
+        body = f"AI Constitution v{version}\n\n{core}\n\nProject context: `.ai/project.md`. If present, read `.ai/architecture.md` for the chosen project baseline and `.ai/architecture-onboarding.md` for its implementation handoff. Specialized guidance: `.ai/shared/engineering.md`, `.ai/shared/research.md`, `.ai/shared/routing.md`, `.ai/shared/security-guidance.md`, `.ai/shared/collaboration.md`, and `.ai/shared/operational.md`, loaded when relevant.\n"
         add("AGENTS.md", body.encode(), block=True)
         for name in MODULES:
             add(".ai/shared/" + name, module_bytes(name))
         add(".ai/project.md", (root / "templates/project.md").read_bytes(), create_only=True)
         # Project context belongs to the user, not to the managed bundle.
         tracked.pop(".ai/project.md", None)
-        lock = {"schema_version": 1, "version": version, "pinned": pin,
+        lock = {"schema_version": 2, "version": version, "pinned": pin,
+                "modules": list(MODULES), "release_sha256": preferences["release_sha256"],
                 "source": "https://github.com/thierry-gilgen-ict/ai-constitution",
                 "files": {k: v for k, v in tracked.items()}}
         add(".ai/constitution.lock.json", json_bytes(lock))
@@ -380,6 +460,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
             add(f".config/ai-constitution/libraries/{platform}/{name}", module_bytes(name))
         add(f".config/ai-constitution/libraries/{platform}/installation.json", json_bytes({
             "schema_version": 1, "source_root": str(source_reference), "version": version, "platform": platform,
+            "release_sha256": preferences["release_sha256"],
         }))
         if platform == "codex":
             # Respect CODEX_HOME only for the actual default home, not fixture homes.
@@ -395,7 +476,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
             skill = text(root / f"skills/{name}/SKILL.md") + f"\nInstalled source checkout: `{source_reference.as_posix()}`.\n"
             add(f".{platform}/skills/{name}/SKILL.md", skill.encode())
     db["targets"][identity] = {"kind": "project" if project else platform, "root": str(target_root),
-                               "version": version, "pinned": pin, "files": tracked}
+                               "version": version, "pinned": pin, "files": tracked, "release_sha256": preferences["release_sha256"]}
     if cursor_dir is not None:
         db["targets"][identity]["cursor_dir"] = str(cursor_dir)
     writes[state / "installations.json"] = json_bytes(db)
@@ -406,6 +487,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
 
 
 def sync(root, state, include_pinned=False, dry_run=False):
+    private_state_boundary(root, state)
     results = []
     for target in state_load(state)["targets"].values():
         if target["pinned"] and not include_pinned:
@@ -443,6 +525,13 @@ def _rollback(state, snapshot):
     atomic_bytes(path, json_bytes(record))
     for item in reversed(record["files"]):
         target = Path(item["path"])
+        no_links(target)
+        actual = target.read_bytes() if target.exists() else None
+        before = base64.b64decode(item["before"]) if item["before"] is not None else None
+        if actual == before:
+            continue
+        if (digest(actual) if actual is not None else None) != item["after_sha256"]:
+            raise ValueError("A target changed during rollback; preserve later edits and reconcile the journal")
         if item["before"] is None:
             target.unlink(missing_ok=True)
         else:
@@ -474,8 +563,12 @@ def doctor(root, state, project=None):
         override = Path(target["root"]) / (".codex/AGENTS.override.md" if target["kind"] == "codex" else "AGENTS.override.md")
         if target["kind"] != "cursor" and override.exists() and override.stat().st_size:
             problems.append("AGENTS.override.md shadows the installed entry point")
+        if target.get("release_sha256") and target["version"] == text(root / "VERSION").strip() and target["release_sha256"] != policy.release_identity(root):
+            problems.append("same-version instruction source changed; preview synchronization")
+        findings = policy.authority_findings(Path(target["root"])) if target["kind"] == "project" else []
         observations.append({"target": target["root"], "kind": target["kind"], "version": target["version"],
                              "status": "drift" if problems else "files-verified", "problems": problems,
+                             "authority_findings": findings, "release_sha256": target.get("release_sha256", "unknown"),
                              "activation": "Verify loading in a fresh client session; file checks do not prove model behavior."})
     return observations
 
@@ -486,6 +579,7 @@ def source_check(root, state):
 
 def upgrade(source, state, dry_run=False, payload=None, expected_plan=None):
     """Stage an immutable library and update eligible targets in one transaction."""
+    private_state_boundary(source, state)
     import tempfile
     with tempfile.TemporaryDirectory() as folder:
         candidate = Path(folder).resolve()
@@ -540,6 +634,8 @@ def explain(root, state, project=None):
             "catalog": str(catalog.catalog_path(root, state)),
             "effective_sha256": selected["effective_sha256"], "layers": selected["layer_hashes"],
             "route_sources": selected["provenance"], "routes": selected["routes"]["routes"],
+            "release_sha256": selected["release_sha256"], "constraints": selected["constraints"],
+            "exceptions": selected["exceptions"], "legacy_exceptions": selected["legacy_exceptions"],
             "installation": doctor(root, state, project),
             "portable_bundle": "Personal prose and routes stay private; project policy is rendered into project bundles.",
             "host_loading": "unverified; file ownership checks do not establish client instruction loading"}
@@ -592,11 +688,16 @@ def scan(root):
 
 
 def export_bundle(root, output):
+    no_links(root)
+    for relative in [*MODULES, "registry/models.json", "registry/routes.json", "registry/sources.json"]:
+        no_links(root / relative)
     validate(root)
     build(root, check=True)
     files = list(MODULES) + ["LICENSE", "onboarding/bot.md", "onboarding/project.md", "docs/updates.md", "checks/acceptance.md", "checks/evaluation.md"]
     files += list(render(root))
     files += ["registry/models.json", "registry/routes.json", "registry/sources.json"]
+    for relative in files:
+        no_links(root / relative)
     no_links(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     # Explicit allowlist excludes local state, full catalog, credentials, and project facts.
@@ -618,6 +719,7 @@ def main(argv=None):
     upgrading.add_argument("--archive", type=Path)
     upgrading.add_argument("--sha256")
     upgrading.add_argument("--dry-run", action="store_true")
+    upgrading.add_argument("--plan", help="Exact preview plan required for CLI activation")
     release = sub.add_parser("release", help="Export a managed-upgrade archive")
     release.add_argument("--output", type=Path, required=True)
     explaining = sub.add_parser("explain")
@@ -660,9 +762,12 @@ def main(argv=None):
     sub.add_parser("providers", help="List every catalog provider and its model count")
     route_parser = sub.add_parser("route")
     route_parser.add_argument("--platform", choices=["codex", "cursor", "grok-bot"], required=True)
-    route_parser.add_argument("--task", choices=["small", "implementation", "deep", "review", "research"], default="implementation")
-    route_parser.add_argument("--available", action="append", help="Eligible registry key; repeat to supply account-verified availability")
+    route_parser.add_argument("--task", choices=policy.TASKS, default="implementation")
+    route_parser.add_argument("--available", action="append", help="Caller-reported eligible registry key; not independent account proof")
     route_parser.add_argument("--project", type=Path)
+    route_parser.add_argument("--risk", choices=policy.RISKS)
+    route_parser.add_argument("--missing-capability", action="append", default=[])
+    route_parser.add_argument("--escalation-reason", help="Recorded reason; separate authorization still required")
     local = sub.add_parser("local", help="Discover models on an explicitly selected local server")
     local.add_argument("--kind", choices=["ollama", "openai-compatible"], default="ollama")
     local.add_argument("--url")
@@ -679,6 +784,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     root = args.root.absolute()
     state = (args.state_dir or Path(os.environ.get("AI_CONSTITUTION_STATE_DIR", str(Path.home() / ".config/ai-constitution/state")))).absolute()
+    private_state_boundary(root, state, getattr(args, "project", None))
     if args.command not in {"build", "check", "scan", "release", "upgrade", "architecture"} and not getattr(args, "source_checkout", False):
         root = releases.selected(state, root)
     if args.command not in {"build", "check", "scan", "models", "providers", "route", "export"}:
@@ -766,18 +872,9 @@ def main(argv=None):
             result = {"matches": len(rows), "showing": min(len(rows), args.limit), "models": rows[:args.limit]}
     elif args.command == "route":
         preferences = policy.resolve(root, state, args.project)
-        routes = preferences["routes"]["routes"]
-        models = {m["key"]: m for m in read_json(root / "registry/models.json")["models"]}
-        route = next(r for r in routes if r["platform"] == args.platform and r["task"] == args.task)
-        candidates = [route["preferred"], *route["fallbacks"]]
-        candidates = [c for c in candidates if args.available is None or c in args.available]
-        if not candidates:
-            raise ValueError("No eligible route or fallback; retain the current configuration and verify availability")
-        selected = models[candidates[0]]
-        age = (dt.datetime.now(dt.timezone.utc).date() - dt.date.fromisoformat(selected["verified_at"])).days
-        result = {"recommendation": selected, "note": route["note"], "account_verified": args.available is not None,
-                  "preference_source": preferences["provenance"][args.platform + "/" + args.task],
-                  "stale": age > read_json(root / "registry/models.json")["max_age_days"], "applied": False}
+        result = policy.select_route(root, preferences, args.platform, args.task, risk=args.risk,
+                                     available=args.available, missing_capabilities=args.missing_capability,
+                                     escalation_reason=args.escalation_reason)
     elif args.command == "local":
         url = args.url or ("http://127.0.0.1:11434" if args.kind == "ollama" else "http://127.0.0.1:1234/v1")
         inventory = discover_local(url, args.kind, allow_remote=args.allow_remote, key_env=args.api_key_env)
@@ -787,10 +884,12 @@ def main(argv=None):
     elif args.command == "export":
         result = export_bundle(root, args.output)
     elif args.command == "upgrade":
+        if not args.dry_run and not args.plan:
+            raise ValueError("Preview upgrade first, then activate with --plan PLAN_HASH")
         if args.source and args.archive or bool(args.archive) != bool(args.sha256):
             raise ValueError("Use --source or --archive with --sha256")
         payload = releases.unpack(args.archive.read_bytes(), args.sha256) if args.archive else None if args.source else releases.latest()
-        result = upgrade(args.source or root, state, args.dry_run, payload)
+        result = upgrade(args.source or root, state, args.dry_run, payload, expected_plan=args.plan)
     elif args.command == "release":
         validate(root)
         build(root, check=True)

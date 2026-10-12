@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.5.0 — pilot candidate
+
+- Added bounded shared workflow states and on-demand security, collaboration and operational modules.
+- Extended the existing route/policy resolver with operational work, independent risk/effort, stricter constraints and expiring exception metadata; retained provisional routes and explicit unknown access.
+- Added instruction-source identity, versioned module locks and compatible legacy adoption; preserved managed blocks, pins, private layers and guarded rollback.
+- Added negative routing/overlay tests and known-authority diagnostics. Real client loading, account access, independent approval and business acceptance remain separate gates.
+
 ## 0.4.0 — 2026-10-04
 
 - Added effective project setup inspection, reviewed preparation recipes, private checkpoints and workspace previews with canary rollout, pin, pause and drift protection.

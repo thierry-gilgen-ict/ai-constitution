@@ -44,3 +44,11 @@ The optional controller keeps its state separately from the core enrollment data
 - Core refreshes and installations are explicit. The optional controller runs background project synchronization and opt-in monitoring/backups while it is running; it does not silently replace its executable or update model weights.
 
 The 0.3 companion separates project discovery (`workspace.py`), application updates (`updates.py`), optional encrypted repositories (`encrypted_backup.py`), OS schedules (`schedules.py`), API cost connectors (`connectors.py`), catalog review (`model_inbox.py`) and measured evidence (`insights.py`). Release staging never mutates the Git checkout. `routing.py` selects an eligible route before dispatch; streaming remains single-attempt under the original lease. Private-state ACLs and a shared Python 3.11-compatible reparse-point guard protect filesystem boundaries.
+
+## Contract extensions in 0.5
+
+The existing renderer/installer owns nine project modules, schema-2 portable locks and versioned legacy adoption. Authored security, collaboration and operational modules remain on demand. Policy schema 2 carries bounded constraints and expiring route exceptions in the existing policy resolver; prose still needs semantic review.
+
+Route recommendations classify task and risk independently. Explicit missing capability/authority blocks selection; an escalation needs a recorded reason and separate authorization. --available is caller-reported eligibility, never independently verified entitlement. Requested effort, actual model/effort UNKNOWN, source digests and applied:false remain explicit. No Markdown, installer or route lookup switches a running client.
+
+Doctor reports same-version source changes and bounded known-authority findings separately from managed-file checks. This is a limited detector, not a complete semantic validator, branch-protection audit or proof of loading. Private policy constraints and exception details do not enter portable project bundles.

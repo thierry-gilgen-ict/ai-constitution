@@ -17,7 +17,7 @@ if __package__:
 else:
     from catalog import atomic_bytes, digest, json_bytes
 
-TOP = {"VERSION", "LICENSE", "README.md", "AGENTS.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "requirements-local-node.txt", "requirements-desktop.txt", "requirements-build.txt", "THIRD_PARTY_NOTICES.md"}
+TOP = {"VERSION", "LICENSE", "README.md", "AGENTS.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "security-guidance.md", "collaboration.md", "operational.md", "requirements-local-node.txt", "requirements-desktop.txt", "requirements-build.txt", "THIRD_PARTY_NOTICES.md"}
 DIRS = {"scripts", "registry", "adapters", "skills", "templates", "onboarding", "checks", "docs", "local_control", "packaging"}
 SUFFIXES = {".py", ".ps1", ".json", ".md", ".mdc", ".html", ".js", ".css", ".txt", ".png"}
 INVENTORY = 'checks/release-files.json'
@@ -50,6 +50,20 @@ def allowed(name):
                  and path.suffix in SUFFIXES)))
 
 
+def destination_keys(names):
+    seen = set()
+    reserved = {"CON", "PRN", "AUX", "NUL", *("COM" + str(i) for i in range(1, 10)), *("LPT" + str(i) for i in range(1, 10))}
+    for name in names:
+        parts = PurePosixPath(name).parts
+        if any(p.rstrip(" .") != p or p.split(".")[0].upper() in reserved
+               or any(c in p for c in '<>:"|?*') or any(ord(v) < 32 for v in p) for p in parts):
+            raise ValueError("Unsafe release path is not portable")
+        key = "/".join(p.casefold() for p in parts)
+        if key in seen:
+            raise ValueError("Case-colliding release paths")
+        seen.add(key)
+
+
 def files(root):
     result = {}
     # Never traverse unrelated trees such as Git, local build outputs or private
@@ -66,6 +80,7 @@ def files(root):
             if path.is_symlink() or any(is_link(p) for p in (path, *path.parents)):
                 raise ValueError('Release sources must not traverse links')
             result[name] = path.read_bytes()
+    destination_keys(result)
     return result
 
 
@@ -95,6 +110,7 @@ def public_files(root):
 
 
 def manifest(payload):
+    destination_keys(payload)
     version = payload.get('VERSION', b'').decode().strip()
     if not re.fullmatch(r'\d+\.\d+\.\d+', version):
         raise ValueError('Release VERSION must be numeric')
@@ -115,11 +131,19 @@ def export(root, output):
 
 
 def unpack(data, expected):
+    try:
+        return _unpack(data, expected)
+    except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, EOFError, KeyError, UnicodeError) as error:
+        raise ValueError("Release archive is malformed or unreadable") from error
+
+
+def _unpack(data, expected):
     if not re.fullmatch(r'[a-f0-9]{64}', expected) or digest(data) != expected:
         raise ValueError('Release archive checksum mismatch')
     payload = {}
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
         entries = archive.infolist()
+        destination_keys([item.filename for item in entries])
         if len(entries) > 1000 or sum(i.file_size for i in entries) > 64 * 1024 * 1024:
             raise ValueError('Release archive exceeds limits')
         for item in entries:
@@ -134,9 +158,19 @@ def unpack(data, expected):
 
 
 def prepare(payload, state, *, preview=False):
+    if any(not allowed(name) for name in payload):
+        raise ValueError('Unsafe release payload path')
     document = manifest(payload)
     identity = document['version'] + '-' + digest(json_bytes(document))[:16]
     destination = state.parent / 'releases' / identity
+    no_links(destination)
+    for name in payload:
+        path = destination / name
+        no_links(path)
+        if not path.resolve().is_relative_to(destination.resolve()):
+            raise ValueError('Release destination escapes selected root')
+    if destination.exists() and set(files(destination)) - set(payload):
+        raise ValueError('Immutable release destination has unexpected files; preserve and reconcile it')
     if not preview:
         for name, data in payload.items():
             path = destination / name
@@ -145,6 +179,8 @@ def prepare(payload, state, *, preview=False):
         for name, data in payload.items():
             atomic_bytes(destination / name, data)
         atomic_bytes(destination / 'release-manifest.json', json_bytes(document))
+        if files(destination) != payload:
+            raise ValueError('Immutable release destination does not match the complete payload')
     return identity, destination
 
 

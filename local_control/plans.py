@@ -55,9 +55,10 @@ def project(root, value):
     path = Path(value).expanduser().absolute(); kit.no_links(path)
     from .studio import Studio
     targets = kit.state_load(Studio(root).state)['targets']
-    if not path.is_dir() or 'project:' + str(path) not in targets:
+    identity = kit.target_identity('project', path)
+    if not path.is_dir() or identity not in targets:
         raise ValueError('Choose an existing project enrolled on this controller')
-    return path
+    return Path(targets[identity]['root'])
 
 
 def evidence(value, source, *, level='observed', observed_at=None):

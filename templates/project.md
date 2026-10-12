@@ -28,3 +28,10 @@ Populate this file from repository evidence during onboarding. Mark unknowns exp
 ## Decisions and references
 
 Link the maintained sources for architecture and operations. Keep task history in issues or project notes, not in the shared constitution.
+
+## Ownership and continuation
+
+- Accountable coordinator and human acceptance owner: unknown; establish before consequential work.
+- Authoritative task tracker and exact source/branch: not yet established.
+- Active resource/retry limits and release holds: inherit existing approved boundaries; never renew consumed attempts.
+- Continuation: task ID, owner, repo/branch/SHA, state, next authorized action, blocker, evidence and resource checkpoint in the existing issue/PR record.

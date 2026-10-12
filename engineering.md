@@ -1,14 +1,13 @@
 # Engineering
 
-Use this module for implementation, debugging, and code review.
+Load for implementation, debugging and code review.
 
-- Read the applicable project instructions, relevant code, and working-tree status before editing. Preserve unrelated work.
-- Identify the observable behavior and acceptance criteria. Trace failures to their cause before changing code.
-- Prefer established libraries, conventions, and commands. Add dependencies only when they materially simplify the solution.
-- Keep diffs focused. Avoid opportunistic reformatting, renaming, or architecture changes.
-- Test meaningful behavior and failure cases. For low-impact prose or formatting changes, inspection may be sufficient.
-- Treat deployment, publishing, migrations, and external writes according to the user's authorization and the environment's controls. Prepare reviewable artifacts before asking about genuinely unresolved authority.
-- Use parameterized APIs and literal filesystem paths. Validate destructive targets before changing them.
-- Document surprising decisions, required environment setup, and operational limitations. Let clear code explain ordinary mechanics.
-- Review for correctness, data loss, regressions, and missing behavior. Report actionable findings with evidence and location.
-- Stop broadening verification when the relevant checks pass unless new evidence warrants it.
+- Read applicable guidance, relevant code and working-tree status. Preserve domain architecture and unrelated work.
+- Bind one bounded issue/owner outcome to measurable acceptance, independent risk and resource budget; use one worker on an isolated branch.
+- Trace the cause, prefer established commands/libraries and make focused diffs. Avoid unrelated formatting, dependencies and redesign.
+- Test behavior and negative cases that could disprove the claim: wrong environment/entity, reordered responses, absent domain fields, failed persistence, lost acknowledgments and stale publication. Do not mock away the failing boundary.
+- Nontrivial changes need independent exact-revision review and relevant CI on the same candidate. High/critical risk needs stronger verification, not an expensive model for every step.
+- Integrate small accepted slices; preserve human deployment authority and separate semantic/business acceptance. Load collaboration.md and operational.md when relevant.
+- Use literal filesystem paths and parameterized APIs. Validate destructive targets/ownership before separately authorized actions.
+- Report implementation, review, integration, deployment and acceptance separately. Green CI and an agent DONE statement cannot promote one to another.
+- Low-impact mechanical/docs work may use diff inspection and deterministic checks. Stop broadening verification when relevant checks pass unless new evidence warrants it.
