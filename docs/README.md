@@ -4,12 +4,13 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 
 <!-- screenshots:manual-summary:begin -->
 
-**[Illustrated manual](manual/README.md)** · 99 images of the actual UI, with fictional data and step-by-step captions.
+**[Illustrated manual](manual/README.md)** · 114 images of the actual UI, with fictional data and step-by-step captions.
 
 <!-- screenshots:manual-summary:end -->
 
 | I want to… | Guide |
 | --- | --- |
+| Inventory, scan and reconcile global/project instructions | [Constitution health](constitution-health.md) · [Controlled migration](constitution-migration.md) |
 | See the 0.3 workspace features | [Workspace maintenance](workspace-upgrades.md) |
 | Encrypt backups and schedule them outside the dashboard | [Encrypted backups](encrypted-backups.md) |
 | Try a disposable demonstration | [Synthetic browser journeys](demonstration.md) |
@@ -38,6 +39,7 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 - [Security and privacy](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/SECURITY.md): private state, secrets, account collection and backup storage.
 - [Architecture](architecture.md): ownership, transactions, background services and current limits.
 - [Review and roadmap](review-and-roadmap.md): implemented work, evidence and remaining release gates.
+- [Project improvement and MCP plan](project-improvement-plan.md): proposed phased work for project lessons, bounded agent runs, evaluation and reviewed promotion; not a shipped feature.
 - [Alternatives](alternatives.md): scope and adjacent projects.
 - [Provenance](provenance.md): catalog data, artwork and demonstration screenshots.
 

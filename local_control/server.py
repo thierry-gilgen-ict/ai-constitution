@@ -11,6 +11,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from . import hardware, credentials, diagnostics, launcher, locations, distribution, synchronization, monitoring, project_vault
 from . import workspace, updates, operations, encrypted_backup, schedules, model_inbox, insights, routing, connectors, workflows, resource_profiles
+from . import auditing
 from .core import ALIAS, model_name
 from .transport import connect
 
@@ -18,6 +19,7 @@ WEB = Path(__file__).parent / "web"
 ASSETS = {"/experience.js": ("experience.js", "text/javascript"), "/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/center.js": ("center.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
 NODE_GET = {"/api/version", "/api/tags", "/api/ps"}
 ASSETS['/workflows.js'] = ('workflows.js','text/javascript')
+ASSETS['/audit.js'] = ('audit.js','text/javascript')
 NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions"}
 
 
@@ -169,7 +171,14 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 target = path.removeprefix("/node")
                 if target in ('/version', '/admin/version') and not post:
-                    self.reply({'version': updates.current(), 'protocol': 2, 'capabilities': ['updates', 'diagnostics', 'monitoring', 'drivers', 'autostart']})
+                    self.reply({'version': updates.current(), 'protocol': 2, 'capabilities': ['updates', 'diagnostics', 'monitoring', 'drivers', 'autostart', 'constitution-audit-v1']})
+                elif target.startswith('/audit/'):
+                    operation=target.removeprefix('/audit/')
+                    if not self.principal:
+                        self.reply({'error':'A scoped paired controller is required'},403);return
+                    if operation=='overview' and not post or operation!='overview' and post:
+                        self.reply(auditing.dispatch(control,operation,body,principal=self.principal))
+                    else:raise ValueError('Unsupported audit method')
                 elif target.startswith('/updates'):
                     self.update_request(target.removeprefix('/updates'), post, body)
                 elif target == '/operations' and not post:
@@ -222,6 +231,11 @@ class Handler(BaseHTTPRequestHandler):
                 self.update_request(path.removeprefix('/api/updates'), post, body)
             elif path.startswith('/api/workflows/') and post:
                 self.reply(workflows.dispatch(control,path.removeprefix('/api/workflows/'),body))
+            elif path.startswith('/api/audit/'):
+                operation=path.removeprefix('/api/audit/')
+                if operation=='overview' and not post or operation!='overview' and post:
+                    self.reply(auditing.dispatch(control,operation,body))
+                else:raise ValueError('Unsupported audit method')
             elif path == '/api/workspace' and not post:
                 self.reply(workspace.overview(control))
             elif path == '/api/workspace/discover' and post:

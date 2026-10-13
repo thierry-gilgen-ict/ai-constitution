@@ -377,7 +377,7 @@ class Control:
             job = self.jobs.get(identity)
             if not job or job['status'] not in ('queued', 'running'):
                 raise ValueError('No active operation with that ID')
-            if job['status'] == 'running' and job.get('operation') not in ('pull','run_lab'):
+            if job['status'] == 'running' and job.get('operation') not in ('pull','run_lab','audit_scan_job'):
                 raise ValueError('This operation has started; let its safe transition finish')
             self.cancelled.add(identity)
             job['detail'] = 'Cancellation requested; waiting for the next download progress event'
@@ -609,8 +609,8 @@ class Control:
             operations.save(self.root, self.jobs, self.events)
         def progress(detail):
             with self.lock:
-                if identity in self.cancelled and function.__name__ in ('pull','run_lab'):
-                    raise operations.Cancelled('Download cancelled; retry explicitly to let Ollama resume available chunks')
+                if identity in self.cancelled and function.__name__ in ('pull','run_lab','audit_scan_job'):
+                    raise operations.Cancelled('Operation cancelled at a safe progress boundary')
                 job["detail"] = str(detail)[:200]
                 operations.save(self.root, self.jobs, self.events)
         def run():

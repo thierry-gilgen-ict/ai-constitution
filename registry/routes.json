@@ -140,6 +140,34 @@
       "preferred": "grok-bot:managed",
       "fallbacks": [],
       "note": "Use tools on the Bot's computer or recommend an authorized handoff. Underlying model selection is managed."
+    },
+    {
+      "platform": "codex",
+      "task": "operational",
+      "description": "Bounded operational diagnosis and release preparation",
+      "preferred": "codex:balanced",
+      "fallbacks": [
+        "codex:deep"
+      ],
+      "note": "Capability and authority first. Risk is separate from model tier; preserve explicit selections. Deployment requires its authorized scope."
+    },
+    {
+      "platform": "cursor",
+      "task": "operational",
+      "description": "Bounded operational diagnosis and release preparation",
+      "preferred": "cursor:fast",
+      "fallbacks": [
+        "cursor:deep"
+      ],
+      "note": "Capability and authority first. Risk is separate from model tier; preserve explicit selections. Deployment requires its authorized scope."
+    },
+    {
+      "platform": "grok-bot",
+      "task": "operational",
+      "description": "Bounded operational diagnosis and release preparation",
+      "preferred": "grok-bot:managed",
+      "fallbacks": [],
+      "note": "Capability and authority first. Risk is separate from model tier; preserve explicit selections. Deployment requires its authorized scope."
     }
   ]
 }

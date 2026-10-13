@@ -2,6 +2,10 @@
 
 Updated October 3, 2026 for v0.3.0. The original review baseline was v0.1.0, commit `96c2b277a3ed86c6119b3f4481342838434e4b54`. This document separates implemented behavior, validation evidence and remaining work. It is not an independent certification or a claim to be the best product in the category.
 
+## Constitution health preview
+
+The 0.5 implementation adds scoped instruction inventory, contextual findings, reviewed correction transactions, locally approved worker access, disabled-by-default schedules, private evidence and an optional scoped MCP bridge. Semantic execution uses an interactive native-client handoff until a confined unattended adapter is independently verified. Physical multi-machine and macOS client acceptance remain pending. See the [health guide](constitution-health.md) for current behavior and [the project-improvement roadmap](project-improvement-plan.md) for the later runner.
+
 ## 0.3 implementation review
 
 The follow-up review’s six reliability fixes are implemented: exact template snapshot pins, durable backup retry, normalized storage paths, durable failure history, Python 3.11 reparse-point checks, and private Windows ACLs. The accepted workspace features now have dashboard/API paths and fixture coverage; [workspace maintenance](workspace-upgrades.md) maps the workflows.

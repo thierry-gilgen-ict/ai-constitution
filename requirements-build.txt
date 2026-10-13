@@ -1,4 +1,5 @@
 # Build in an isolated environment; never bundle a user's general Python environment.
 -r requirements-desktop.txt
 -r requirements-local-node.txt
+-r requirements-mcp.txt
 PyInstaller==6.22.3

@@ -7,3 +7,5 @@ Copy the following prompt into Codex or Cursor in the target project. The same p
 The installer creates a portable bundle and a lock file. It does not infer the project facts for you. Review `.ai/project.md` before considering onboarding complete.
 
 For a reusable stack, first choose a [project template](../docs/project-templates.md) in Local Control. Applying it also performs standard onboarding. Then provide `.ai/architecture-onboarding.md` to the agent; it reads the saved component choices and implements the baseline within the user's authorized scope.
+
+After adoption, use Constitution health to inspect expected instruction discovery and file integrity without executing project code. Select profiles and scope deliberately; schedules are disabled until configured. A changed installation needs fresh client-loading evidence. [Health guide](../docs/constitution-health.md).

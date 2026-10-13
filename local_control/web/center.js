@@ -128,7 +128,7 @@
   setInterval(async()=>{
     if(!authorized || polling || document.querySelector('dialog[open]'))return;
     const current=document.querySelector('.page.active')?.id;
-    if(!['projects','accounts'].includes(current))return;
+    if(!['projects','accounts','audit'].includes(current))return;
     polling=true;try{await window.centerPage(current);}finally{polling=false;}
   },30000);
 })();

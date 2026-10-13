@@ -36,6 +36,10 @@ The optional controller keeps its state separately from the core enrollment data
 
 ## Current limits
 
+Constitution health shares the read-only `scripts/audit.py` engine between CLI, controller, workers and optional MCP. `audit_store.py` stores private versioned evidence in SQLite; `auditing.py` controls permissions, schedules and deterministic reconciliation. The existing installation ownership, transaction journals, synchronization locks and pin/pause policy protect correction writes. Structural discovery, source integrity, selected release and actual client loading remain separate facts.
+
+`audit_review.py` prepares bounded native-client handoffs and validates proposed findings/edits. The reviewing client never receives an apply tool through this bridge. A reviewed project prose correction uses a transaction; shared/generated changes retain the Studio rollout path. The autonomous project coding and comparative learning runner remain future work and consume this evidence foundation.
+
 - Codex and Cursor have native file installers; actual Grok Bots have an explicit cloud onboarding/export path.
 - Arbitrary semantic conflicts between existing instructions require agent or human review.
 - Custom `CODEX_HOME` layouts use manual adapter installation in this release.

@@ -26,6 +26,8 @@ def main():
             if path == '/api/ps': return {'models':[]}
             return {'status':'fixture'}
         control=Control(root,rpc)
+        from local_control import auditing
+        auditing.configure(root,{'scope':{'projects':[str(project),str(second)],'profiles':[]}})
         # This isolated loopback fixture deliberately uses recognizable test-only
         # credentials. Failure traces must never contain generated bearer secrets.
         control.config.update(token='fixture', gateway_token='fixture-gateway')

@@ -29,6 +29,7 @@ class Fixture(unittest.TestCase):
         names=sorted(set(releases.files(self.library))|{releases.INVENTORY})
         (self.library/releases.INVENTORY).write_text(json.dumps({'schema_version':1,'files':names}))
         for p in (patch('local_control.studio.bundled_source',return_value=self.library),
+                  patch('local_control.auditing.bundled_source',return_value=self.library),
                   patch.object(Path,'home',return_value=self.base/'home')):
             p.start();self.addCleanup(p.stop)
         self.state=Studio(self.root).state

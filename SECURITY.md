@@ -23,6 +23,12 @@ Portable companions are unsigned previews. Verify the release revision and check
 
 ## Publishing checks
 
+Constitution health uses a read-only scanner and a private SQLite evidence store. Reports, excerpts, diffs, machine paths and operator receipts must stay outside public repositories. The scanner reads bounded instruction text and metadata; it executes no repository commands or inference. Heuristic credential detection omits suspicious review excerpts but does not guarantee that prose contains no sensitive information.
+
+Worker audit access requires a separate local grant bound to the paired controller, selected roots, profiles and operations. Pairing, legacy administration and inference credentials do not imply instruction access. Fixed audit operations provide no general remote file or shell API. Grants are rechecked before queued reads and writes; TLS pins and revocation still apply. After an uncertain remote correction, inspect its durable request instead of replaying it.
+
+AI review uses a bounded interactive handoff with validated source IDs and fingerprints. Candidate prose remains private until explicit diff review; host client permissions still apply to the user's native review session. Optional MCP tools recheck their project/profile grant on every call and expose no apply or permission-management operations. Evidence restoration does not restore authority, schedules or interrupted corrections. SQLite backups are protected private copies; use encrypted backup storage where needed.
+
 `scan` checks tracked and nonignored files for private filenames, common credential patterns, personal Windows home paths, and unexpected binaries. It reports file names and rule IDs rather than secret values. Also run a dedicated secret scanner over Git history and review the staged diff.
 
 Public source exports and native build inputs use the reviewed `checks/release-files.json` inventory. Files merely present in an allowed directory are not automatically published, even if Git ignores them. Sensitive filenames are rejected, declared inputs must exist, and links/reparse points are refused. Private Studio editing still uses its separate runtime library; it does not expand the public export inventory.

@@ -15,11 +15,27 @@ const chapters = {
   insights: ['Measured performance', 'workspace-upgrades.md'], vault: ['Private configuration and backups', 'encrypted-backups.md'],
   recovery: ['Progress and recovery', 'workspace-upgrades.md'], toolkit: ['Instruction toolkit and external setup', 'getting-started.md'],
   workflows: ['Workspace workflows', 'workspace-workflows.md'],
+  audit: ['Constitution health', 'constitution-health.md'],
 };
 const names = {setup: 'Get started', overview: 'Overview', models: 'Model library', machines: 'Your machines', connect: 'Connect a project', architectures: 'Project templates', constitution: 'Constitution files', projects: 'Projects', accounts: 'Apps & subscriptions', workers: 'Set up a worker', storage: 'Storage & locations', updates: 'Updates & model inbox', insights: 'Measured performance', vault: 'Configs & backups'};
 names.workflows='Workspace workflows';
+names.audit='Constitution health';
 for (const [page, title] of Object.entries(names)) add(page, page, page, title, 'Open ' + title + ' from the sidebar. The page below uses fictional documentation data.', [], {overview: true});
 add('welcome', 'overview', 'setup', 'Open the authenticated dashboard', 'Opening the bare address shows this welcome dialog. Run the displayed open command to sign in locally.', [], {scenario: 'login', scope: '#login'});
+add('audit-findings','audit','audit','Review health findings','Verified structural findings and contextual review items remain distinct. Coverage gaps are explicit.',[click('[data-audit-tab="findings"]')]);
+add('audit-chain','audit','audit','Explain instruction discovery','Expected applicability is separate from client loading. Record the version and evidence from a fresh session.',[click('[data-audit-chain]')],{scope:'#center-dialog'});
+add('audit-settings','audit','audit','Choose scope and correction policy','Select profiles, roots, notification behavior and permitted managed updates. AI prose always needs review.',[click('#audit-settings')],{scope:'#center-dialog'});
+add('audit-corrections','audit','audit','Inspect eligible targets','Preview installation corrections before adoption. Pins and local edits stay protected.',[click('[data-audit-tab="corrections"]')]);
+add('audit-preview','audit','audit','Review a correction diff','Check the exact files and correction type. The fixture applies nothing.',[click('[data-audit-tab="corrections"]'),click('[data-audit-preview]')],{scope:'#center-dialog'});
+add('audit-history','audit','audit','Review history and recovery','Evidence backups preserve history. Restoring them does not re-enable permissions, schedules or corrections.',[click('[data-audit-tab="history"]')]);
+add('audit-semantic','audit','audit','Prepare a client review','Use the bounded snapshot with Codex or Cursor and import structured results. Unverified unattended execution uses the interactive handoff.',[click('[data-audit-tab="findings"]'),click('#audit-semantic')],{scope:'#center-dialog'});
+add('audit-worker','audit','audit','Grant worker access locally','Inference pairing grants no instruction-file access. Choose roots and permissions on the worker.',[click('#audit-worker')],{scope:'#center-dialog'});
+add('audit-profile','audit','audit','Add a custom client profile','Choose the owning client configuration directory and a unique profile ID. Unavailable sources remain coverage gaps.',[click('#audit-add-profile')],{scope:'#center-dialog'});
+add('audit-policy','audit','audit','Choose one target correction policy','Automatic corrections require both selected types and approval of the exact library. Project pins and pauses remain authoritative.',[click('[data-audit-tab="corrections"]'),click('[data-audit-policy]')],{scope:'#center-dialog'});
+add('audit-mcp','audit','audit','Grant bounded MCP access','Choose a project and client profile. The bridge can inspect, scan and propose; apply and permission changes stay outside its tools.',[click('#audit-mcp')],{scope:'#center-dialog'});
+add('audit-receipt','audit','audit','Record separate delivery evidence','Implementation, review, integration, deployment and acceptance have independent evidence. Unknown and not applicable are valid states.',[click('[data-audit-tab="history"]'),click('#audit-receipt')],{scope:'#center-dialog'});
+add('audit-github','audit','audit','Compare GitHub controls','Read observable controls using an existing login. Compare optional project governance without changing protections or merging candidates.',[click('[data-audit-tab="history"]'),click('#audit-github')],{scope:'#center-dialog'});
+add('audit-mobile','audit','audit','Inspect health on a smaller screen','The instruction inventory uses the same controls on a smaller viewport. This is browser layout coverage, not a native mobile app.',[],{viewport:{width:390,height:844},fullPage:true});
 add('gpu-gaming', 'overview', 'overview', 'Gaming mode', 'After draining active responses, subsequent requests use the tested fallback and managed GPU residency is checked. This state is simulated; no GPU benchmark is claimed.', [], {scenario: 'gaming'});
 add('gpu-draining', 'overview', 'overview', 'Wait for the current response', 'A transition waits for the response already using the GPU. The next request can then use the fallback.', [], {scenario: 'draining'});
 add('model-fit', 'models', 'models', 'Find models for your hardware', 'Choose Find models for my hardware. Estimated fit is shown separately from measured results.', [click('#suggest')], {scope: '#recommendations'});

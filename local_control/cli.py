@@ -96,6 +96,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-dir", type=Path, default=private_root())
     sub = parser.add_subparsers(dest="command", required=True)
+    mcp_parser=sub.add_parser('audit-mcp',help='Optional project-scoped stdio MCP bridge')
+    mcp_parser.add_argument('--project',type=Path,required=True)
+    mcp_parser.add_argument('--profile',required=True,help='Exact locally granted client-profile ID')
+    auditing_parser=sub.add_parser('audit',help='Constitution health and locally granted worker access')
+    auditing_parser.add_argument('operation',choices=['scan','overview','settings','preview','apply','rollback','grant','revoke','due','backup','restore','review','review-snapshot','review-import','semantic-apply','receipt','loading','github','os-schedule'])
+    auditing_parser.add_argument('--input',type=Path,help='Private JSON request file')
+    auditing_parser.add_argument('--root',action='append',default=[])
+    auditing_parser.add_argument('--project',action='append',default=[])
+    auditing_parser.add_argument('--controller')
+    auditing_parser.add_argument('--permission',action='append',default=[])
+    auditing_parser.add_argument('--profile',action='append',default=[])
     setup = sub.add_parser("setup", help="Install explicitly selected components")
     setup.add_argument("--llmfit", action="store_true")
     setup.add_argument("--ollama", action="store_true")
@@ -152,6 +163,32 @@ def main():
     cursor.add_argument("--project", type=Path, required=True)
     args = parser.parse_args(sys.argv[1:] or ['start', '--open'])
     root = locations.resolve_root(args.state_dir)
+    if args.command=='audit-mcp':
+        from .audit_mcp import server
+        server(root,args.project,args.profile).run(transport='stdio');return 0
+    if args.command=='audit':
+        from . import auditing
+        from .audit_store import Store
+        body={} if args.input is None else __import__('scripts.audit',fromlist=['document']).document(args.input)
+        if args.operation=='settings':result=auditing.configure(root,body)
+        elif args.operation=='scan':
+            if args.root or args.project:auditing.configure(root,{'scope':{'roots':args.root,'projects':args.project}})
+            result=auditing.scan(root)
+        elif args.operation=='overview':result=auditing.overview(root)
+        elif args.operation=='grant':result=auditing.grant(root,{'controller':args.controller,'roots':args.root,'profiles':args.profile,'permissions':args.permission},load(root))
+        elif args.operation=='revoke':
+            from .storage import wait_lock
+            with wait_lock(root/'audit-policy'):
+                value=auditing.settings(root);value['grants'].pop(args.controller,None);atomic(root/'audit-settings.json',value)
+            result={'status':'revoked'}
+        elif args.operation=='due':result=auditing.scheduled(root)
+        elif args.operation=='preview':result=auditing.preview(root,body)
+        elif args.operation=='apply':result=auditing.apply(root,body)
+        elif args.operation=='rollback':result=auditing.rollback(root,body)
+        else:
+            from types import SimpleNamespace
+            result=auditing.dispatch(SimpleNamespace(root=root),args.operation,body)
+        print(json.dumps(result,indent=2));return 0
     if args.command == 'finish-update':
         from .updates import finish
         finish(root, args.ticket); return 0
@@ -314,6 +351,10 @@ def main():
         context.minimum_version = ssl.TLSVersion.TLSv1_2
         context.load_cert_chain(cert, key)
         server.socket = context.wrap_socket(server.socket, server_side=True, do_handshake_on_connect=False)
+        if not getattr(args,'no_background_services',False):
+            from .services import Services
+            server.services=Services(control,worker=True)
+            server.services.start()
     else:
         atomic(runtime_path, {"url": url, "pid": os.getpid(), 'process': processes.identity(os.getpid())})
         if args.fleet_address:

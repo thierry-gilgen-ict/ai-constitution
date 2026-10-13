@@ -34,6 +34,12 @@ Automated fixtures cover controller TLS scope separation and certificate pinning
 
 Physical acceptance remains pending: pair two independent controllers on Windows and macOS; disconnect/reconnect a peer without losing its last successful snapshot; stage competing edits and recover a renamed checkout; restore an encrypted configuration on the second machine; enable a real game-process trigger with a tested remote/CPU fallback; observe active-response completion and actual GPU release; repeat after sleep/wake. Do not run these inference/driver tests implicitly during repository checks.
 
+## Constitution health 0.5 preview acceptance
+
+Automated disposable fixtures cover custom profiles, Codex overrides/fallbacks/limits, conditional Cursor rules, worktree discovery, bounded file hashing, scoped references, managed ownership, stale previews, durable requests, revoked grants, reviewed prose, cached handoffs, scheduling and history-only restoration. Loopback HTTP tests exercise worker scan → preview → correction → verification → rollback. Browser journeys exercise the health controls and accessibility. Optional MCP tests exercise the official SDK and stdio transport.
+
+These are separate from the physical gate: on each Windows computer, enroll a disposable project, approve its local worker roots, remove one owned file, scan, preview, explicitly apply, rescan and roll back. Verify later edits prevent unsafe rollback and revoked permissions prevent access. Physical main/second-PC execution and actual macOS Codex/Cursor/package acceptance are **pending**. Native-client loading and unattended semantic review are not inferred from file or SDK tests.
+
 ## Availability soak
 
 Run explicitly in your own terminal:

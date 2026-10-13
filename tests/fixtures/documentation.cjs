@@ -68,6 +68,7 @@ function fixture(scenario = 'ready') {
     if (p === '/api/login') { authorized = true; return {}; }
     if (!authorized) return {__status: 401, error: 'Open the authenticated dashboard from your terminal.'};
     if (p.startsWith('/api/workflows/')) return require('./workflows.cjs')(workspace,TIME)(p.replace('/api/workflows/',''),body);
+    if (p.startsWith('/api/audit/')) return require('./audit.cjs')(PROJECT,TIME,VERSION)(p.replace('/api/audit/',''),body);
     if (p === '/api/status') return state;
     if (p === '/api/version') return {version: VERSION, protocol: 2};
     if (p === '/api/inventory') return inventory;

@@ -978,3 +978,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 #workspace-palette { width: min(42rem, 90vw); max-height: 85vh; overflow: auto; }
 .palette-result { display: block; text-align: left; width: 100%; margin: .4rem 0; }
 .palette-result small, #workflows .caption { display: block; overflow-wrap: anywhere; }
+#audit td small { display:block; color:var(--muted); margin:6px 0; overflow-wrap:anywhere; }
+#audit td { vertical-align:top; }
+#audit .section-title { flex-wrap:wrap; gap:16px; }
+#audit pre, #center-dialog pre { white-space:pre-wrap; overflow-wrap:anywhere; }

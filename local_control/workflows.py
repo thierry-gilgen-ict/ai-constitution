@@ -3,6 +3,7 @@ from pathlib import Path
 from . import inspector,rollouts,project_setup,toolkits,launch_advice,fleet,recovery,model_lab,resource_profiles,plans,monitoring
 
 PAGES={'overview':'Overview','setup':'Get started','projects':'Projects','architectures':'Project templates','constitution':'Constitution files','models':'Model library','machines':'Your machines','accounts':'Apps & subscriptions','workers':'Set up a worker','storage':'Storage & locations','vault':'Configs & backups','updates':'Updates & model inbox','insights':'Measured performance','workflows':'Workspace workflows'}
+PAGES['audit']='Constitution health'
 
 
 def search(control,query):

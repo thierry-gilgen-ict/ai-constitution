@@ -1,6 +1,6 @@
 # Routing
 
-Generated for v0.4.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
+Generated for v0.5.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
 
 These are provisional starting points, not measured rankings. Respect an explicit model choice. Confirm account access and required tools before selecting a model. Reasoning levels and model identifiers can differ between clients.
 
@@ -21,6 +21,9 @@ These are provisional starting points, not measured rankings. Respect an explici
 | codex | research | GPT-6.1 Sol | GPT-6 Astra |
 | cursor | research | Composer 2.5 | Grok 4.7 |
 | grok-bot | research | Platform-managed selection | Platform managed |
+| codex | operational | GPT-6.1 Sol | GPT-6 Astra |
+| cursor | operational | Composer 2.5 | Grok 4.7 |
+| grok-bot | operational | Platform-managed selection | Platform managed |
 
 ## Selection boundaries
 

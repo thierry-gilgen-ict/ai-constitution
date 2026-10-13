@@ -17,6 +17,8 @@ Run from the source checkout. Prefix every command below with `python scripts/co
 | `architecture apply --template web-product --project /path/to/project --name my-project --plan HASH` | Apply exactly the reviewed plan with rollback |
 | `explain --project /path/to/project --json` | Explain preference layers, routes, installed files and unverified host loading |
 | `doctor` | Check enrolled files for drift and instruction shadowing |
+| `audit --project /path/to/project --client codex` | Read-only structural inventory and expected instruction discovery |
+| `audit --search-root /path/to/projects --format json` | Bounded repository/worktree discovery; private JSON report |
 | `sync --all --dry-run` | Preview updates to enrolled, unpinned targets |
 | `sync --all` | Apply shared changes to enrolled, unpinned targets |
 | `providers` | List every bundled provider and its definition count |
@@ -59,3 +61,7 @@ For a new project:
 > Use constitution-onboarding for this project. Inspect its existing instructions and commands, preserve them, install the shared baseline, and fill the project context with verified facts.
 
 See [updates and rollback](updates.md), [project onboarding](../onboarding/project.md), and [Grok Bot onboarding](../onboarding/bot.md) for the full workflows.
+
+## Constitution health companion
+
+Prefix these operations with `python scripts/local_control.py audit`; use `--input /private/request.json` for structured requests. `scan`, `overview`, `settings`, `preview`, `apply`, `rollback`, `review`, `review-snapshot`, `review-import`, `semantic-apply`, `receipt`, `loading`, `github`, `backup`, `restore`, `due` and `os-schedule` share the dashboard contracts. Worker `grant`/`revoke` require local paired-controller selection; roots, permissions and profiles have explicit repeatable flags. The optional native `audit-mcp --project /path/to/project --profile PROFILE_ID` exposes the scoped stdio bridge. See [request examples and safety boundaries](constitution-health.md).

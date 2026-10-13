@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.5.0 — Constitution health preview
+
+- Added read-only Codex/Cursor instruction inventory, bounded discovery, expected instruction chains, ownership integrity, release differences and contextual findings. The existing secret-scanning `scan` command is unchanged; structural inspection uses `audit`.
+- Added private SQLite history, dispositions, separate session-loading evidence, acceptance receipts and optional read-only GitHub control checks.
+- Added reviewed managed correction previews, source approvals, per-target policy, stale-plan rejection, durable worker requests and recoverable application/rollback. Pins, pauses, modified files and local worker grants remain authoritative.
+- Added scoped worker audit capabilities, explicit owner-approved roots and permissions, cached offline reports, disabled-by-default schedules, per-user OS jobs and optional native notifications.
+- Added bounded Codex/Cursor review handoffs and structured-result validation. AI prose always requires an explicit diff review; unattended model execution is not enabled.
+- Added an optional project/profile-scoped MCP bridge with inventory, reports, scan and proposals. It exposes no apply, permission-management or shell tools.
+- Added compact delivery profiles, separately evidenced engineering outcomes, optional project governance and operational task routing. Controller and worker versions now use the packaged release version.
+- Fixed peer synchronization preserving exact Windows line endings, and expanded the synthetic illustrated manual with constitution-health workflows.
+
+This is a multi-machine preview. New schedules and semantic reviews remain disabled until configured; notify-only is the initial correction policy. Actual two-computer and macOS native-client acceptance remain separate physical release gates. The later autonomous project runner and comparative workflow promotion are still proposed.
+
 ## 0.4.0 — 2026-10-04
 
 - Added effective project setup inspection, reviewed preparation recipes, private checkpoints and workspace previews with canary rollout, pin, pause and drift protection.
