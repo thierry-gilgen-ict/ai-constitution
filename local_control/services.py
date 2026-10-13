@@ -31,8 +31,9 @@ def readiness(control, progress=lambda _: None):
 
 
 class Services:
-    def __init__(self, control):
+    def __init__(self, control, *, worker=False):
         self.control = control
+        self.worker = worker
         self.stopped = threading.Event()
         self.wake = threading.Event()
         self.last_monitor = 0
@@ -80,12 +81,25 @@ class Services:
         if synchronization.settings(self.control.root)['enabled'] and overview(self.control.root)['projects']:
             self.submit('Synchronize project toolkits',synchronize_toolkits,self.control)
 
+    def audit(self):
+        from . import auditing
+        config=auditing.settings(self.control.root)
+        if (config['schedule']['enabled'] or config['semantic']['enabled']) and not config['schedule']['paused']:
+            from .audit_store import Store
+            last=Store(self.control.root).get('schedule','last',{})
+            semantic=Store(self.control.root).get('schedule','semantic',{})
+            structural_due=config['schedule']['enabled'] and (config['schedule']['changes'] and time.time()-last.get('checked_at',0)>=300 or time.time()-last.get('at',0)>=config['schedule']['hours']*3600)
+            review_due=config['semantic']['enabled'] and time.time()-semantic.get('at',0)>=config['semantic']['hours']*3600
+            if structural_due or review_due:
+                self.submit('Scheduled constitution health scan',auditing.scheduled,self.control.root)
+
     def tick(self):
         if self.control.stopping: return
         # The peer listener is independently optional. A stale record cannot
         # manufacture an active listener when this service was started without it.
         errors = []
-        for task in (self.backups, self.synchronize, self.monitor, self.health, self.releases, self.profiles, self.toolkits):
+        tasks=(self.audit,) if self.worker else (self.backups, self.synchronize, self.monitor, self.health, self.releases, self.profiles, self.toolkits, self.audit)
+        for task in tasks:
             try: task()
             except Exception as error:
                 # Saturation is transient. Each independent service still gets its

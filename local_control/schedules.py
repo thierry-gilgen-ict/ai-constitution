@@ -13,19 +13,21 @@ from .storage import atomic
 from .permissions import user_sid
 
 
-def read(root):
+def read(root, kind='backup'):
     from scripts import constitution as kit
-    path = Path(root) / 'backup-schedule.json'; no_links(path)
+    if kind not in ('backup','audit'):raise ValueError('Unknown schedule kind')
+    path = Path(root) / (kind+'-schedule.json'); no_links(path)
     return kit.read_json(path) if path.exists() else {'enabled': False, 'hours': 24, 'scope': 'No OS task configured'}
 
 
-def configure(root, enabled, hours=24, *, system=None, home=None, runner=subprocess.run):
+def configure(root, enabled, hours=24, *, system=None, home=None, runner=subprocess.run, kind='backup'):
+    if kind not in ('backup','audit'):raise ValueError('Unknown schedule kind')
     if type(enabled) is not bool or type(hours) is not int or not 1 <= hours <= 720:
         raise ValueError('Choose an enabled state and interval from 1 to 720 hours')
     system = system or platform.system(); home = Path(home or Path.home())
-    identity = 'ai-constitution-backup-' + digest(str(Path(root).absolute()).encode())[:12]
-    args = command('--state-dir', root, 'backup', '--due')
-    marker = 'AI Constitution managed backup ' + identity
+    identity = 'ai-constitution-'+kind+'-' + digest(str(Path(root).absolute()).encode())[:12]
+    args = command('--state-dir', root, 'audit', 'due') if kind=='audit' else command('--state-dir', root, 'backup', '--due')
+    marker = 'AI Constitution managed '+kind+' ' + identity
     if system == 'Windows':
         name = '\\' + identity
         existing = runner(['schtasks', '/Query', '/TN', name, '/XML'], capture_output=True, text=True)
@@ -79,5 +81,5 @@ def configure(root, enabled, hours=24, *, system=None, home=None, runner=subproc
         scope = 'Linux systemd user timer; user manager must be running'
     else: raise ValueError('OS backup schedules support Windows, macOS and systemd Linux')
     value = {'enabled': enabled, 'hours': hours, 'identity': identity, 'scope': scope}
-    atomic(Path(root) / 'backup-schedule.json', value)
+    atomic(Path(root) / (kind+'-schedule.json'), value)
     return value

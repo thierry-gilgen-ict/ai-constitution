@@ -51,6 +51,8 @@ def validate(root=ROOT, *, sources=True, release=True):
         try:
             inputs = manifest['digest_inputs']
             allowed = ['local_control/web/' + a for a in ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js']] + ['VERSION', 'tests/fixtures/documentation.cjs', 'scripts/documentation_scenarios.cjs', 'scripts/documentation_cli.py', 'scripts/screenshots.cjs', 'templates/architecture-components.json'] + ['templates/architectures/' + a + '.json' for a in ['web-product', 'data-dashboard', 'python-api']] + ['constitution.md', 'engineering.md', 'research.md', 'routing.md', 'registry/routes.json', 'tests/fixtures/workflows.cjs']
+            allowed.insert(allowed.index('VERSION'),'local_control/web/audit.js')
+            allowed.append('tests/fixtures/audit.cjs')
             if inputs != allowed:
                 raise ValueError('Screenshot digest inputs must match the capture harness')
             data = b''.join(name.encode() + b'\0' + (root / name).read_bytes().replace(b'\r\n', b'\n') + b'\0' for name in inputs)

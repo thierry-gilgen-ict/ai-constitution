@@ -5,7 +5,7 @@
   const completed = new Set();
   const button = (id, label) => `<button id="${id}">${e(label)}</button>`;
   const go = name => { $('center-dialog').close(); page(name); };
-  const recovery = job => /backup|restore|scheduled/.test(job.operation) ? 'vault' : /update|stage|check/.test(job.operation) ? 'updates' : /synchron|reconcile/.test(job.operation) ? 'projects' : /refresh/.test(job.operation) ? 'accounts' : 'overview';
+  const recovery = job => /constitution|audit/i.test(job.label+' '+job.operation) ? 'audit' : /backup|restore|scheduled/.test(job.operation) ? 'vault' : /update|stage|check/.test(job.operation) ? 'updates' : /synchron|reconcile/.test(job.operation) ? 'projects' : /refresh/.test(job.operation) ? 'accounts' : 'overview';
   window.trackOperation = result => {
     tracked = result.job;
     $('operation-strip').hidden = false;

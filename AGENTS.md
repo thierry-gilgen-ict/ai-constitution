@@ -4,6 +4,7 @@ This repository is public. Keep private state, host paths, credentials, and proj
 
 - Runtime source: `scripts/constitution.py` and `scripts/catalog.py`; Python 3.11+, standard library only.
 - Optional Local Control: `local_control/` and `scripts/local_control.py`. Keep private state outside the checkout. The dashboard/gateway use the standard library; only remote worker TLS adds `requirements-local-node.txt`.
+- Constitution health: `scripts/audit.py` is read-only; `local_control/auditing.py` owns private evidence and reviewed corrections. Optional MCP uses `requirements-mcp.txt`. Never promote AI prose without explicit diff review or grant worker file access through inference pairing.
 - Local inference tests use fixtures. Live setup requires the user's authorization. Preserve active response leases, certificate pinning, separate inference/admin credentials, and verified GPU release. Never claim native Cursor Agent switching or distributed VRAM pooling.
 - Model data: refresh the imported snapshot with `update`. Use source-linked `registry/overrides.json` entries for verified additions missing upstream.
 - Generated files: run `python scripts/constitution.py build`; do not hand-edit `routing.md` or generated adapters.

@@ -613,6 +613,12 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     for name in ("build", "check", "scan"):
         sub.add_parser(name)
+    auditing = sub.add_parser('audit', help='Read-only constitution inventory; no client writes or inference')
+    auditing.add_argument('--project', type=Path, action='append', default=[])
+    auditing.add_argument('--search-root', type=Path, action='append', default=[])
+    auditing.add_argument('--client', choices=['codex','cursor','all'], default='all')
+    auditing.add_argument('--home', type=Path)
+    auditing.add_argument('--format', choices=['text','json'], default='text')
     upgrading = sub.add_parser("upgrade", help="Activate a verified library without changing the source checkout")
     upgrading.add_argument("--source", type=Path, help="Reviewed local checkout")
     upgrading.add_argument("--archive", type=Path)
@@ -660,7 +666,7 @@ def main(argv=None):
     sub.add_parser("providers", help="List every catalog provider and its model count")
     route_parser = sub.add_parser("route")
     route_parser.add_argument("--platform", choices=["codex", "cursor", "grok-bot"], required=True)
-    route_parser.add_argument("--task", choices=["small", "implementation", "deep", "review", "research"], default="implementation")
+    route_parser.add_argument("--task", choices=["small", "implementation", "deep", "review", "research", "operational"], default="implementation")
     route_parser.add_argument("--available", action="append", help="Eligible registry key; repeat to supply account-verified availability")
     route_parser.add_argument("--project", type=Path)
     local = sub.add_parser("local", help="Discover models on an explicitly selected local server")
@@ -679,6 +685,19 @@ def main(argv=None):
     args = parser.parse_args(argv)
     root = args.root.absolute()
     state = (args.state_dir or Path(os.environ.get("AI_CONSTITUTION_STATE_DIR", str(Path.home() / ".config/ai-constitution/state")))).absolute()
+    if args.command == 'audit':
+        if __package__: from . import audit
+        else: import audit
+        home = args.home or Path.home()
+        profiles = [{'id':client,'client':client,'home':str(home/('.'+client))} for client in ('codex','cursor') if args.client in (client,'all')]
+        result = audit.scan({'projects':[str(p) for p in args.project], 'roots':[str(p) for p in args.search_root],
+                             'profiles':profiles,'canonical':str(root),'state':str(state)})
+        if args.format == 'json': print(json.dumps(result,indent=2))
+        else:
+            print(f"Constitution health: {len(result['projects'])} projects, {len(result['sources'])} sources, {len(result['findings'])} findings")
+            print('Coverage: '+('complete for selected scope' if result['coverage']['complete'] else 'partial; inspect coverage gaps'))
+            for finding in result['findings']: print(f"[{finding['severity']}/{finding['evidence']}] {finding['code']}: {finding['detail']}")
+        return 0
     if args.command not in {"build", "check", "scan", "release", "upgrade", "architecture"} and not getattr(args, "source_checkout", False):
         root = releases.selected(state, root)
     if args.command not in {"build", "check", "scan", "models", "providers", "route", "export"}:

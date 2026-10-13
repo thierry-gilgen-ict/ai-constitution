@@ -20,6 +20,7 @@ else:
 TOP = {"VERSION", "LICENSE", "README.md", "AGENTS.md", "CHANGELOG.md", "constitution.md", "engineering.md", "research.md", "maintenance.md", "routing.md", "requirements-local-node.txt", "requirements-desktop.txt", "requirements-build.txt", "THIRD_PARTY_NOTICES.md"}
 DIRS = {"scripts", "registry", "adapters", "skills", "templates", "onboarding", "checks", "docs", "local_control", "packaging"}
 SUFFIXES = {".py", ".ps1", ".json", ".md", ".mdc", ".html", ".js", ".css", ".txt", ".png"}
+TOP.add('requirements-mcp.txt')
 INVENTORY = 'checks/release-files.json'
 
 

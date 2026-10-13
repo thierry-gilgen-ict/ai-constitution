@@ -93,6 +93,7 @@ def main():
     command=[sys.executable,'-m','PyInstaller','--noconfirm','--onedir','--noupx','--name','ai-constitution-local',
              '--distpath',str(output/'app'),'--workpath',str(output/'build'),'--specpath',str(output),
              '--paths',str(library),'--collect-submodules','local_control','--collect-submodules','pystray',
+             '--collect-submodules','mcp.server','--collect-submodules','mcp.client','--recursive-copy-metadata','mcp',
              '--hidden-import','cryptography','--add-data',str(library/'local_control/web')+':local_control/web',
              '--add-data',str(library)+':library']
     if platform.system()=='Windows':command+=['--hide-console','hide-early']

@@ -17,7 +17,7 @@ from .studio import Studio
 from .transport import request, validate_url
 
 DEFAULT={'schema':1,'peers':{},'grants':{},'pairings':{}}
-SCOPES={'library','inventory','accounts'}
+SCOPES={'library','inventory','accounts','audit'}
 
 
 def overview(root):
@@ -30,7 +30,7 @@ def overview(root):
 
 def pairing(root,body):
     scopes=body.get('scopes',['library']);name=monitoring.text(body.get('name','Trusted controller'),80)
-    if not isinstance(scopes,list) or not scopes or set(scopes)-SCOPES:raise ValueError('Choose library, inventory or accounts scopes')
+    if not isinstance(scopes,list) or not scopes or set(scopes)-SCOPES:raise ValueError('Choose library, inventory, accounts or audit scopes')
     listener=plans.read(root,'fleet-listener.json',{'schema':1})
     if not listener.get('url') or time.time()-listener.get('heartbeat',0)>120:raise ValueError('Start the controller with --fleet-address before creating a pairing code')
     nonce=secrets.token_urlsafe(32);key=hashlib.sha256(nonce.encode()).hexdigest();expires=time.time()+300
@@ -92,7 +92,7 @@ def portable(root,*,_locked=False):
         studio.initialize();files={}
         for name in releases.files(studio.draft):
             if shareable(studio,name):
-                path=kit.safe_path(studio.draft,name);plans.fingerprint(path);files[name]=path.read_text(encoding='utf-8')
+                path=kit.safe_path(studio.draft,name);plans.fingerprint(path);files[name]=path.read_bytes().decode('utf-8')
         kits=plans.read(root,'toolkits.json',toolkits.DEFAULT)['kits']
     value={'schema':1,'files':files,'toolkits':kits}
     if len(json_bytes(value))>4*1024*1024:raise ValueError('Shared library exceeds portable limit')
@@ -113,6 +113,13 @@ def snapshot(control,grant):
     if 'accounts' in grant['scopes']:
         data=monitoring.load(control.root)
         value['accounts']=[{k:a.get(k) for k in ('label','login','application','provider','plan','subscription_key','usage')} for a in data['accounts'].values()]
+    if 'audit' in grant['scopes']:
+        from .audit_store import Store
+        reports=Store(control.root).list('report',1)
+        if reports:
+            r=reports[0]
+            value['audit']={'machine_id':r.get('machine_id'),'observed_at':r['observed_at'],'projects':len(r['projects']),
+                            'findings':len(r['findings']),'complete':r['coverage']['complete'],'note':'Summary only; paths and instruction content excluded'}
     return value
 
 

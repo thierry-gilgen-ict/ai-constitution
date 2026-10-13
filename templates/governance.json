@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "delivery_profile": "standard",
+  "risk": "medium",
+  "acceptance": ["Replace with observable project-specific acceptance criteria"],
+  "owner_roles": ["project-owner"],
+  "wip_limit": 3,
+  "required_reviews": 1,
+  "required_checks": [],
+  "exceptions": []
+}

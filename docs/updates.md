@@ -2,6 +2,10 @@
 
 There are three operations: refresh model facts, change your policy, and upgrade the toolkit. Keeping them distinct makes each one predictable.
 
+## Constitution health preview
+
+Version 0.5 adds private audit evidence and settings without rewriting existing enrollment or policy formats. New audit/review schedules are disabled and corrections start in notify-only mode. Global/client installations retain their selected releases; an older valid installation is a finding, not automatic update authorization. Keep existing private state when upgrading workers, then grant audit roots and operations locally. [Health guide](constitution-health.md) · [Migration runbook](constitution-migration.md).
+
 ## Refresh definitions
 
 ```sh
@@ -113,8 +117,8 @@ The dashboard now provides an **Update available** notification, public release 
 
 **In the dashboard · Review an update restart.** After verification, restart only when tracked and external clients are idle. Private settings and model storage are retained.
 
-![Review an update restart — demonstration data, UI 0.4.0](assets/screenshots/update-restart.png)
+![Review an update restart — demonstration data, UI 0.5.0](assets/screenshots/update-restart.png)
 
-[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.4.0.
+[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.5.0.
 
 <!-- screenshots:restart:end -->

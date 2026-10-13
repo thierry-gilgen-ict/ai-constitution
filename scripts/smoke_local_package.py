@@ -63,10 +63,24 @@ def smoke(binary):
             assert (project / '.ai/architecture.md').is_file()
             preview = api('activation-preview', {})
             api('activate', {'plan': preview['plan']})
+            assert request('/audit.js')[0]==200
+            status,data=request('/api/audit/settings',{'scope':{'projects':[str(project)],'profiles':[]}},token)
+            assert status==200
+            status,data=request('/api/audit/scan',{},token);assert status==200
+            job=json.loads(data)['job']
+            for _ in range(100):
+                status,data=request('/api/status',token=token)
+                operation=next((j for j in json.loads(data)['jobs'] if j['id']==job),{})
+                if operation.get('status')=='done':break
+                if operation.get('status')=='failed':raise RuntimeError('Packaged audit failed: '+operation.get('detail','unknown'))
+                time.sleep(.1)
+            else:raise RuntimeError('Packaged audit timeout')
+            status,data=request('/api/audit/overview',token=token)
+            assert status==200 and json.loads(data)['latest']['projects'][0]['path']==str(project)
             assert request('/api/stop', {'acknowledge_external': True}, token)[0] == 200
             assert child.wait(10) == 0
             return {'authenticated_studio': True, 'bundled_templates': True, 'draft_save': True,
-                    'project_apply': True, 'library_activation': True, 'isolated_state': True}
+                    'project_apply': True, 'library_activation': True, 'isolated_state': True,'constitution_health':True}
         finally:
             if child.poll() is None:
                 child.terminate()

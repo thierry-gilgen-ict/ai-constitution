@@ -1,0 +1,2 @@
+# Optional stdio MCP bridge; the scanner and controller do not import it normally.
+mcp==2.3.0
