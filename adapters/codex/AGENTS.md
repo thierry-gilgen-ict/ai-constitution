@@ -1,4 +1,4 @@
-AI Constitution v0.5.0
+AI Constitution v0.6.0
 
 # Shared constitution
 

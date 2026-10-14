@@ -47,7 +47,7 @@ def output_path(value):
             or any(ord(v) < 32 or v in '<>"|?*' for v in value)
             or '\\' in value or ':' in value or any(v.endswith(('.', ' ')) for v in p.parts)
             or any(v.lower().split('.')[0] in {'con', 'prn', 'aux', 'nul', *('com'+str(i) for i in range(1,10)), *('lpt'+str(i) for i in range(1,10))} for v in p.parts)
-            or any(v.lower() in {'.git', '.ai', '.codex', '.cursor', '.agents', '.aws', '.ssh', 'node_modules'} for v in p.parts)
+            or any(v.lower() in {'.git', '.ai', '.codex', '.cursor', '.claude', '.agents', '.aws', '.ssh', 'node_modules'} for v in p.parts)
             or p.name.lower() in {'agents.md', 'agents.override.md', 'claude.md', 'auth.json', 'credentials.json'}
             or any(v.lower().startswith('.env') and v != '.env.example' for v in p.parts)
             or p.suffix.lower() in {'.pem', '.key', '.pfx', '.p12', '.exe', '.dll'}):

@@ -1,5 +1,11 @@
 # Compatibility and physical acceptance
 
+## Claude Code 0.6 preview
+
+Disposable tests cover explicit enrollment, legacy locks, custom profiles, imports, ownership, stale previews, telemetry isolation, output limits and reviewed prose. Browser journeys cover opt-in Claude controls and accessibility. See the [Claude guide](claude-code.md) and [illustrated manual](manual/claude.md).
+
+Actual Windows terminal/IDE/desktop instruction loading, native MCP connectivity, macOS/Linux client acceptance, real Messages inference and two-PC Gaming/GPU-release acceptance remain pending. Desktop/IDE local inference is not enabled through an unverified integration. Existing Codex/Cursor evidence does not certify Claude.
+
 Report evidence separately for source tests, packaged startup and real inference. A green fixture suite does not certify a GPU driver or promise that an arbitrary model fits.
 
 | Surface | Automated coverage | Physical acceptance for 0.3 |

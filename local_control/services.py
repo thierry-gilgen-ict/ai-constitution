@@ -60,7 +60,8 @@ class Services:
             self.submit('Synchronize enrolled projects', synchronize, self.control)
 
     def monitor(self):
-        if time.time() - self.last_monitor >= 300 and monitoring.load(self.control.root)['codex_enabled']:
+        from .claude import settings
+        if time.time() - self.last_monitor >= 300 and (monitoring.load(self.control.root)['codex_enabled'] or settings(self.control.root)['monitoring']):
             if self.submit('Refresh local subscription usage', monitoring.refresh, self.control): self.last_monitor = time.time()
 
     def health(self):
@@ -91,7 +92,7 @@ class Services:
             structural_due=config['schedule']['enabled'] and (config['schedule']['changes'] and time.time()-last.get('checked_at',0)>=300 or time.time()-last.get('at',0)>=config['schedule']['hours']*3600)
             review_due=config['semantic']['enabled'] and time.time()-semantic.get('at',0)>=config['semantic']['hours']*3600
             if structural_due or review_due:
-                self.submit('Scheduled constitution health scan',auditing.scheduled,self.control.root)
+                self.submit('Scheduled constitution health scan',auditing.run_scheduled,self.control)
 
     def tick(self):
         if self.control.stopping: return

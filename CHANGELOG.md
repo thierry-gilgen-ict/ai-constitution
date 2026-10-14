@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 0.6.0 — Claude Code compatibility preview
+
+- Added opt-in Claude enrollment, independent custom profiles, schema-2 portable ownership, shared client capabilities and generated routing aliases. Legacy installation defaults remain compatible.
+- Added bounded Claude instruction resolution, imports, local/nested sources, conditional rules, exclusions and separate loading evidence for controller/worker scans.
+- Added dashboard controls, skills/MCP exports, scoped MCP recipes, reviewed handoffs and disabled-by-default isolated API/local reviews and schedules.
+- Added private sign-in collection and authenticated aggregate HTTP JSON telemetry. Subscription allowances remain unknown unless imported; API costs and estimates remain separate.
+- Added a Messages gateway, protocol-specific qualification, managed launches and lease/Gaming protections for qualified local/worker routes. No paid-cloud fallback or conversation transfer is claimed.
+- Added illustrated workflows and disposable tests. Native terminal/IDE/desktop, macOS and physical two-PC acceptance remain pending.
+
 ## 0.5.0 — Constitution health preview
 
 - Added read-only Codex/Cursor instruction inventory, bounded discovery, expected instruction chains, ownership integrity, release differences and contextual findings. The existing secret-scanning `scan` command is unchanged; structural inspection uses `audit`.

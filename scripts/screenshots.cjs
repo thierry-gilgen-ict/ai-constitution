@@ -12,7 +12,7 @@ const args = process.argv.slice(2);
 const option = name => args.includes(name) ? args[args.indexOf(name) + 1] : null;
 const output = path.resolve(ROOT, option('--output') || 'docs/assets/screenshots');
 const selected = option('--only')?.split(',');
-const assets = ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js', 'audit.js'];
+const assets = ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js', 'audit.js', 'claude.js'];
 const inputs = [...assets.map(a => 'local_control/web/' + a), 'VERSION', 'tests/fixtures/documentation.cjs', 'scripts/documentation_scenarios.cjs', 'scripts/documentation_cli.py', 'scripts/screenshots.cjs', 'templates/architecture-components.json', ...['web-product', 'data-dashboard', 'python-api'].map(id => 'templates/architectures/' + id + '.json'), 'constitution.md', 'engineering.md', 'research.md', 'routing.md', 'registry/routes.json'];
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
 inputs.push('tests/fixtures/workflows.cjs');

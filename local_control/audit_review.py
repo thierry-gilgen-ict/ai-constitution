@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import re
 import time
+from scripts import clients
 from scripts import audit, constitution as kit
 from scripts.catalog import digest, json_bytes
 from .audit_store import Store
@@ -21,7 +22,7 @@ def prepare(root,body,*,granted=None):
     store=Store(root);report=store.get('report',body.get('report'))
     if not report:raise ValueError('Choose an existing report')
     client=body.get('client','codex')
-    if client not in ('codex','cursor'):raise ValueError('Choose Codex or Cursor')
+    if client not in tuple(clients.CLIENTS):raise ValueError('Choose an available client')
     profiles=[p for p in report['profiles'] if p['client']==client]
     profile=body.get('profile')
     if profile is None and len(profiles)==1:profile=profiles[0]['id']
@@ -53,7 +54,7 @@ def prepare(root,body,*,granted=None):
         if audit.fingerprint(path)!=src['sha256']:raise ValueError('Source changed; scan again')
         with path.open('rb') as stream:text=stream.read(min(budget,audit.MAX_SAMPLE)).decode('utf-8',errors='replace')
         if SECRET.search(text):omitted.append(src['id']);continue
-        budget-=len(text.encode());sources.append({**src,'content':text,'editable':src['bytes']<=len(text.encode())})
+        budget-=len(text.encode());sources.append({**src,'content':text,'editable':src['classification']!='managed-policy' and src['bytes']<=len(text.encode())})
     if not sources:raise ValueError('No safe instruction excerpts selected')
     cache=digest(json_bytes([client,profile,[(p['id'],p.get('configuration_fingerprint')) for p in profiles if p['id']==profile],project,[(s['id'],s['sha256']) for s in sources],PROMPT,1]))
     cached=store.get('review-cache',cache)

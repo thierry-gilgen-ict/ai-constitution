@@ -156,6 +156,17 @@ def main():
     controllers.add_argument('--port', type=int, default=8767)
     controllers.add_argument('--revoke')
     controllers.add_argument('--disable-legacy', action='store_true')
+    claude_config = sub.add_parser('claude-config',help='Owner-local Claude settings and reviewed worker enrollment')
+    claude_config.add_argument('action',choices=['show','settings','collect','enroll'])
+    claude_config.add_argument('--input',type=Path)
+    claude_config.add_argument('--profile')
+    claude_config.add_argument('--project',type=Path)
+    claude_config.add_argument('--plan')
+    claude = sub.add_parser('claude', help='Launch an explicitly enrolled Claude Code profile')
+    claude.add_argument('--project',type=Path,required=True)
+    claude.add_argument('--profile',required=True)
+    claude.add_argument('--mode',choices=['hosted','local'],default='hosted')
+    claude.add_argument('args',nargs=argparse.REMAINDER)
     codex = sub.add_parser("codex", help="Start a Codex local session, also usable in Cursor's terminal")
     codex.add_argument("--project", type=Path, default=Path.cwd())
     codex.add_argument("args", nargs=argparse.REMAINDER)
@@ -163,6 +174,17 @@ def main():
     cursor.add_argument("--project", type=Path, required=True)
     args = parser.parse_args(sys.argv[1:] or ['start', '--open'])
     root = locations.resolve_root(args.state_dir)
+    if args.command=='claude-config':
+        from . import claude
+        if args.action=='show':result=claude.settings(root)
+        elif args.action=='settings':
+            if not args.input:raise ValueError('Provide --input with reviewed settings; key values are not accepted')
+            result=claude.configure(root,__import__('scripts.audit',fromlist=['document']).document(args.input))
+        elif args.action=='collect':result=claude.collect(root,args.profile)
+        else:
+            if not args.project:raise ValueError('Choose --project')
+            result=claude.enroll(root,{'project':str(args.project),'plan':args.plan},apply=bool(args.plan))
+        print(json.dumps(result,indent=2));return 0
     if args.command=='audit-mcp':
         from .audit_mcp import server
         server(root,args.project,args.profile).run(transport='stdio');return 0
@@ -293,6 +315,10 @@ def main():
     if args.command == "open":
         webbrowser.open(runtime["url"] + "/#" + config["token"])
         return 0
+    if args.command == 'claude':
+        from .claude import launch
+        runtime={**runtime,"token":load(root)["token"],"gateway_token":load(root)["gateway_token"]}
+        return launch(root,runtime,{'project':str(args.project),'profile':args.profile,'mode':args.mode,'args':args.args[1:] if args.args[:1]==['--'] else args.args})
     if args.command == "codex":
         if os.name == 'nt' and getattr(sys, 'frozen', False):
             import ctypes

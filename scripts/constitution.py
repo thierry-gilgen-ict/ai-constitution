@@ -25,12 +25,12 @@ else:
 
 if __package__:
     from .adoption import project_record
-    from . import policy, releases, source_review, architecture, catalog
+    from . import policy, releases, source_review, architecture, catalog, clients
     from .catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
                           json_bytes, refresh, utc_now, validate_providers)
 else:
     from adoption import project_record
-    import policy, releases, source_review, architecture, catalog
+    import policy, releases, source_review, architecture, catalog, clients
     from catalog import (atomic_bytes, catalog_diff, digest, discover_local, effective_providers, fetch_public,
                          json_bytes, refresh, utc_now, validate_providers)
 
@@ -88,7 +88,9 @@ def safe_path(root, relative):
     return path
 
 
-def installed_path(root, relative, cursor_dir=None):
+def installed_path(root, relative, cursor_dir=None, claude_dir=None):
+    if claude_dir is not None and relative.startswith(".claude/"):
+        return safe_path(Path(claude_dir), relative[len(".claude/"):])
     if cursor_dir is not None and relative.startswith(".cursor/"):
         return safe_path(Path(cursor_dir), relative[len(".cursor/"):])
     return safe_path(root, relative)
@@ -116,8 +118,10 @@ def managed_hash(body):
 def state_load(state):
     path = state / "installations.json"
     result = read_json(path) if path.exists() else {"schema_version": 1, "targets": {}}
-    if result.get("schema_version") != 1 or not isinstance(result.get("targets"), dict):
+    if result.get("schema_version") not in (1,2) or not isinstance(result.get("targets"), dict):
         raise ValueError("Unsupported installation-state schema; migrate state before continuing")
+    if any(not isinstance(t,dict) or t.get('kind') not in ('project',*clients.CLIENTS) for t in result['targets'].values()):
+        raise ValueError('Unsupported installed client; upgrade this CLI before maintaining its targets')
     return result
 
 
@@ -208,6 +212,7 @@ def render(root, preferences=None):
     return {
         "routing.md": "\n".join(lines) + "\n",
         "adapters/codex/AGENTS.md": common,
+        "adapters/claude-code/CLAUDE.md": common,
         "adapters/cursor/user-rules.md": common,
         "adapters/cursor/ai-constitution.mdc": "---\ndescription: Shared AI Constitution working defaults\nalwaysApply: true\n---\n\n" + common,
         "adapters/grok-bot/description.md": bot_description,
@@ -288,6 +293,7 @@ def adopt(state, project, dry_run=False):
         if override.exists() and override.stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
         db = state_load(state)
+        if 'claude-code' in record.get('clients',[]):db['schema_version']=2
         identity = "project:" + str(project)
         if identity in db["targets"] and db["targets"][identity] != record:
             raise ValueError("Project already enrolled with different evidence; run doctor")
@@ -302,7 +308,7 @@ def adopt(state, project, dry_run=False):
         return apply()
 
 
-def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, dry_run=False, pin=None, planned=None, database=None, source_reference=None):
+def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=None, claude_dir=None, selected_clients=None, dry_run=False, pin=None, planned=None, database=None, source_reference=None):
     validate(root)
     build(root, check=True)
     db = database if database is not None else state_load(state)
@@ -311,7 +317,15 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
     if project and not target_root.is_dir():
         raise ValueError("Project directory must already exist")
     identity = ("project:" if project else platform + ":") + str(target_root)
+    if platform == "claude-code":
+        claude_dir = Path(claude_dir or clients.directory(platform, home)).expanduser().absolute()
+        no_links(claude_dir)
+        identity += ":" + str(claude_dir)
     previous = db["targets"].get(identity, {})
+    enabled = list(dict.fromkeys([*previous.get("clients", clients.LEGACY if project else []), *(selected_clients or [])]))
+    if any(c not in clients.CLIENTS for c in enabled):
+        raise ValueError("Unknown project client")
+    if platform=='claude-code' or 'claude-code' in enabled:db['schema_version']=2
     if project and not previous and safe_path(target_root, ".ai/constitution.lock.json").exists():
         raise ValueError("Existing project lock: run onboard --adopt to verify and enroll this bundle first")
     if pin is None:
@@ -339,7 +353,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         return (root / name).read_bytes()
 
     def add(relative, data, block=False, create_only=False):
-        path = installed_path(target_root, relative, cursor_dir)
+        path = installed_path(target_root, relative, cursor_dir, claude_dir)
         existing = path.read_bytes() if path.exists() else b""
         if create_only and path.exists():
             return
@@ -367,21 +381,36 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
         add(".ai/project.md", (root / "templates/project.md").read_bytes(), create_only=True)
         # Project context belongs to the user, not to the managed bundle.
         tracked.pop(".ai/project.md", None)
-        lock = {"schema_version": 1, "version": version, "pinned": pin,
+        bridge = 'managed'
+        if "claude-code" in enabled:
+            from_scripts = __import__('scripts.claude_audit', fromlist=['imports']) if __package__ else __import__('claude_audit')
+            existing = safe_path(target_root,'CLAUDE.md')
+            imported = existing.exists() and any(Path(p)==Path('AGENTS.md') for p in from_scripts.imports(text(existing)))
+            if imported and 'CLAUDE.md' not in previous.get('files',{}):
+                bridge = 'existing-import'
+            else:
+                if previous.get('claude_bridge')=='existing-import' and selected_clients is None:
+                    raise ValueError('Unowned Claude import changed; review explicit enrollment before modifying it')
+                add("CLAUDE.md", b"# Shared project instructions\n\n@AGENTS.md\n", block=True)
+        lock = {"schema_version": 2 if "claude-code" in enabled else 1, "version": version, "pinned": pin,
                 "source": "https://github.com/thierry-gilgen-ict/ai-constitution",
                 "files": {k: v for k, v in tracked.items()}}
+        if lock["schema_version"] == 2: lock.update(clients=enabled,claude_bridge=bridge)
         add(".ai/constitution.lock.json", json_bytes(lock))
     else:
-        source = "adapters/codex/AGENTS.md" if platform == "codex" else "adapters/cursor/ai-constitution.mdc"
+        source = clients.CLIENTS[platform]["adapter"]
         source_reference = source_reference or root
-        library = target_root / ".config/ai-constitution/libraries" / platform
+        library_key = platform + '/' + digest(str(claude_dir).encode())[:16] if platform == 'claude-code' else platform
+        library = target_root / ".config/ai-constitution/libraries" / library_key
         content = outputs[source] + f"\nInstalled shared library: `{library.as_posix()}`. Source checkout: `{source_reference.as_posix()}`.\n"
         for name in MODULES:
-            add(f".config/ai-constitution/libraries/{platform}/{name}", module_bytes(name))
-        add(f".config/ai-constitution/libraries/{platform}/installation.json", json_bytes({
+            add(f".config/ai-constitution/libraries/{library_key}/{name}", module_bytes(name))
+        add(f".config/ai-constitution/libraries/{library_key}/installation.json", json_bytes({
             "schema_version": 1, "source_root": str(source_reference), "version": version, "platform": platform,
         }))
-        if platform == "codex":
+        if platform == "claude-code":
+            add(".claude/CLAUDE.md", content.encode(), block=True)
+        elif platform == "codex":
             # Respect CODEX_HOME only for the actual default home, not fixture homes.
             codex_dir = Path(os.environ.get("CODEX_HOME", str(target_root / ".codex"))) if home is None else target_root / ".codex"
             if codex_dir.absolute() != target_root / ".codex":
@@ -393,9 +422,11 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
             add(".cursor/rules/ai-constitution.mdc", content.encode())
         for name in ("constitution-onboarding", "constitution-maintenance"):
             skill = text(root / f"skills/{name}/SKILL.md") + f"\nInstalled source checkout: `{source_reference.as_posix()}`.\n"
-            add(f".{platform}/skills/{name}/SKILL.md", skill.encode())
+            add(f"{clients.CLIENTS[platform]['directory']}/skills/{name}/SKILL.md", skill.encode())
     db["targets"][identity] = {"kind": "project" if project else platform, "root": str(target_root),
                                "version": version, "pinned": pin, "files": tracked}
+    if project and "claude-code" in enabled: db["targets"][identity].update(clients=enabled,claude_bridge=bridge)
+    if claude_dir is not None: db["targets"][identity]["claude_dir"] = str(claude_dir)
     if cursor_dir is not None:
         db["targets"][identity]["cursor_dir"] = str(cursor_dir)
     writes[state / "installations.json"] = json_bytes(db)
@@ -412,7 +443,7 @@ def sync(root, state, include_pinned=False, dry_run=False):
             results.append({"status": "skipped-pinned", "target": target["root"]})
             continue
         try:
-            kwargs = {"project": Path(target["root"])} if target["kind"] == "project" else {"platform": target["kind"], "home": Path(target["root"])}
+            kwargs = {"project": Path(target["root"])} if target["kind"] == "project" else {"platform": target["kind"], "home": Path(target["root"]), "claude_dir": Path(target["claude_dir"]) if target.get("claude_dir") else None}
             results.append(install(root, state, **kwargs, pin=target["pinned"], dry_run=dry_run))
         except (OSError, ValueError) as error:
             results.append({"status": "error", "target": target["root"], "error": str(error)})
@@ -464,7 +495,7 @@ def doctor(root, state, project=None):
     for target in targets:
         problems = []
         for relative, expected in target["files"].items():
-            path = installed_path(Path(target["root"]), relative, target.get("cursor_dir"))
+            path = installed_path(Path(target["root"]), relative, target.get("cursor_dir"), target.get("claude_dir"))
             if not path.exists():
                 problems.append(relative + ": missing")
             else:
@@ -472,7 +503,7 @@ def doctor(root, state, project=None):
                 if value != expected["sha256"]:
                     problems.append(relative + ": modified")
         override = Path(target["root"]) / (".codex/AGENTS.override.md" if target["kind"] == "codex" else "AGENTS.override.md")
-        if target["kind"] != "cursor" and override.exists() and override.stat().st_size:
+        if target["kind"] in ("codex", "project") and override.exists() and override.stat().st_size:
             problems.append("AGENTS.override.md shadows the installed entry point")
         observations.append({"target": target["root"], "kind": target["kind"], "version": target["version"],
                              "status": "drift" if problems else "files-verified", "problems": problems,
@@ -507,7 +538,7 @@ def upgrade(source, state, dry_run=False, payload=None, expected_plan=None):
                     continue
                 kwargs = {"project": Path(target["root"])} if target["kind"] == "project" else {
                     "platform": target["kind"], "home": Path(target["root"]),
-                    "cursor_dir": Path(target["cursor_dir"]) if target.get("cursor_dir") else None}
+                    "cursor_dir": Path(target["cursor_dir"]) if target.get("cursor_dir") else None, "claude_dir": Path(target["claude_dir"]) if target.get("claude_dir") else None}
                 targets.append(_install(candidate, state, **kwargs, source_reference=destination,
                                         pin=target["pinned"], planned=writes, database=db))
             active = state / "active-release.json"
@@ -616,7 +647,7 @@ def main(argv=None):
     auditing = sub.add_parser('audit', help='Read-only constitution inventory; no client writes or inference')
     auditing.add_argument('--project', type=Path, action='append', default=[])
     auditing.add_argument('--search-root', type=Path, action='append', default=[])
-    auditing.add_argument('--client', choices=['codex','cursor','all'], default='all')
+    auditing.add_argument('--client', choices=[*clients.CLIENTS,'all'], default='all')
     auditing.add_argument('--home', type=Path)
     auditing.add_argument('--format', choices=['text','json'], default='text')
     upgrading = sub.add_parser("upgrade", help="Activate a verified library without changing the source checkout")
@@ -639,11 +670,13 @@ def main(argv=None):
     update.add_argument("--sources", action="store_true", help="Also check curated official documentation for changes")
     update.add_argument("--source-checkout", action="store_true", help="Contributor mode: refresh the tracked snapshot instead of private cache")
     setup = sub.add_parser("install", help="Install global Codex/Cursor instructions and skills")
-    setup.add_argument("--platform", choices=["codex", "cursor", "all"], default="all")
+    setup.add_argument("--claude-dir", type=Path)
+    setup.add_argument("--platform", choices=[*clients.CLIENTS, "all"], default="all")
     setup.add_argument("--home", type=Path)
     setup.add_argument("--cursor-dir", type=Path, help="Explicit real Cursor configuration directory for relocated profiles; retained privately for sync")
     setup.add_argument("--dry-run", action="store_true")
     onboard = sub.add_parser("onboard", help="Adopt a project without replacing its own guidance")
+    onboard.add_argument("--client", action="append", choices=list(clients.CLIENTS))
     onboard.add_argument("--project", type=Path, required=True)
     onboard.add_argument("--pin", action="store_true", default=None)
     onboard.add_argument("--dry-run", action="store_true")
@@ -665,7 +698,7 @@ def main(argv=None):
     query.add_argument("--limit", type=int, default=30)
     sub.add_parser("providers", help="List every catalog provider and its model count")
     route_parser = sub.add_parser("route")
-    route_parser.add_argument("--platform", choices=["codex", "cursor", "grok-bot"], required=True)
+    route_parser.add_argument("--platform", choices=[*clients.CLIENTS, "grok-bot"], required=True)
     route_parser.add_argument("--task", choices=["small", "implementation", "deep", "review", "research", "operational"], default="implementation")
     route_parser.add_argument("--available", action="append", help="Eligible registry key; repeat to supply account-verified availability")
     route_parser.add_argument("--project", type=Path)
@@ -689,7 +722,7 @@ def main(argv=None):
         if __package__: from . import audit
         else: import audit
         home = args.home or Path.home()
-        profiles = [{'id':client,'client':client,'home':str(home/('.'+client))} for client in ('codex','cursor') if args.client in (client,'all')]
+        profiles = [{'id':client,'client':client,'home':str(clients.directory(client, args.home))} for client in clients.CLIENTS if args.client in (client,'all')]
         result = audit.scan({'projects':[str(p) for p in args.project], 'roots':[str(p) for p in args.search_root],
                              'profiles':profiles,'canonical':str(root),'state':str(state)})
         if args.format == 'json': print(json.dumps(result,indent=2))
@@ -744,11 +777,11 @@ def main(argv=None):
         platforms = ["codex", "cursor"] if args.platform == "all" else [args.platform]
         if args.cursor_dir and args.platform == "codex":
             raise ValueError("--cursor-dir applies to Cursor installation")
-        result = [install(root, state, platform=p, home=args.home, cursor_dir=args.cursor_dir, dry_run=args.dry_run) for p in platforms]
+        result = [install(root, state, platform=p, home=args.home, cursor_dir=args.cursor_dir, claude_dir=args.claude_dir, dry_run=args.dry_run) for p in platforms]
     elif args.command == "onboard":
         if args.adopt and args.pin is not None:
             raise ValueError("Adoption preserves the existing pin; omit --pin")
-        result = adopt(state, args.project, args.dry_run) if args.adopt else install(root, state, project=args.project, pin=args.pin, dry_run=args.dry_run)
+        result = adopt(state, args.project, args.dry_run) if args.adopt else install(root, state, project=args.project, pin=args.pin, selected_clients=args.client, dry_run=args.dry_run)
     elif args.command == "sync":
         result = sync(root, state, args.include_pinned, args.dry_run)
         exit_code = 2 if any(r["status"] == "error" for r in result) else 0

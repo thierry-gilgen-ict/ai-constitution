@@ -69,6 +69,13 @@ function fixture(scenario = 'ready') {
     if (!authorized) return {__status: 401, error: 'Open the authenticated dashboard from your terminal.'};
     if (p.startsWith('/api/workflows/')) return require('./workflows.cjs')(workspace,TIME)(p.replace('/api/workflows/',''),body);
     if (p.startsWith('/api/audit/')) return require('./audit.cjs')(PROJECT,TIME,VERSION)(p.replace('/api/audit/',''),body);
+    if(p.startsWith('/api/claude/')) {
+      const op=p.replace('/api/claude/','');
+      if(op==='overview')return {client:{status:'available',version:'2.1.286'},profiles:[{id:'claude-demo',home:HOME+'/.claude'}],settings:{monitoring:false,telemetry:false,share:false,automated_reviews:false,api_key_env:null},usage:{status:'not-collected'},note:'Synthetic preview. Native client loading and inference are not verified by this image.'};
+      if(op==='enroll-preview')return {plan:'claude-demo-plan',diffs:[{path:'CLAUDE.md',diff:'+ <!-- ai-constitution:begin -->\n+ @AGENTS.md\n+ <!-- ai-constitution:end -->'}]};
+      if(op==='launch-command')return {command:'python scripts/local_control.py --state-dir /private/demo-state claude --project '+PROJECT+' --profile claude-demo --mode '+body.mode};
+      return {status:'demonstration',note:'No native client or inference was executed.'};
+    }
     if (p === '/api/status') return state;
     if (p === '/api/version') return {version: VERSION, protocol: 2};
     if (p === '/api/inventory') return inventory;

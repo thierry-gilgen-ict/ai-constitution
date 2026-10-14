@@ -1,6 +1,6 @@
 # Routing
 
-Generated for v0.5.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
+Generated for v0.6.0. Edit `registry/models.json` and `registry/routes.json`, then run `build`.
 
 These are provisional starting points, not measured rankings. Respect an explicit model choice. Confirm account access and required tools before selecting a model. Reasoning levels and model identifiers can differ between clients.
 
@@ -24,6 +24,12 @@ These are provisional starting points, not measured rankings. Respect an explici
 | codex | operational | GPT-6.1 Sol | GPT-6 Astra |
 | cursor | operational | Composer 2.5 | Grok 4.7 |
 | grok-bot | operational | Platform-managed selection | Platform managed |
+| claude-code | small | Claude Haiku | Claude Sonnet |
+| claude-code | implementation | Claude Sonnet | Claude Haiku |
+| claude-code | deep | Claude Sonnet | Claude Haiku |
+| claude-code | review | Claude Opus | Claude Sonnet |
+| claude-code | research | Claude Opus | Claude Sonnet |
+| claude-code | operational | Claude Sonnet | Claude Haiku |
 
 ## Selection boundaries
 
@@ -42,3 +48,11 @@ These are provisional starting points, not measured rankings. Respect an explici
 - **Composer 2.5** (cursor): provisional; checked 2026-10-02. Official Cursor catalog; no comparative project evaluation yet. [Source](https://cursor.com/docs/models-and-pricing).
 - **Grok 4.7** (cursor): provisional; checked 2026-10-02. Official Cursor catalog; no comparative project evaluation yet. [Source](https://cursor.com/docs/models-and-pricing).
 - **Platform-managed selection** (grok-bot): documented; checked 2026-10-02. Grok Bot settings documentation. [Source](https://docs.x.ai/grok-bot/settings-and-notifications).
+- **Claude Haiku** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).
+- **Claude Sonnet** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).
+- **Claude Opus** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).
+- **Claude fable** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).
+- **Claude best** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).
+- **Claude opusplan** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).
+- **Claude sonnet[1m]** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).
+- **Claude opus[1m]** (claude-code): provisional; checked 2026-10-14. Official client alias documentation; no comparative project evaluation. [Source](https://code.claude.com/docs/en/model-config).

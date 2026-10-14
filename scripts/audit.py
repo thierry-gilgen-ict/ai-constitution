@@ -11,14 +11,18 @@ import re
 import time
 import tomllib
 if __package__:
+    from . import clients, claude_audit
+else:
+    import clients, claude_audit
+if __package__:
     from .paths import no_links, is_link
 else:
     from paths import no_links, is_link
 
 SCHEMA = 1
-ENGINE = '1.0'
+ENGINE = '1.1'
 SKIP = {'.git', '.local', 'node_modules', '.venv', 'venv', 'vendor', 'dist', 'build', '__pycache__'}
-NAMES = {'AGENTS.md', 'AGENTS.override.md', 'CLAUDE.md', '.cursorrules', 'ROUTING.md',
+NAMES = {'AGENTS.md', 'AGENTS.override.md', 'CLAUDE.md', 'CLAUDE.local.md', '.cursorrules', 'ROUTING.md',
          'routing.md', 'STATE.md', 'CHECKLIST.md', 'constitution.md', 'engineering.md',
          'research.md', 'maintenance.md', 'governance.json', 'policy.json', 'VERSION'}
 BEGIN, END = '<!-- ai-constitution:begin -->', '<!-- ai-constitution:end -->'
@@ -28,6 +32,12 @@ SENSITIVE=re.compile(r'''(?:sk-[A-Za-z0-9_-]{15,}|(?:ghp_|github_pat_|xai-)[A-Za
 
 def identity(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def target_id(target):
+    key=[target['root'],target['kind']]
+    if target.get('claude_dir'):key.append(target['claude_dir'])
+    return identity(key)[:24]
 
 
 def absolute(value):
@@ -101,7 +111,7 @@ def governance(value):
 
 def default_profiles(home=None):
     base=Path(home or Path.home()).absolute()
-    return [{'id':'codex','client':'codex','home':str(base/'.codex')}, {'id':'cursor','client':'cursor','home':str(base/'.cursor')}]
+    return [{'id':key,'client':key,'home':str(clients.directory(key, home))} for key in clients.CLIENTS]
 
 
 def scope(value, *, home=None):
@@ -118,7 +128,7 @@ def scope(value, *, home=None):
     if not isinstance(profiles,list) or len(profiles)>20: raise ValueError('Choose up to twenty profiles')
     seen=set()
     for entry in profiles:
-        if not isinstance(entry,dict) or set(entry)-{'id','client','home','cwd','account_rules','files','client_version'} or entry.get('client') not in ('codex','cursor'):
+        if not isinstance(entry,dict) or set(entry)-{'id','client','home','cwd','account_rules','files','client_version'} or entry.get('client') not in clients.CLIENTS:
             raise ValueError('Invalid client profile')
         if not re.fullmatch('[a-zA-Z0-9_-]{1,64}',entry.get('id','')) or entry['id'] in seen: raise ValueError('Use unique profile IDs')
         seen.add(entry['id'])
@@ -184,7 +194,7 @@ def scan(request, *, home=None, now=None, progress=lambda _:None, ownership=None
             else:
                 for name in sorted(files):
                     p=path/name; relative=p.relative_to(base)
-                    if name in NAMES or '.cursor' in relative.parts and p.suffix in ('.mdc','.md') or '.ai' in relative.parts and p.suffix=='.md':
+                    if name in NAMES or '.cursor' in relative.parts and p.suffix in ('.mdc','.md') or '.ai' in relative.parts and p.suffix=='.md' or '.claude' in relative.parts and 'rules' in relative.parts and p.suffix=='.md':
                         add(p,base,'project')
     def add(path,base,kind):
         key=str(path)
@@ -282,6 +292,9 @@ def scan(request, *, home=None, now=None, progress=lambda _:None, ownership=None
         try:entry['configuration_fingerprint']=identity([profile,fingerprint(base/'config.toml') if client=='codex' and (base/'config.toml').is_file() else None])
         except (OSError,ValueError):entry['configuration_fingerprint']=None;gap(base,'Profile configuration is unavailable')
         report['profiles'].append(entry);fallbacks=[];cap=32768
+        if client=='claude-code':
+            claude_audit.resolve(profile, entry, cfg, report, add, gap, finding, contents, absolute, fingerprint, document, identity)
+            continue
         if client=='codex':
             config=base/'config.toml'
             try:
@@ -397,15 +410,16 @@ def scan(request, *, home=None, now=None, progress=lambda _:None, ownership=None
     if cfg.get('state') or supplied_ownership is not None:
         try:
             database=supplied_ownership if supplied_ownership is not None else document(absolute(cfg['state'])/'installations.json')
-            if database and database.get('schema_version')!=1:raise ValueError()
+            if database and database.get('schema_version') not in (1,2):raise ValueError()
             for target in database.get('targets',{}).values():
                 base=absolute(target['root'])
                 if target['kind']=='project' and str(base) not in projects:continue
-                if target['kind'] in ('codex','cursor') and not any(p['client']==target['kind'] and (Path(p['home'])==base/('.'+target['kind']) or target.get('cursor_dir') and Path(p['home'])==Path(target['cursor_dir'])) for p in cfg['profiles']):continue
+                if target['kind'] in clients.CLIENTS and not any(p['client']==target['kind'] and (Path(p['home'])==Path(target.get('claude_dir') or clients.directory(target['kind'], base)) or target.get('cursor_dir') and Path(p['home'])==Path(target['cursor_dir'])) for p in cfg['profiles']):continue
                 for relative,expected in target.get('files',{}).items():
                     path=absolute(base/relative)
                     if target.get('cursor_dir') and relative.startswith('.cursor/'):path=absolute(Path(target['cursor_dir'])/relative[8:])
-                    if not path.is_relative_to(base) and not target.get('cursor_dir'):raise ValueError()
+                    if target.get('claude_dir') and relative.startswith('.claude/'):path=absolute(Path(target['claude_dir'])/relative[8:])
+                    if not path.is_relative_to(base) and not target.get('cursor_dir') and not target.get('claude_dir'):raise ValueError()
                     src=add(path,base,'project' if target['kind']=='project' else 'global')
                     current=fingerprint(path)
                     if expected.get('managed') and current:

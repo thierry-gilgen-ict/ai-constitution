@@ -4,7 +4,7 @@ import time
 from . import insights
 
 
-def select(control):
+def select(control, *, api=None):
     gaming = control.mode in ('gaming', 'draining')
     primary = control.config.get('fallback' if gaming else 'primary')
     if not primary: raise ValueError('Configure a working route in the dashboard first')
@@ -14,6 +14,9 @@ def select(control):
         preferred = control.config.get('fast_route')
         if preferred: candidates.sort(key=lambda e: (e['node'], e['model']) != (preferred['node'], preferred['model']))
     for endpoint in candidates:
+        if api=='messages':
+            from .messages import current
+            if not current(control,endpoint):continue
         node = endpoint['node']
         if node in control.config['maintenance'] or (node in control.admin_nodes and endpoint != primary): continue
         if gaming and not control.gaming_eligible(endpoint): continue

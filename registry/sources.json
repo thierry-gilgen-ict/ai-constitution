@@ -66,6 +66,12 @@
       "provider": "google",
       "url": "https://ai.google.dev/gemini-api/docs/models",
       "purpose": "Discovery source; verify before adding routes"
+    },
+    {
+      "id": "claude-code-models",
+      "provider": "anthropic",
+      "url": "https://code.claude.com/docs/en/model-config",
+      "purpose": "Claude Code aliases and backend availability"
     }
   ]
 }

@@ -41,7 +41,7 @@ class Access:
         targets=kit.state_load(locations.folder(self.root,'constitution_state'))['targets'].values()
         target=next((t for t in targets if t['kind']=='project' and Path(t['root'])==self.project),None)
         if not target:return {'status':'enrollment-required','note':'No project write was performed'}
-        return auditing.preview(self.root,{'target':audit.identity([target['root'],target['kind']])[:24]})
+        return auditing.preview(self.root,{'target':audit.target_id(target)})
 
 
 def server(root,project,profile):
