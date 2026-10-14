@@ -718,7 +718,7 @@ def main(argv=None):
         if __package__: from . import audit
         else: import audit
         home = args.home or Path.home()
-        profiles = [{'id':client,'client':client,'home':str(clients.directory(client, home))} for client in clients.CLIENTS if args.client in (client,'all')]
+        profiles = [{'id':client,'client':client,'home':str(clients.directory(client, args.home))} for client in clients.CLIENTS if args.client in (client,'all')]
         result = audit.scan({'projects':[str(p) for p in args.project], 'roots':[str(p) for p in args.search_root],
                              'profiles':profiles,'canonical':str(root),'state':str(state)})
         if args.format == 'json': print(json.dumps(result,indent=2))
