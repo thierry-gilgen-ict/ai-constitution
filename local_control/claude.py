@@ -121,7 +121,22 @@ def collect(root, identity=None, runner=bounded_run):
         value={'status':'available','profile':selected['id'],'observed_at':time.time(),'account':allowed,'allowance':None,'cost_basis':'subscription usage unknown'}
     except (OSError,ValueError,subprocess.TimeoutExpired):value={'status':'unavailable','profile':selected['id'],'observed_at':time.time(),'allowance':None}
     if not settings(root)['monitoring']:return {'status':'disabled'}
-    atomic(Path(root)/'claude-observation.json',value);return value
+    atomic(Path(root)/'claude-observation.json',value)
+    with wait_lock(Path(root)/'claude-observations'):
+        path=Path(root)/'claude-observations.json';kit.no_links(path)
+        records=kit.read_json(path) if path.exists() else {}
+        records[selected['id']]=value;atomic(path,records)
+    return value
+
+
+def collect_all(root):
+    if not settings(root)['monitoring']:return {}
+    result={}
+    for p in auditing.current_scope(root)['profiles']:
+        if p['client']!='claude-code':continue
+        try:result[p['id']]=collect(root,p['id'])
+        except (ValueError,OSError):result[p['id']]={'status':'unavailable','profile':p['id'],'allowance':None}
+    return result
 
 
 def telemetry(root, body):

@@ -33,6 +33,14 @@ class ClaudeRuntime(Fixture):
         self.assertIsNone(result['allowance'])
         with self.assertRaises(ValueError):claude.configure(self.root,{'api_key_env':'a real key here'})
 
+    def test_multiple_profiles_collect_independently(self):
+        claude.configure(self.root,{'monitoring':True})
+        profiles=[{'id':name,'client':'claude-code','home':str(self.profile)} for name in ('one','two')]
+        auditing.configure(self.root,{'scope':{'projects':[str(self.project)],'profiles':profiles}})
+        with patch('local_control.claude.collect',side_effect=lambda root,identity:{'status':'available','profile':identity}):
+            result=claude.collect_all(self.root)
+        self.assertEqual(set(result),{'one','two'})
+
     def test_telemetry_is_opt_in_bounded_redacted_and_deduplicated(self):
         with self.assertRaises(ValueError):claude.telemetry(self.root,{})
         claude.configure(self.root,{'telemetry':True})
