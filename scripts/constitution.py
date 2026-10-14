@@ -118,8 +118,10 @@ def managed_hash(body):
 def state_load(state):
     path = state / "installations.json"
     result = read_json(path) if path.exists() else {"schema_version": 1, "targets": {}}
-    if result.get("schema_version") != 1 or not isinstance(result.get("targets"), dict):
+    if result.get("schema_version") not in (1,2) or not isinstance(result.get("targets"), dict):
         raise ValueError("Unsupported installation-state schema; migrate state before continuing")
+    if any(not isinstance(t,dict) or t.get('kind') not in ('project',*clients.CLIENTS) for t in result['targets'].values()):
+        raise ValueError('Unsupported installed client; upgrade this CLI before maintaining its targets')
     return result
 
 
@@ -291,6 +293,7 @@ def adopt(state, project, dry_run=False):
         if override.exists() and override.stat().st_size:
             raise ValueError("AGENTS.override.md shadows AGENTS.md; reconcile it first")
         db = state_load(state)
+        if 'claude-code' in record.get('clients',[]):db['schema_version']=2
         identity = "project:" + str(project)
         if identity in db["targets"] and db["targets"][identity] != record:
             raise ValueError("Project already enrolled with different evidence; run doctor")
@@ -322,6 +325,7 @@ def _install(root, state, *, platform=None, project=None, home=None, cursor_dir=
     enabled = list(dict.fromkeys([*previous.get("clients", clients.LEGACY if project else []), *(selected_clients or [])]))
     if any(c not in clients.CLIENTS for c in enabled):
         raise ValueError("Unknown project client")
+    if platform=='claude-code' or 'claude-code' in enabled:db['schema_version']=2
     if project and not previous and safe_path(target_root, ".ai/constitution.lock.json").exists():
         raise ValueError("Existing project lock: run onboard --adopt to verify and enroll this bundle first")
     if pin is None:

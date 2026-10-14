@@ -24,6 +24,7 @@ class ClaudeCore(unittest.TestCase):
         kit.install(kit.ROOT,self.state,project=self.project,selected_clients=['claude-code'])
         lock=json.loads((self.project/'.ai/constitution.lock.json').read_text())
         self.assertEqual(lock['schema_version'],2)
+        self.assertEqual(kit.state_load(self.state)['schema_version'],2)
         self.assertIn('Existing owner guidance',(self.project/'CLAUDE.md').read_text())
         record=project_record(self.project,modules=kit.MODULES,safe_path=kit.safe_path,managed_hash=kit.managed_hash,digest=kit.digest)
         self.assertIn('claude-code',record['clients'])

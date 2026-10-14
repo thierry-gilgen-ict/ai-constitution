@@ -410,7 +410,7 @@ def scan(request, *, home=None, now=None, progress=lambda _:None, ownership=None
     if cfg.get('state') or supplied_ownership is not None:
         try:
             database=supplied_ownership if supplied_ownership is not None else document(absolute(cfg['state'])/'installations.json')
-            if database and database.get('schema_version')!=1:raise ValueError()
+            if database and database.get('schema_version') not in (1,2):raise ValueError()
             for target in database.get('targets',{}).values():
                 base=absolute(target['root'])
                 if target['kind']=='project' and str(base) not in projects:continue

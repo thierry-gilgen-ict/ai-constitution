@@ -17,6 +17,8 @@ For a custom profile, pass `--claude-dir /path/to/profile` to global installatio
 
 Project enrollment adds a managed `CLAUDE.md` import of `AGENTS.md`, preserves owner text and records schema 2 with explicit client selections. Existing schema-1 projects remain readable. Synchronization preserves client selections; the legacy `install --platform all` still installs Codex and Cursor only. Existing project locks must be adopted before enrollment.
 
+Use AI Constitution 0.6 or later before enabling Claude. Its private installation database also moves to schema 2 on explicit enrollment, so older maintenance tools refuse it instead of accidentally rewriting Claude targets. Ordinary Codex/Cursor installations retain schema 1 until that opt-in. Rollback retains the previous database in the private transaction journal.
+
 The health scanner explains Claude imports, rules, exclusions, local files and version-dependent `AGENTS.md` selection. External imports can require native approval. Rules with `paths` are conditional. Ancestors outside approved roots are coverage gaps, not automatically read. Scanning executes neither repository commands nor inference. Confirm actual loading in a fresh native session using `/context`; record the evidence in Constitution health. [Instruction behavior](https://code.claude.com/docs/en/memory).
 
 ## MCP and portable assets
