@@ -1,5 +1,7 @@
 # Security and privacy
 
+Claude support is opt-in. Account collection does not scrape authentication stores. Telemetry has a separate ingestion-only credential and stores aggregate counters without prompts or raw event bodies. Public exports reject `.claude.json` and `CLAUDE.local.md`. Isolated reviews disable tools, MCP and hooks, use temporary directories and produce candidates requiring diff approval; subscription login is not reused for unattended execution. See [Claude compatibility](docs/claude-code.md) for rollout controls and acceptance limitations.
+
 The project distributes instructions and model metadata. It does not enforce a security boundary around an agent, replace host approval controls, or guarantee model compliance.
 
 ## Data boundaries

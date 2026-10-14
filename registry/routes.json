@@ -168,6 +168,66 @@
       "preferred": "grok-bot:managed",
       "fallbacks": [],
       "note": "Capability and authority first. Risk is separate from model tier; preserve explicit selections. Deployment requires its authorized scope."
+    },
+    {
+      "platform": "claude-code",
+      "task": "small",
+      "description": "Small, well-specified edits",
+      "preferred": "claude-code:fast",
+      "fallbacks": [
+        "claude-code:balanced"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "claude-code",
+      "task": "implementation",
+      "description": "Ordinary implementation",
+      "preferred": "claude-code:balanced",
+      "fallbacks": [
+        "claude-code:fast"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "claude-code",
+      "task": "deep",
+      "description": "Difficult debugging and architecture",
+      "preferred": "claude-code:balanced",
+      "fallbacks": [
+        "claude-code:fast"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "claude-code",
+      "task": "review",
+      "description": "Review correctness and regressions",
+      "preferred": "claude-code:deep",
+      "fallbacks": [
+        "claude-code:balanced"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "claude-code",
+      "task": "research",
+      "description": "Evidence gathering with appropriate tools",
+      "preferred": "claude-code:deep",
+      "fallbacks": [
+        "claude-code:balanced"
+      ],
+      "note": "Recommendation only. Retain the user's chosen model unless changing it is authorized. Verify tool availability separately."
+    },
+    {
+      "platform": "claude-code",
+      "task": "operational",
+      "description": "Bounded operational diagnosis and release preparation",
+      "preferred": "claude-code:balanced",
+      "fallbacks": [
+        "claude-code:fast"
+      ],
+      "note": "Capability and authority first. Risk is separate from model tier; preserve explicit selections. Deployment requires its authorized scope."
     }
   ]
 }

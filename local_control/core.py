@@ -662,7 +662,7 @@ class Control:
                 self.changed.notify_all()
 
     @contextmanager
-    def lease(self, payload, *, direct=False):
+    def lease(self, payload, *, direct=False, api=None):
         if payload.get("previous_response_id") or payload.get("conversation"):
             raise ValueError("Send full conversation history; server-side response IDs cannot move between machines")
         if not direct and payload.get('model') != ALIAS:
@@ -681,7 +681,7 @@ class Control:
                 while True:
                     if request_id in self.cancelled_requests:
                         raise ValueError('Queued request cancelled before inference; no generation was sent')
-                    endpoint = {'node': 'local', 'model': model_name(payload.get('model'))} if direct else self.route()
+                    endpoint = {'node': 'local', 'model': model_name(payload.get('model'))} if direct else __import__('local_control.routing',fromlist=['select']).select(self,api='messages') if api=='messages' else self.route()
                     node_id = endpoint['node']
                     self.waiting_nodes[request_id] = node_id
                     if self.config.get('driver_hold') or node_id in self.config['maintenance']:
@@ -709,7 +709,8 @@ class Control:
                 self.changed.notify_all()
                 self.cancelled_requests.discard(request_id)
         try:
-            body = {**payload, "model": endpoint["model"], "store": False, "truncation": "disabled"}
+            body = {**payload, "model": endpoint["model"]}
+            if api != "messages":body.update(store=False,truncation="disabled")
             yield self.node(endpoint["node"]), body
         finally:
             with self.changed:

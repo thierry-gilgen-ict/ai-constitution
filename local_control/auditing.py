@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import time
 import uuid
+from scripts import clients
 from scripts import audit, constitution as kit, releases
 from scripts.catalog import digest, json_bytes
 from . import locations, synchronization
@@ -17,7 +18,7 @@ CORRECTIONS={'restore-missing','managed-update','generated-refresh','reference-m
 PERMISSIONS={'scan','report','preview','apply','review','excerpts'}
 DEFAULT={'schema':1,'scope':{},'mode':'notify','corrections':[],'approved_source':None,
          'schedule':{'enabled':False,'hours':24,'changes':False,'paused':False,'window_start':None,'window_end':None},
-         'semantic':{'enabled':False,'client':'codex','profile':None,'hours':168,'minutes':10,'max_projects':3},
+         'semantic':{'enabled':False,'client':'codex','profile':None,'execution':'handoff','hours':168,'minutes':10,'max_projects':3},
          'notifications':True,'native_notifications':False,'retention_days':90,'grants':{},'overrides':{},'mcp_projects':[]}
 
 
@@ -47,7 +48,7 @@ def configure(root, body):
         value=settings(root)
         if body.get('target'):
             identity=body['target'];db=kit.state_load(locations.folder(root,'constitution_state'))
-            if not any(audit.identity([t['root'],t['kind']])[:24]==identity for t in db['targets'].values()):raise ValueError('Choose an enrolled policy target')
+            if not any(audit.target_id(t)==identity for t in db['targets'].values()):raise ValueError('Choose an enrolled policy target')
             if set(body)-{'target','mode','corrections'}:raise ValueError('Target policies accept mode and correction types')
             mode=body.get('mode','notify');types=body.get('corrections',[])
             if mode not in ('notify','propose','automatic') or not isinstance(types,list) or set(types)-CORRECTIONS:raise ValueError('Invalid target correction policy')
@@ -83,7 +84,8 @@ def configure(root, body):
                 start,end=candidate.get('window_start'),candidate.get('window_end')
                 if (start is None)!=(end is None) or start is not None and (type(start) is not int or type(end) is not int or not 0<=start<=23 or not 0<=end<=23 or start==end):raise ValueError('Choose distinct maintenance-window hours from 0 to 23, or leave both empty')
             if key=='semantic':
-                if candidate['client'] not in ('codex','cursor') or type(candidate['minutes']) is not int or not 1<=candidate['minutes']<=10 or type(candidate['max_projects']) is not int or not 1<=candidate['max_projects']<=3:raise ValueError('Invalid bounded review settings')
+                if candidate.get('execution','handoff') not in ('handoff','api','local') or candidate.get('execution','handoff')!='handoff' and candidate['client']!='claude-code':raise ValueError('Only Claude supports isolated execution; other clients use handoffs')
+                if candidate['client'] not in tuple(clients.CLIENTS) or type(candidate['minutes']) is not int or not 1<=candidate['minutes']<=10 or type(candidate['max_projects']) is not int or not 1<=candidate['max_projects']<=3:raise ValueError('Invalid bounded review settings')
                 profiles=[p for p in audit.scope(value['scope'])['profiles'] if p['client']==candidate['client']]
                 profile=candidate.get('profile')
                 if profile is not None and not any(p['id']==profile for p in profiles):raise ValueError('Choose a review profile in the selected scope')
@@ -129,14 +131,18 @@ def authorize(root, principal, operation):
     return allowed
 
 
-def target_allowed(target, granted):
+def target_allowed(target, granted, *, root=None):
     if not granted:return True
     kind=target['kind'];path=audit.absolute(target['root'])
     if kind=='codex':path=path/'.codex'
+    if kind=='claude-code':path=Path(target.get('claude_dir') or clients.directory(kind,path))
     if kind=='cursor':path=Path(target.get('cursor_dir') or path/'.cursor')
-    if not (kind=='project' or kind in granted['profiles']) or not any(path.is_relative_to(Path(p)) for p in granted['roots']):return False
+    profiles={kind}
+    if root is not None and kind in clients.CLIENTS:
+        profiles={p['id'] for p in current_scope(root)['profiles'] if p['client']==kind and Path(p['home'])==path}
+    if not (kind=='project' or profiles.intersection(granted['profiles'])) or not any(path.is_relative_to(Path(p)) for p in granted['roots']):return False
     for relative in target.get('files',{}):
-        candidate=audit.absolute(kit.installed_path(Path(target['root']),relative,target.get('cursor_dir')))
+        candidate=audit.absolute(kit.installed_path(Path(target['root']),relative,target.get('cursor_dir'),target.get('claude_dir')))
         if not any(candidate.is_relative_to(Path(p)) for p in granted['roots']):return False
     return True
 
@@ -181,7 +187,7 @@ def scan(root, progress=lambda _:None, *, granted=None, record_unchanged=True):
         owned=None
         if granted:
             db=kit.state_load(locations.folder(root,'constitution_state'))
-            owned={'schema_version':1,'targets':{k:t for k,t in db['targets'].items() if target_allowed(t,granted)}}
+            owned={'schema_version':1,'targets':{k:t for k,t in db['targets'].items() if target_allowed(t,granted,root=root)}}
         report=audit.scan(current_scope(root,granted),progress=progress,ownership=owned)
         report['application_version']=__import__('local_control',fromlist=['VERSION']).VERSION
         report['machine_id']=audit.identity([__import__('platform').node(),str(Path.home())])[:24]
@@ -224,20 +230,20 @@ def loading(root, body):
 def preview(root, body, *, granted=None):
     canonical=source(root);state=locations.folder(root,'constitution_state');cfg=policy_for(root,body.get('target'))
     requested=body.get('target');db=kit.state_load(state)
-    candidates=[(k,t) for k,t in db['targets'].items() if audit.identity([t['root'],t['kind']])[:24]==requested]
+    candidates=[(k,t) for k,t in db['targets'].items() if audit.target_id(t)==requested]
     if len(candidates)!=1:raise ValueError('Choose an enrolled installation target')
     key,target=candidates[0];path=audit.absolute(target['root'])
-    if not target_allowed(target,granted):raise ValueError('Target is outside the local grant')
+    if not target_allowed(target,granted,root=root):raise ValueError('Target is outside the local grant')
     if target.get('pinned') or str(path) in synchronization.settings(root)['paused_projects']:raise ValueError('Pinned or paused target requires its owner to change that policy')
     with wait_lock(Path(root)/'sync-operations'),wait_lock(Path(root)/'studio-operations'),wait_lock(state):
         signature=source_signature(root)
         _,immutable=releases.prepare(releases.files(canonical),state,preview=True)
         writes={};database=copy.deepcopy(db)
-        kwargs={'project':path} if target['kind']=='project' else {'platform':target['kind'],'home':path,'cursor_dir':Path(target['cursor_dir']) if target.get('cursor_dir') else None}
+        kwargs={'project':path} if target['kind']=='project' else {'platform':target['kind'],'home':path,'cursor_dir':Path(target['cursor_dir']) if target.get('cursor_dir') else None,'claude_dir':Path(target['claude_dir']) if target.get('claude_dir') else None}
         kit._install(canonical,state,**kwargs,planned=writes,database=database,source_reference=immutable)
         changes=[]
         for name,data in writes.items():
-            if not name.is_relative_to(path) and not (target.get('cursor_dir') and name.is_relative_to(Path(target['cursor_dir']))):continue
+            if not name.is_relative_to(path) and not any(target.get(k) and name.is_relative_to(Path(target[k])) for k in ('cursor_dir','claude_dir')):continue
             before=name.read_bytes() if name.exists() else None
             if before==data:continue
             correction='restore-missing' if before is None else 'generated-refresh' if name.name=='routing.md' else 'managed-update'
@@ -266,7 +272,7 @@ def apply(root, body, *, granted=None, automatic=False, principal=None):
     with wait_lock(Path(root)/'audit-policy'),wait_lock(Path(root)/'sync-operations'),wait_lock(Path(root)/'studio-operations'),wait_lock(state):
         if principal:granted=authorize(root,principal,'apply')
         cfg=policy_for(root,proposal['target']);db=kit.state_load(state);target=db['targets'].get(proposal['installation'])
-        if not target or not target_allowed(target,granted):raise ValueError('Target outside the current grant')
+        if not target or not target_allowed(target,granted,root=root):raise ValueError('Target outside the current grant')
         prior=store.get('request',request_id)
         if prior:
             if prior['signature']!=proposal['plan'] or principal and prior.get('principal')!=principal:raise ValueError('Request belongs to another proposal or controller')
@@ -274,7 +280,7 @@ def apply(root, body, *, granted=None, automatic=False, principal=None):
         if not target or digest(json_bytes(db))!=proposal['enrollment'] or source_signature(root)!=proposal['source_signature']:raise ValueError('Source or enrollment changed; preview again')
         path=audit.absolute(target['root'])
         if target.get('pinned') or str(path) in synchronization.settings(root)['paused_projects']:raise ValueError('Target was pinned or paused after preview')
-        if not target_allowed(target,granted):raise ValueError('Target outside local grant')
+        if not target_allowed(target,granted,root=root):raise ValueError('Target outside local grant')
         if automatic and (cfg['mode']!='automatic' or cfg['approved_source']!=proposal['source_signature'] or any(c['correction'] not in cfg['corrections'] for c in proposal['changes'])):raise ValueError('This correction is not preauthorized')
         for change in proposal['changes']:
             if audit.fingerprint(Path(change['path']))!=change['before']:raise ValueError('Target changed; preview again')
@@ -282,7 +288,7 @@ def apply(root, body, *, granted=None, automatic=False, principal=None):
         if existing:return {'status':'needs-review','request':request_id}
         writes={};canonical=source(root)
         _,immutable=releases.prepare(releases.files(canonical),state)
-        kwargs={'project':path} if target['kind']=='project' else {'platform':target['kind'],'home':path,'cursor_dir':Path(target['cursor_dir']) if target.get('cursor_dir') else None}
+        kwargs={'project':path} if target['kind']=='project' else {'platform':target['kind'],'home':path,'cursor_dir':Path(target['cursor_dir']) if target.get('cursor_dir') else None,'claude_dir':Path(target['claude_dir']) if target.get('claude_dir') else None}
         kit._install(canonical,state,**kwargs,planned=writes,database=copy.deepcopy(db),source_reference=immutable)
         for change in proposal['changes']:
             if digest(writes[Path(change['path'])])!=change['after']:raise ValueError('Rendered correction changed')
@@ -306,7 +312,7 @@ def rollback(root,body,*,granted=None,principal=None):
         if principal:
             granted=authorize(root,principal,'apply')
             target=kit.state_load(state)['targets'].get(proposal.get('installation'))
-            if not target or not target_allowed(target,granted):raise ValueError('Rollback target outside current grant')
+            if not target or not target_allowed(target,granted,root=root):raise ValueError('Rollback target outside current grant')
         prior=store.get('request',request)
         if prior:
             if prior['signature']!=signature or principal and prior.get('principal')!=principal:raise ValueError('Request belongs to another correction or controller')
@@ -322,7 +328,7 @@ def rollback(root,body,*,granted=None,principal=None):
 
 def overview(root):
     cfg=settings(root);store=Store(root);reports=store.list('report',10);state=locations.folder(root,'constitution_state')
-    targets=[{'id':audit.identity([t['root'],t['kind']])[:24],'name':Path(t['root']).name,'kind':t['kind'],'release':t['version'],'pinned':t.get('pinned',False)} for t in kit.state_load(state)['targets'].values()]
+    targets=[{'id':audit.target_id(t),'name':Path(t['root']).name,'kind':t['kind'],'release':t['version'],'pinned':t.get('pinned',False)} for t in kit.state_load(state)['targets'].values()]
     from . import schedules,plans
     machines={}
     for remote in store.list('remote'):
@@ -337,7 +343,7 @@ def overview(root):
         if summary.get('machine_id'):
             item=machines.setdefault(summary['machine_id'],{'id':summary['machine_id'],'connections':[],'observed_at':summary.get('observed_at'),'status':'controller-snapshot'})
             item['connections'].append({'id':path.stem[5:],'kind':'controller'});item['summary']=summary
-    return {'schema':1,'settings':cfg,'os_schedule':schedules.read(root,'audit'),'profile_defaults':audit.default_profiles(),'targets':targets,'latest':annotated(root,reports[0]) if reports else None,
+    return {'schema':1,'client_capabilities':clients.capabilities(),'settings':cfg,'os_schedule':schedules.read(root,'audit'),'profile_defaults':audit.default_profiles(),'targets':targets,'latest':annotated(root,reports[0]) if reports else None,
             'history':[{'id':r['id'],'observed_at':r['observed_at'],'findings':len(r['findings']),'complete':r['coverage']['complete']} for r in reports],
             'proposals':store.list('proposal'),'notifications':store.list('notification'),'remote':store.list('remote'),
             'reviews':[{'id':r['id'],'client':r['client'],'created_at':r['created_at'],'status':'handoff'} for r in store.list('review')],
@@ -359,6 +365,7 @@ def remote(control, body, progress=lambda _:None):
         if 'constitution-audit-v1' not in version.get('capabilities',[]):raise ValueError('Worker update required for constitution health')
         payload=body.get('body',{})
         if not isinstance(payload,dict):raise ValueError('Use a bounded operation request')
+        if operation=='review' and payload.get('client')=='claude-code' and 'claude-code' not in version.get('audit_clients',[]):raise ValueError('Worker update required for Claude instruction reviews')
         if operation in ('scan','apply','rollback'):
             payload=copy.deepcopy(payload)
             if operation!='scan':payload.setdefault('request',uuid.uuid4().hex)
@@ -400,14 +407,14 @@ def schedule_targets(root,report):
     for target in kit.state_load(locations.folder(root,'constitution_state'))['targets'].values():
         path=Path(target['root']);kind=target['kind']
         eligible=kind=='project' and path in projects and path.is_dir()
-        if kind in ('codex','cursor'):
-            home=Path(target.get('cursor_dir') or path/('.'+kind))
+        if kind in tuple(clients.CLIENTS):
+            home=Path(target.get('cursor_dir') or target.get('claude_dir') or clients.directory(kind, path))
             eligible=any(p['client']==kind and Path(p['home'])==home and p.get('configuration')=='available' for p in report['profiles'])
-        if eligible:selected.add(audit.identity([target['root'],kind])[:24])
+        if eligible:selected.add(audit.target_id(target))
     return selected
 
 
-def scheduled(root, progress=lambda _:None):
+def scheduled(root, progress=lambda _:None, *, controller=None):
     with wait_lock(Path(root)/'audit-due',timeout=1):
         cfg=settings(root);schedule=cfg['schedule'];store=Store(root)
         if (not schedule['enabled'] and not cfg['semantic']['enabled']) or schedule['paused']:return {'status':'disabled'}
@@ -443,13 +450,27 @@ def scheduled(root, progress=lambda _:None):
         if review_due:
             from .audit_review import prepare
             for project in report['projects'][:semantic['max_projects']]:
-                try:reviews.append(prepare(root,{'report':report['id'],'project':project['path'],'client':semantic['client'],'profile':semantic.get('profile')}))
-                except ValueError:continue
+                try:
+                    body={'report':report['id'],'project':project['path'],'client':semantic['client'],'profile':semantic.get('profile')}
+                    if semantic.get('execution','handoff')!='handoff':
+                        from . import claude
+                        if controller is None and semantic['execution']=='local':raise ValueError('Local review requires the owning controller')
+                        from types import SimpleNamespace
+                        candidate=claude.review(controller or SimpleNamespace(root=Path(root)),{**body,'execution':semantic['execution'],'minutes':semantic['minutes']})
+                        reviews.append({'id':candidate['id'],'status':'needs-review'})
+                    else:reviews.append(prepare(root,body))
+                except (ValueError,OSError,__import__('subprocess').SubprocessError):
+                    notice='review-failed-'+audit.identity([project['id'],report['id']])[:24]
+                    store.put('notification',notice,{'id':notice,'created_at':time.time(),'message':'Scheduled Claude review unavailable; inspect profile, credentials and execution prerequisites.','acknowledged':False})
             store.put('schedule','semantic',{'at':time.time(),'reviews':[r['id'] for r in reviews]})
             notice='review-'+audit.identity([r['id'] for r in reviews])[:24]
             if reviews and cfg['notifications'] and not store.get('notification',notice):
                 store.put('notification',notice,{'id':notice,'created_at':time.time(),'message':f'{len(reviews)} constitution review handoffs ready','acknowledged':False})
         return {'status':'scanned','report':report['id'],'corrections':corrections,'reviews':[{'id':r['id'],'status':r['status']} for r in reviews]}
+
+
+def run_scheduled(control, progress=lambda _:None):
+    return scheduled(control.root,progress,controller=control)
 
 
 def dispatch(control, operation, body=None, *, principal=None):
@@ -460,7 +481,7 @@ def dispatch(control, operation, body=None, *, principal=None):
         if granted:
             for private in ('settings','profile_defaults','os_schedule','reviews','receipts','github','fleet','remote_operations','evidence_usage'):value.pop(private,None)
             db=kit.state_load(locations.folder(root,'constitution_state'))
-            value['targets']=[t for t in value['targets'] if any(audit.identity([v['root'],v['kind']])[:24]==t['id'] and target_allowed(v,granted) for v in db['targets'].values())]
+            value['targets']=[t for t in value['targets'] if any(audit.target_id(v)==t['id'] and target_allowed(v,granted,root=root) for v in db['targets'].values())]
             value['proposals']=[p for p in value['proposals'] if p['kind']=='managed' and p['target'] in {t['id'] for t in value['targets']}]
             if 'excerpts' not in granted['permissions']:
                 for p in value['proposals']:
@@ -520,7 +541,7 @@ def dispatch(control, operation, body=None, *, principal=None):
         Access(root,body.get('project'),body.get('profile'))
         # Global arguments precede the subcommand in the native CLI.
         argv=command('--state-dir',root,'audit-mcp','--project',body['project'],'--profile',body['profile'])
-        return {'command':argv[0],'args':argv[1:],'note':'Use a runtime with requirements-mcp.txt installed. Install this server through the client’s MCP settings; start a fresh session and test a tool.'}
+        return {'command':argv[0],'args':argv[1:],'claude_config':{'mcpServers':{'ai-constitution-health':{'type':'stdio','command':argv[0],'args':argv[1:]}}},'note':'Use a runtime with requirements-mcp.txt installed. Install this server through the client’s MCP settings; start a fresh session and test a tool.'}
     if operation=='review-import':
         from .audit_review import import_result
         return import_result(root,body)

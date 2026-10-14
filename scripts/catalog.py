@@ -27,7 +27,7 @@ MAX_BYTES = 32 * 1024 * 1024
 OFFICIAL_HOSTS = frozenset({
     "models.dev", "developers.openai.com", "platform.openai.com", "learn.chatgpt.com",
     "cursor.com", "prod.cursor.com", "docs.cursor.com", "docs.x.ai", "x.ai",
-    "platform.claude.com", "docs.anthropic.com", "ai.google.dev", "docs.ollama.com",
+    "code.claude.com", "claude.com", "platform.claude.com", "docs.anthropic.com", "ai.google.dev", "docs.ollama.com",
     "lmstudio.ai",
 })
 

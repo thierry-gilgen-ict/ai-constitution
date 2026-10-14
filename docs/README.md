@@ -4,7 +4,7 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 
 <!-- screenshots:manual-summary:begin -->
 
-**[Illustrated manual](manual/README.md)** · 114 images of the actual UI, with fictional data and step-by-step captions.
+**[Illustrated manual](manual/README.md)** · 122 images of the actual UI, with fictional data and step-by-step captions.
 
 <!-- screenshots:manual-summary:end -->
 
@@ -46,3 +46,5 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 ## Contribute and maintain
 
 [Screenshot maintenance](screenshot-maintenance.md) · [Contributing](https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/CONTRIBUTING.md) · [Release guide](releasing.md) · [Changelog](../CHANGELOG.md) · [Report a bug](https://github.com/thierry-gilgen-ict/ai-constitution/issues/new/choose)
+
+Claude Code compatibility: [setup and limitations](claude-code.md) · [illustrated workflows](manual/claude.md).

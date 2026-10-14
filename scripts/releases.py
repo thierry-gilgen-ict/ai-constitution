@@ -29,7 +29,7 @@ def private_path(name):
     parts = PurePosixPath(name).parts
     for part in parts:
         lower = part.casefold()
-        if (lower in {'auth.json', 'config.json', 'runtime.json', 'pairing.json',
+        if (lower in {'auth.json', '.claude.json', 'claude.local.md', 'config.json', 'runtime.json', 'pairing.json',
                       'drivers.json', 'server.log', '.local', '.config', '.ssh',
                       'transactions', 'configurations', 'local-worker', 'pki', 'secrets'}
                 or lower.startswith(('.env', 'credentials'))

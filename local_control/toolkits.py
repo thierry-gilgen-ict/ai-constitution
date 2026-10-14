@@ -81,6 +81,15 @@ def export(value,format):
         row={'url':s['url']} if 'url' in s else {'command':s['command'],'args':s['args'],'env':{n:'${env:'+n+'}' for n in s.get('environment',[])}}
         if s.get('bearer_env'):row['headers']={'Authorization':'Bearer ${env:'+s['bearer_env']+'}'}
         servers[s['id']]=row
+    if format=='claude-code':
+        files={'.mcp.json':json.dumps({'mcpServers':json.loads(json.dumps(servers).replace('${env:','${'))},indent=2)+'\n'}
+        for group in ('rules','skills','commands'):
+            for a in value[group]:
+                name='constitution-'+value['id']+'-'+a['id']
+                path='.claude/rules/'+name+'.md' if group=='rules' else '.claude/skills/'+name+'/SKILL.md'
+                header='' if group=='rules' else '---\nname: '+name+'\ndescription: '+json.dumps(a['description'])+'\n---\n\n'
+                files[path]=header+a['content']+'\n'
+        return {'format':format,'files':files,'losses':['Exported configuration still needs trusted-client approval and loading verification.']}
     if format=='native':return {'format':format,'document':value,'losses':[]}
     if format=='rulesync':
         files={'.rulesync/mcp.jsonc':json.dumps({'mcpServers':servers},indent=2)+'\n'}
@@ -147,6 +156,9 @@ def _writes(root,body):
         path=kit.safe_path(project,relative);before=plans.fingerprint(path)
         if before is not None and before!=old['files'].get(relative):raise ValueError('Toolkit file has local edits or another owner')
         data=text.encode();writes[path]=data;owned[relative]=digest(data)
+    from . import locations
+    enrollment=kit.state_load(locations.folder(root,'constitution_state'))['targets'].get('project:'+str(project),{})
+    claude_enabled='claude-code' in enrollment.get('clients',[])
     servers={};codex=[];rules=[]
     for value in chosen:
         for group in ('rules','skills','commands'):
@@ -154,6 +166,8 @@ def _writes(root,body):
                 name='constitution-'+value['id']+'-'+a['id'];header='---\nname: '+name+'\ndescription: '+json.dumps(a['description'])+'\n---\n\n'
                 if group=='rules':
                     rules.append(a['content']);file('.cursor/rules/'+name+'.mdc','---\ndescription: '+json.dumps(a['description'])+'\nalwaysApply: true\n---\n\n'+a['content']+'\n')
+                if claude_enabled and group in ('skills','commands'):
+                    file('.claude/skills/'+name+'/SKILL.md',header+a['content']+'\n')
                 if group in ('skills','commands'):
                     file('.agents/skills/'+name+'/SKILL.md',header+a['content']+'\n')
                     if group=='commands':file('.cursor/commands/'+name+'.md',header+a['content']+'\n')
@@ -197,7 +211,19 @@ def _writes(root,body):
         del cursor['mcpServers'][name]
     if set(servers)&set(cursor['mcpServers']):raise ValueError('Cursor MCP server name already in use')
     cursor['mcpServers'].update(servers);writes[path]=json_bytes(cursor)
-    db['projects'][str(project)]={'kits':ids,'versions':{v['id']:v['version'] for v in chosen},'files':owned,'blocks':old['blocks'],'mcp':{n:digest(json_bytes(s)) for n,s in servers.items()}}
+    claude_hashes={}
+    if claude_enabled or old.get('claude_mcp'):
+        path=kit.safe_path(project,'.mcp.json');plans.fingerprint(path)
+        data=kit.read_json(path) if path.exists() else {'mcpServers':{}}
+        if not isinstance(data,dict) or not isinstance(data.get('mcpServers'),dict):raise ValueError('Invalid Claude MCP configuration')
+        for name,hashvalue in old.get('claude_mcp',{}).items():
+            if digest(json_bytes(data['mcpServers'].get(name)))!=hashvalue:raise ValueError('Claude MCP server has local edits')
+            del data['mcpServers'][name]
+        converted=json.loads(json.dumps(servers).replace('${env:','${')) if claude_enabled else {}
+        if set(converted)&set(data['mcpServers']):raise ValueError('Claude MCP server name already in use')
+        data['mcpServers'].update(converted);writes[path]=json_bytes(data)
+        claude_hashes={name:digest(json_bytes(v)) for name,v in converted.items()}
+    db['projects'][str(project)]={'claude_mcp':claude_hashes,'kits':ids,'versions':{v['id']:v['version'] for v in chosen},'files':owned,'blocks':old['blocks'],'mcp':{n:digest(json_bytes(s)) for n,s in servers.items()}}
     writes[Path(root)/'workspace/toolkits.json']=json_bytes(db)
     return project,writes
 

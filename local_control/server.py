@@ -19,8 +19,9 @@ WEB = Path(__file__).parent / "web"
 ASSETS = {"/experience.js": ("experience.js", "text/javascript"), "/": ("index.html", "text/html"), "/app.js": ("app.js", "text/javascript"), "/studio.js": ("studio.js", "text/javascript"), "/center.js": ("center.js", "text/javascript"), "/style.css": ("style.css", "text/css")}
 NODE_GET = {"/api/version", "/api/tags", "/api/ps"}
 ASSETS['/workflows.js'] = ('workflows.js','text/javascript')
+ASSETS['/claude.js'] = ('claude.js','text/javascript')
 ASSETS['/audit.js'] = ('audit.js','text/javascript')
-NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions"}
+NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions", "/v1/messages"}
 
 
 class Server(ThreadingHTTPServer):
@@ -72,6 +73,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Security-Policy", "default-src 'self'; connect-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
 
     def reply(self, value, status=200, *, cookie=False):
+        if status>=400 and self.path.startswith(('/v1/messages','/node/v1/messages')):
+            detail=value.get('error','Messages request failed') if isinstance(value,dict) else 'Messages request failed'
+            value={'type':'error','error':{'type':'authentication_error' if status in (401,403) else 'invalid_request_error',
+                                         'message':detail if isinstance(detail,str) else 'Messages request failed'}}
         body = json.dumps(value).encode()
         self.send_response(status)
         self.headers_common("application/json")
@@ -92,6 +97,14 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 token = ""
         config = self.server.control.config
+        if self.path=='/api/claude/telemetry':
+            from .claude import settings
+            from scripts import constitution as kit
+            path=self.server.control.root/'claude-telemetry-token.json'
+            kit.no_links(path)
+            return bool(settings(self.server.control.root)['telemetry'] and path.exists() and hmac.compare_digest(token,kit.read_json(path)['token']))
+        if self.path in ('/v1/messages','/node/v1/messages') and not token:
+            token=self.headers.get('x-api-key','')
         self.principal = None
         if self.server.worker:
             inference = self.path.startswith('/node/v1/')
@@ -171,7 +184,7 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 target = path.removeprefix("/node")
                 if target in ('/version', '/admin/version') and not post:
-                    self.reply({'version': updates.current(), 'protocol': 2, 'capabilities': ['updates', 'diagnostics', 'monitoring', 'drivers', 'autostart', 'constitution-audit-v1']})
+                    self.reply({'version': updates.current(), 'protocol': 2, 'capabilities': ['updates', 'diagnostics', 'monitoring', 'drivers', 'autostart', 'constitution-audit-v1'], 'audit_clients': list(__import__('scripts.clients',fromlist=['CLIENTS']).CLIENTS), 'inference_apis': ['responses','chat','messages']})
                 elif target.startswith('/audit/'):
                     operation=target.removeprefix('/audit/')
                     if not self.principal:
@@ -208,7 +221,7 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('Account sharing is disabled on this worker. Enable it locally with monitor enable --share.')
                     if target == '/monitoring/refresh' and post: monitoring.collect(control.root)
                     elif post: raise ValueError('Unsupported monitoring operation')
-                    self.reply(monitoring.local_report(control))
+                    self.reply(monitoring.local_report(control,remote=True))
                 elif target == '/drivers/check' and post:
                     self.reply(control.driver_check('local', body.get('updates', False)))
                 elif target == '/drivers/open' and post:
@@ -219,8 +232,23 @@ class Handler(BaseHTTPRequestHandler):
                     self.proxy(target, body, direct=True)
                 else:
                     self.reply({"error": "Unsupported node endpoint"}, 404)
-            elif path in ("/v1/responses", "/v1/chat/completions") and post:
+            elif path in ("/v1/responses", "/v1/chat/completions", "/v1/messages") and post:
                 self.proxy(path, body)
+            elif path.startswith('/api/claude/'):
+                from . import claude, messages
+                action=path.removeprefix('/api/claude/')
+                if action=='overview' and not post:self.reply(claude.overview(control.root))
+                elif action=='settings' and post:self.reply(claude.configure(control.root,body))
+                elif action=='collect' and post:self.reply(claude.collect(control.root,body.get('profile')))
+                elif action=='telemetry' and post:self.reply(claude.telemetry(control.root,body))
+                elif action=='launch-command' and post:self.reply(claude.launch_command(control.root,body))
+                elif action=='readiness' and post:self.reply(messages.readiness(control))
+                elif action=='review-cancel' and post:self.reply(claude.cancel_review(control.root))
+                elif action=='review' and post:self.reply(control.submit('Isolated Claude review',claude.review,control,body))
+                elif action=='qualify' and post:self.reply(control.submit('Qualify Claude Messages',messages.qualify,control,body))
+                elif action=='enroll-preview' and post:self.reply(claude.enroll(control.root,body))
+                elif action=='enroll-apply' and post:self.reply(claude.enroll(control.root,body,apply=True))
+                else:raise ValueError('Unsupported Claude operation')
             elif path == "/v1/models" and not post:
                 self.reply({"object": "list", "data": [{"id": ALIAS, "object": "model", "owned_by": "local-control"}]})
             elif path == "/api/login" and post:
@@ -492,7 +520,11 @@ class Handler(BaseHTTPRequestHandler):
         if control.config.get('driver_hold') and path in NODE_POST and path != '/api/show' and not unloading:
             raise ValueError('Worker is paused for driver maintenance; resume it from Your machines')
         if path.startswith("/v1/"):
-            with control.lease(body, direct=direct) as (node, payload):
+            if path=='/v1/messages':
+                from . import messages
+                messages.validate(body)
+                if not direct:messages.readiness(control)
+            with control.lease(body, direct=direct, **({'api':'messages'} if path=='/v1/messages' else {})) as (node, payload):
                 self.forward(node, path, payload)
         elif path in NODE_GET or path == '/api/show':
             if body and 'model' in body:

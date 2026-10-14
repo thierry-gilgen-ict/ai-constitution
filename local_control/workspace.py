@@ -83,7 +83,7 @@ def plan(studio, body):
                 database['targets'][identity] = project_record(project, modules=kit.MODULES, safe_path=kit.safe_path,
                     managed_hash=kit.managed_hash, digest=digest)
             if not database['targets'].get(identity, {}).get('pinned'):
-                kit._install(studio.draft, studio.state, project=project, planned=draft, database=database)
+                kit._install(studio.draft, studio.state, project=project, selected_clients=entry.get('clients'), planned=draft, database=database)
             config_id = entry.get('configuration')
             if config_id:
                 if config_id not in vault['projects']: raise ValueError('Choose an existing configuration mapping')

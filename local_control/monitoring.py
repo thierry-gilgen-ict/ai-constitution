@@ -202,6 +202,13 @@ def collect(root):
             except (OSError, ValueError, subprocess.SubprocessError) as error:
                 observations['codex'].update(status='unavailable', code=error.code if isinstance(error, ProbeError) else 'collector_failed')
     cursor = shutil.which('cursor') or (os.name == 'nt' and (Path(os.environ.get('LOCALAPPDATA','')) / 'Programs/cursor/Cursor.exe').is_file())
+    from . import claude
+    cfg=claude.settings(root)
+    observation=claude.collect(root) if cfg['monitoring'] else {'status':'disabled'}
+    observation['login']=observation.get('account',{}).get('email','')
+    observation['plan']=observation.get('account',{}).get('subscriptionType','')
+    observation['source']='Opt-in native Claude auth status; subscription allowance unknown'
+    observations['claude-code']=observation
     observations['cursor'] = {'installed': bool(cursor), 'status': 'manual/import', 'source': 'Account mapping and usage observations; no private browser/session-token scraping'}
     with kit.state_lock(Path(root) / 'monitor-operations'):
         current = load(root)
@@ -210,7 +217,7 @@ def collect(root):
         for name, observation in observations.items():
             previous = current.get('observations', {}).get(name, {})
             if observation.get('status') == 'available':
-                observation['subscription_key'] = hashlib.sha256(('openai|' + observation.get('login', '').strip().casefold() + '|' + observation.get('plan', '').casefold()).encode()).hexdigest()[:24]
+                observation['subscription_key'] = hashlib.sha256((('anthropic|' if name=='claude-code' else 'openai|') + observation.get('login', '').strip().casefold() + '|' + observation.get('plan', '').casefold()).encode()).hexdigest()[:24]
                 history = current.setdefault('history', {}).setdefault(name, [])
                 history.append({k:v for k,v in observation.items() if k in ('observed_at','windows','summary','subscription_key')})
                 del history[:-288]
@@ -222,8 +229,13 @@ def collect(root):
     return current
 
 
-def local_report(control):
+def local_report(control, *, remote=False):
     value = load(control.root)
+    if remote:
+        from .claude import settings
+        if not settings(control.root)['share']:
+            value.get('observations',{}).pop('claude-code',None)
+            value.get('history',{}).pop('claude-code',None)
     from .connectors import capabilities, alerts
     return {**value, 'connectors': capabilities(), 'alerts': alerts(value), 'diagnostics': diagnostics.report(control), 'provider_links': LINKS,
             'note': 'Login identifiers are private metadata. No passwords, API keys, auth files or conversation contents are collected. Provider quotas are account-wide, not per-machine totals. A missing value is unknown, never zero.'}

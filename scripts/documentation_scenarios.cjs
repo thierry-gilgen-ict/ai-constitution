@@ -16,6 +16,7 @@ const chapters = {
   recovery: ['Progress and recovery', 'workspace-upgrades.md'], toolkit: ['Instruction toolkit and external setup', 'getting-started.md'],
   workflows: ['Workspace workflows', 'workspace-workflows.md'],
   audit: ['Constitution health', 'constitution-health.md'],
+  claude: ['Claude Code', 'claude-code.md'],
 };
 const names = {setup: 'Get started', overview: 'Overview', models: 'Model library', machines: 'Your machines', connect: 'Connect a project', architectures: 'Project templates', constitution: 'Constitution files', projects: 'Projects', accounts: 'Apps & subscriptions', workers: 'Set up a worker', storage: 'Storage & locations', updates: 'Updates & model inbox', insights: 'Measured performance', vault: 'Configs & backups'};
 names.workflows='Workspace workflows';
@@ -119,4 +120,12 @@ add('workflow-lab','workflows','workflows','Compare bounded local evidence','Syn
 add('workflow-lab-preview','workflows','workflows','Review an experiment budget','Local inference has zero paid budget. The current bounded trial finishes when canceled.',[click('[data-workflow-tab="lab"]'),click('#lab-form button')],{scope:'#center-dialog'});
 add('workflow-profiles','workflows','workflows','Configure resource automation','Automation starts disabled. First matching rule wins, manual choices take priority and active work is deferred.',[click('[data-workflow-tab="profiles"]')],{fullPage:true});
 add('workflow-search','workflows','workflows','Find workspace metadata','Ctrl K or Cmd K opens keyboard search. Credential files and conversation contents are excluded.',[click('#workspace-search'),fill('#workspace-query','orbit')],{scope:'#workspace-palette'});
+add('claude-workspace','audit','claude','Manage a Claude workspace','All collectors and automated reviews start disabled. This example is synthetic.',[click('#audit-claude')],{scope:'#center-dialog',viewport:{width:1440,height:1400}});
+add('claude-onboarding','audit','claude','Review Claude onboarding','A managed import preserves shared instructions and existing owner guidance.',[click('#audit-claude'),fill('#claude-project',PROJECT),click('#claude-enroll')],{scope:'#center-dialog'});
+add('claude-hosted-launch','audit','claude','Use your existing login','Start a fresh session on the owning machine. Account state is not copied.',[click('#audit-claude'),fill('#claude-project',PROJECT),click('#claude-hosted')],{scope:'#center-dialog'});
+add('claude-local-launch','audit','claude','Launch a qualified local route','The gateway manages future requests and response leases. Native acceptance remains separate.',[click('#audit-claude'),fill('#claude-project',PROJECT),click('#claude-local')],{scope:'#center-dialog'});
+add('claude-review-settings','audit','claude','Choose private collection and review','API keys are named environment references. Subscription quotas remain unknown unless imported.',[click('#audit-claude'),fill('#claude-key-env','REVIEW_API_KEY')],{scope:'#center-dialog',viewport:{width:1440,height:1400}});
+add('claude-review-handoff','audit','claude','Review using your subscription','A bounded snapshot is reviewed in a fresh client session; JSON results are validated separately.',[click('[data-audit-tab="findings"]'),click('#audit-semantic'),select('#audit-review-client','claude-code/claude-demo'),click('#center-dialog-apply')],{scope:'#center-dialog'});
+add('claude-isolated-review','audit','claude','Choose isolated execution','This opens the explicit API/local execution choice. The capture starts no inference.',[click('[data-audit-tab="findings"]'),click('#audit-semantic'),select('#audit-review-client','claude-code/claude-demo'),click('#center-dialog-apply'),click('#claude-review-auto')],{scope:'#center-dialog'});
+add('claude-schedule','audit','claude','Choose scheduled review execution','Handoffs remain the default. API/local reviews need separate local approval and configuration.',[click('#audit-settings'),select('#audit-sem-client','claude-code'),select('#audit-sem-execution','local')],{scope:'#center-dialog',viewport:{width:1440,height:1600}});
 module.exports = {entries, chapters, names};
