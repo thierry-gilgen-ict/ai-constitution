@@ -1,14 +1,14 @@
 # Constitution files in Local Control
 
-Choose **Constitution files** in the dashboard to search and read the shared library, then edit its instructions and configuration in a private draft. The controller includes this feature; workers only need their existing paired node service.
+Choose **Instructions → Shared library** in the dashboard to search and read the shared library, then edit its instructions and configuration in a private draft. The controller includes this feature; workers only need their existing paired node service.
 
-The draft is created lazily from the controller's bundled library under `<local-control-state>/studio/library`. With standard paths this is `~/.config/ai-constitution/local-control/studio/library`. It is separate from the public checkout, immutable installed releases, private policy overlays, and client settings.
+The published private Studio library is created lazily from the controller's bundled library under `<local-control-state>/studio/library`. With standard paths this is `~/.config/ai-constitution/local-control/studio/library`. It is separate from the public checkout, immutable installed releases, private policy overlays, and client settings.
 
 ## Save, review, activate
 
 1. Open `constitution.md`, `engineering.md`, another instruction module, or a configuration file. Use the search field or **Customized files only** filter.
 2. Edit the text. **Review & save draft** validates the whole library and shows the changed source plus generated adapters/routing. Invalid JSON or broken references prevent saving.
-3. Save. The editor creates a private rollback snapshot and checks that another tab has not changed the file or library since your preview. Enrolled projects following shared settings synchronize while Local Control runs; inspect **Project sync** for pins, pauses and conflicts.
+3. Save an isolated candidate. No following project changes. Open **Instructions → Saved drafts** to review publication. Publishing revalidates fingerprints and records a rollback snapshot. Following projects then synchronize under their existing pins, pauses and conflict rules. See the [draft migration guide](projects-first-usability.md#save-a-draft-then-publish).
 4. **Preview activation** additionally shows enrolled global client installations and skipped pins. Confirm to create an immutable release and update eligible installations transactionally. Automatic project sync preserves global client settings.
 5. Start a fresh client session and verify instruction loading. Updating files does not establish that an already-running agent has loaded them.
 
@@ -18,9 +18,9 @@ Existing personal and project [policy overlays](updates.md) remain in effect. Th
 
 **In the dashboard · Review instruction edits.** Edit your private draft and choose Review & save draft. Validation and generated-file rebuilding happen before saving.
 
-![Review instruction edits — demonstration data, UI 0.6.0](assets/screenshots/constitution-edit.png)
+![Review instruction edits — demonstration data, UI 0.7.0](assets/screenshots/constitution-edit.png)
 
-[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:edit:end -->
 
@@ -41,9 +41,9 @@ Files over 512 KiB are view-only. Text pages are bounded to 64,000 characters an
 
 **In the dashboard · Recover a previous draft.** Draft history retains reviewed saves. Later edits are protected when undoing a save.
 
-![Recover a previous draft — demonstration data, UI 0.6.0](assets/screenshots/constitution-history.png)
+![Recover a previous draft — demonstration data, UI 0.7.0](assets/screenshots/constitution-history.png)
 
-[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/constitution.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:history:end -->
 

@@ -21,10 +21,15 @@ NODE_GET = {"/api/version", "/api/tags", "/api/ps"}
 ASSETS['/workflows.js'] = ('workflows.js','text/javascript')
 ASSETS['/claude.js'] = ('claude.js','text/javascript')
 ASSETS['/audit.js'] = ('audit.js','text/javascript')
+for _asset in ('shell.js', 'projects.js', 'forms.js', 'connection.js', 'demo.js'):
+    ASSETS['/' + _asset] = (_asset, 'text/javascript')
+ASSETS['/demo/'] = ('demo.html', 'text/html')
 NODE_POST = {"/api/show", "/api/create", "/api/generate", "/api/pull", "/v1/responses", "/v1/chat/completions", "/v1/messages"}
 
 
 class Server(ThreadingHTTPServer):
+    # Browsers open several asset connections before authentication/bootstrap.
+    request_queue_size = 64
     daemon_threads = True
     allow_reuse_address = True
 
@@ -70,7 +75,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Content-Security-Policy", "default-src 'self'; connect-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+        connection = "'none'" if self.path.split('?')[0] in ('/demo/', '/demo.js') else "'self'"
+        self.send_header("Content-Security-Policy", "default-src 'self'; connect-src " + connection + "; style-src 'self'; script-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 
     def reply(self, value, status=200, *, cookie=False):
         if status>=400 and self.path.startswith(('/v1/messages','/node/v1/messages')):
@@ -155,6 +161,8 @@ class Handler(BaseHTTPRequestHandler):
                 return
             parsed = urlsplit(self.path)
             path, query = parsed.path, parse_qs(parsed.query)
+            if not post and path == '/healthz' and not self.server.worker:
+                self.reply({'schema': 1, 'ready': True}); return
             if self.server.worker and post and path == '/node/pair':
                 body = self.read_body()
                 self.reply(self.server.control.redeem_pairing(body.get('code'), body.get('name')))
@@ -178,6 +186,12 @@ class Handler(BaseHTTPRequestHandler):
             if self.server.worker and not path.startswith("/node/"):
                 self.reply({"error": "Worker nodes expose only the paired node API"}, 404)
                 return
+            if path.startswith('/api/ui/') and not self.server.worker:
+                from . import ui
+                operation = path.removeprefix('/api/ui/')
+                reads = {'bootstrap', 'home', 'projects', 'operations', 'drafts'}
+                if (operation in reads) == post: raise ValueError('Unsupported interface request method')
+                self.reply(ui.dispatch(control, operation, body)); return
             if path.startswith("/node/"):
                 if not self.server.worker:
                     self.reply({"error": "Not a worker node"}, 404)
@@ -456,7 +470,10 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as error:
             if not self.started:
                 message = str(error) if isinstance(error, ValueError) else type(error).__name__ + ": check service availability"
-                self.reply({"error": message}, 400 if isinstance(error, ValueError) else 503)
+                self.reply({"error": message, "problem": {"schema": 1,
+                    "code": "review-required" if isinstance(error, ValueError) else "service-unavailable",
+                    "summary": message, "recovery": "Your entered values are retained. Inspect the affected target and preview again before retrying; an uncertain operation must not be replayed.",
+                    "retry_automatically": False}}, 400 if isinstance(error, ValueError) else 503)
             else:
                 # Once headers/tokens have been emitted, close the stream. Never silently replay.
                 self.close_connection = True

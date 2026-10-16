@@ -71,9 +71,10 @@ class Control:
 
     def status(self):
         from .services import errors as service_errors
+        from .updates import current
         with self.lock:
             nodes = {k: {a: b for a, b in n.items() if a not in ("token", "inference_token", "fingerprint")} for k, n in self.config["nodes"].items()}
-            return {"nodes": nodes, "primary": self.config["primary"], "fallback": self.config["fallback"],
+            return {"application_version": current(), "nodes": nodes, "primary": self.config["primary"], "fallback": self.config["fallback"],
                     "mode": self.mode, "phase": self.phase, "active_requests": sum(self.active.values()),
                     "service_errors": service_errors(self.root),
                     "notifications": [j for j in self.jobs.values() if j["status"] in ("failed", "interrupted") and not j.get("acknowledged")],
@@ -857,10 +858,14 @@ class Control:
                           for (n, m), count in self.active.items()):
                     self.changed.wait(timeout=1)
             node = self.node(primary["node"])
+            with self.lock: self.phase = 'unloading managed models'
+            progress('Responses drained; unloading managed models')
             for model in self.config["managed"].get(primary["node"], []):
                 if primary["node"] == endpoint["node"] and model == endpoint["model"]:
                     continue
                 self.rpc(node, "/api/generate", {"model": model, "keep_alive": 0, "stream": False})
+            with self.lock: self.phase = 'verifying GPU release'
+            progress('Verifying Ollama residency; other GPU applications are outside this check')
             resident = self.rpc(node, "/api/ps").get("models", [])
             with self.lock:
                 self.mode = "gaming"

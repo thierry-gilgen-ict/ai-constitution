@@ -51,7 +51,7 @@ def validate(root=ROOT, *, sources=True, release=True):
         try:
             inputs = manifest['digest_inputs']
             allowed = ['local_control/web/' + a for a in ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js']] + ['VERSION', 'tests/fixtures/documentation.cjs', 'scripts/documentation_scenarios.cjs', 'scripts/documentation_cli.py', 'scripts/screenshots.cjs', 'templates/architecture-components.json'] + ['templates/architectures/' + a + '.json' for a in ['web-product', 'data-dashboard', 'python-api']] + ['constitution.md', 'engineering.md', 'research.md', 'routing.md', 'registry/routes.json', 'tests/fixtures/workflows.cjs']
-            allowed[allowed.index('VERSION'):allowed.index('VERSION')] = ['local_control/web/audit.js', 'local_control/web/claude.js']
+            allowed[allowed.index('VERSION'):allowed.index('VERSION')] = ['local_control/web/audit.js', 'local_control/web/claude.js', *['local_control/web/'+n for n in ('shell.js','connection.js','projects.js','forms.js','demo.html','demo.js')]]
             allowed.append('tests/fixtures/audit.cjs')
             if inputs != allowed:
                 raise ValueError('Screenshot digest inputs must match the capture harness')
@@ -73,7 +73,8 @@ def validate(root=ROOT, *, sources=True, release=True):
         failures.append('Dashboard-page screenshot coverage is incomplete')
     if sources:
         scenario_text = (root / 'scripts/documentation_scenarios.cjs').read_text(encoding='utf-8')
-        required = set(re.findall(r"add\('([a-z]+(?:-[a-z]+)*)'", scenario_text)) | nav | {'worker-windows', 'worker-macos', 'worker-linux'}
+        extra={'usability-'+n for n in ('home','project-list','onboarding','worker-setup','drafts','activity-page','settings-page')}
+        required = extra | set(re.findall(r"add\('([a-z]+(?:-[a-z]+)*)'", scenario_text)) | nav | {'worker-windows', 'worker-macos', 'worker-linux'}
         if set(ids) != required:
             failures.append('Capture manifest does not cover every declared documentation journey')
     total = 0

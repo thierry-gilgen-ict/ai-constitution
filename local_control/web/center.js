@@ -10,7 +10,7 @@
   const modal = (title, html, label, action) => {
     $('center-dialog-title').textContent = title; $('center-dialog-body').innerHTML = html;
     $('center-dialog-error').textContent = ''; $('center-dialog-apply').textContent = label || 'Apply';
-    $('center-dialog-apply').hidden = !action; confirmAction = action; $('center-dialog').showModal();
+    $('center-dialog-apply').hidden = !action; confirmAction = action; $('center-dialog').showModal(); document.dispatchEvent(new CustomEvent('workspace-modal'));
   };
   $('center-dialog-close').onclick = () => $('center-dialog').close();
   $('center-dialog-apply').onclick = safe(async () => {
@@ -123,10 +123,10 @@
     });
   });
   const pages={projects,accounts,storage,workers,vault};
-  window.centerPage=safe(async name=>{if(pages[name])await pages[name]();});
+  Object.entries(pages).forEach(([name,fn])=>registerView(name,safe(fn)));
   let polling=false;
   setInterval(async()=>{
-    if(!authorized || polling || document.querySelector('dialog[open]'))return;
+    if(!authorized || polling || document.querySelector('dialog[open]') || document.activeElement?.matches('input,textarea,select'))return;
     const current=document.querySelector('.page.active')?.id;
     if(!['projects','accounts','audit'].includes(current))return;
     polling=true;try{await window.centerPage(current);}finally{polling=false;}

@@ -1,3 +1,8 @@
+const viewRegistry = new Map();
+function registerView(name, callback) { const handlers=viewRegistry.get(name)||[];handlers.push(callback);viewRegistry.set(name,handlers); }
+window.registerView=registerView;
+window.renderView=async name=>{for(const callback of viewRegistry.get(name)||[])await callback(name);};
+window.centerPage=window.renderView;
 /* Local data only. Never interpolate server-provided strings without escaping. */
 const $ = (id) => document.getElementById(id);
 const escapeHTML = (s) =>
@@ -24,6 +29,12 @@ function notice(message, error = false) {
   el.hidden = false;
 }
 async function api(path, body, headers = {}) {
+  if (window.uiRequest) {
+    try { return await window.uiRequest(path,body,headers); } catch(error) {
+      if(error.status===401){authorized=false;document.documentElement.dataset.connection="signin";$("connection").textContent="Sign-in required";if(!$("login").open)$("login").showModal();}
+      throw error;
+    }
+  }
   const response = await fetch(path, {
     method: body ? "POST" : "GET",
     credentials: "same-origin",
@@ -56,7 +67,7 @@ function page(name) {
     .querySelectorAll(".page")
     .forEach((e) => e.classList.toggle("active", e.id === name));
   document
-    .querySelectorAll(".nav")
+    .querySelectorAll(".nav[data-page]")
     .forEach((e) => e.classList.toggle("active", e.dataset.page === name));
   $("breadcrumb").textContent =
     "Workspace / " +
@@ -74,11 +85,11 @@ function page(name) {
     }[name];
   if (name === "models") loadInventory();
   if (name === "setup") loadSetup();
-  if (window.studioPage) window.studioPage(name);
-  if (window.centerPage) window.centerPage(name);
+  if (name === "overview") loadHardware();
+  if (authorized) window.renderView(name).catch(error=>notice(error.message,true));
   if (name === "machines" && !driversRequested) {
     driversRequested = true;
-    action({action: "driver-check-all"});
+    // Driver collection is an explicit user action, not a navigation side effect.
   }
 }
 document
@@ -238,7 +249,7 @@ async function loadHardware() {
       ? Number(h.gpu_vram_gb).toFixed(0) + " GB"
       : "CPU only";
     $("gpu-name").textContent = h.gpu_name || "No compatible GPU detected";
-    $("ram-memory").textContent = Number(h.total_ram_gb).toFixed(0) + " GB";
+    $("ram-memory").textContent = Number.isFinite(h.total_ram_gb) ? Number(h.total_ram_gb).toFixed(0) + " GB" : "Unknown";
     $("cpu-name").textContent = h.cpu_name || "System memory";
   } catch (e) {
     $("gpu-name").textContent = "Run setup --llmfit for hardware detection";
@@ -316,7 +327,7 @@ $("suggest").onclick = async () => {
     );
     const target = $("recommendations");
     target.hidden = false;
-    target.innerHTML = `<div class="panel-head"><h2>Fits your hardware</h2><span class="tiny">${r.context.toLocaleString()} CONTEXT · 15% VRAM HEADROOM</span></div><p class="muted">${escapeHTML(r.note)}</p><div class="recommend-grid">${r.models.map((m) => `<article class="recommend-card"><h3>${escapeHTML(m.name)}</h3><p>${escapeHTML(m.best_quant)} · ${Number(m.memory_required_gb).toFixed(1)} GB estimated memory<br>${escapeHTML(m.estimated_tps)} tokens/s estimated · ${escapeHTML(m.fit_label)} fit<br>License: ${escapeHTML(m.license || "Check model card")}</p><button data-find="${escapeHTML(m.name.split("/").pop())}">Find GGUF downloads ↗</button></article>`).join("")}</div>${!r.models.length ? "<p>No coding candidates meet these constraints. Try a smaller context in a future custom profile; do not assume a larger model will fit.</p>" : ""}`;
+    target.innerHTML = `<div class="panel-head"><h2>Fits your hardware</h2><span class="tiny">${r.context.toLocaleString()} CONTEXT · 15% VRAM HEADROOM</span></div><p class="muted">${escapeHTML(r.note)}</p><div class="recommend-grid">${r.models.map((m) => `<article class="recommend-card"><span class="pill">${escapeHTML(m.purpose||"Candidate")}</span><h3>${escapeHTML(m.name)}</h3><p>${escapeHTML(m.best_quant)} · ${Number(m.memory_required_gb).toFixed(1)} GB estimated memory<br>${escapeHTML(m.estimated_tps)} tokens/s estimated · ${escapeHTML(m.fit_label)} fit<br>License: ${escapeHTML(m.license || "Check model card")}</p><p>${escapeHTML(m.reason||"")}</p><p>${escapeHTML(m.client_support||"Qualification not observed")} Download size: verify the selected GGUF file below.</p><button data-find="${escapeHTML(m.name.split("/").pop())}">Find GGUF downloads ↗</button></article>`).join("")}</div>${!r.models.length ? "<p>No coding candidates meet these constraints. Try a smaller context in a future custom profile; do not assume a larger model will fit.</p>" : ""}`;
     target.querySelectorAll("[data-find]").forEach(
       (b) =>
         (b.onclick = () => {
@@ -486,25 +497,6 @@ $("pair-form").onsubmit = async (e) => {
     notice(e.message, true);
   }
 };
-(async () => {
-  const token = location.hash.slice(1);
-  if (token) {
-    history.replaceState(null, "", location.pathname);
-    try {
-      await api("/api/login", {}, { Authorization: "Bearer " + token });
-    } catch (e) {
-      notice(e.message, true);
-    }
-  }
-  try {
-    state = await api("/api/status");
-    authorized = true;
-    renderState();
-    if (!state.primary && document.querySelector('.page.active')?.id === 'overview') page("setup");
-    loadHardware();
-    loadInventory();
-  } catch (e) {
-    if (!$("login").open) $("login").showModal();
-  }
-  setInterval(refresh, 2500);
-})();
+// The module bootstrap owns bounded connection recovery and authentication.
+window.addEventListener('error', () => { $("connection").textContent='Application error'; notice('A dashboard component failed. Reload the application; use the desktop launcher if sign-in is required.',true); });
+setTimeout(()=>{if(!window.uiRequest){$("connection").textContent='Application error';notice('The dashboard modules did not load. Reload this page or check the installed application.',true);}},8000);

@@ -1,5 +1,7 @@
 # Set up a second Windows computer
 
+Use **Models & machines → Add a worker** for a resumable guide. It shows matching cached packages and complete fresh-terminal commands; **Worker packages** retains release download, upgrade and startup controls. Instruction access remains a separate owner-local grant.
+
 Use this on a trusted home LAN. RustDesk can transfer the portable package and let you run the commands on the second computer; it is not the model transport. Keep Ollama bound to loopback. Do not forward router ports or expose the worker to the internet.
 
 1. Download a reviewed [Windows portable preview](desktop-preview.md) and extract the **whole archive** to a permanent folder on the second computer. Keep `app`, license notices and the manifest together. The app is unsigned; if operating-system policy blocks it, use the documented source/Python path rather than disabling security protections.
@@ -45,9 +47,9 @@ Use this on a trusted home LAN. RustDesk can transfer the portable package and l
 
 **In the dashboard · Worker commands · windows.** Choose the OS and package type, then copy each command into a fresh terminal. These are screenshots of the dashboard’s instructions, not the operating-system terminal.
 
-![Worker commands · windows — demonstration data, UI 0.6.0](assets/screenshots/worker-windows.png)
+![Worker commands · windows — demonstration data, UI 0.7.0](assets/screenshots/worker-windows.png)
 
-[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:commands:end -->
 

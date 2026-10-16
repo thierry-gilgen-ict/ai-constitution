@@ -3,13 +3,14 @@ from pathlib import Path
 from . import inspector,rollouts,project_setup,toolkits,launch_advice,fleet,recovery,model_lab,resource_profiles,plans,monitoring
 
 PAGES={'overview':'Overview','setup':'Get started','projects':'Projects','architectures':'Project templates','constitution':'Constitution files','models':'Model library','machines':'Your machines','accounts':'Apps & subscriptions','workers':'Set up a worker','storage':'Storage & locations','vault':'Configs & backups','updates':'Updates & model inbox','insights':'Measured performance','workflows':'Workspace workflows'}
-PAGES['audit']='Constitution health'
+PAGES.update({'home':'Home', 'project-list':'All projects', 'onboarding':'Connect a coding project', 'worker-setup':'Add a worker', 'activity-page':'Operations and recovery', 'settings-page':'Startup and help', 'drafts':'Saved instruction drafts', 'audit':'Constitution health'})
 
 
 def search(control,query):
     from .workspace import overview
+    from .ui import project_id, preferences
     text=str(query).casefold().strip()[:160];items=[{'label':label,'kind':'page','page':p} for p,label in PAGES.items()]
-    items.extend({'label':Path(p['project']).name,'detail':p['project'],'kind':'project','project':p['project'],'page':'workflows'} for p in overview(control)['projects'])
+    items.extend({'label':Path(p['project']).name,'detail':p['project'],'kind':'project','id':project_id(p['project']),'project':p['project'],'page':'project-detail'} for p in overview(control)['projects'])
     items.extend({'label':v['name'],'detail':v['id']+' · '+v['version'],'kind':'toolkit','page':'workflows'} for v in toolkits.overview(control.root)['kits'].values())
     from .studio import Studio
     studio=Studio(control.root);studio.initialize();items.extend({'label':n,'kind':'file','page':'constitution'} for n in studio.payload())
@@ -28,6 +29,10 @@ def search(control,query):
     for path in list((studio.draft/'templates/architectures').glob('*.json'))[:200]:
         value=kit.read_json(kit.safe_path(studio.draft,path.relative_to(studio.draft).as_posix()))
         items.append({'label':value.get('name',path.stem),'detail':path.stem,'kind':'architecture','page':'architectures'})
+    items.extend({'label':n['name'],'kind':'machine','page':'machines'} for n in control.config['nodes'].values())
+    items.extend({'label':j.get('label','Operation'),'detail':j['status'],'kind':'operation','page':'activity-page'} for j in control.status()['jobs'])
+    recent=preferences(control.root)['recent']
+    if not text:items.sort(key=lambda i: recent.index(i['id']) if i.get('id') in recent else 1000)
     matches=[i for i in items if all(word in (i['label']+' '+i.get('detail','')).casefold() for word in text.split())]
     return {'items':matches[:60],'truncated':len(matches)>60,'note':'Searches project, model, architecture, account and toolkit metadata plus library filenames. Secret contents and conversations are excluded.'}
 

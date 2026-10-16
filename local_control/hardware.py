@@ -28,10 +28,11 @@ def run_fit(root, args):
     return json.loads(result.stdout)
 
 
-def recommendations(root, context=65536):
+def recommendations(root, context=None):
     hardware = run_fit(root, ["--json", "system"])
     actual = hardware.get("system", hardware)
     memory = actual.get("gpu_vram_gb", 0)
+    context = context or context_advice(actual)["suggested"]
     args = ["--max-context", str(context)]
     if memory:
         args += ["--memory", f"{memory * 0.85:.1f}G"]
@@ -47,8 +48,17 @@ def recommendations(root, context=65536):
         model["hugging_face_url"] = "https://huggingface.co/" + model["name"]
         model["download_verified"] = False
         models.append(model)
+    # Preserve the helper's ordering; these labels describe relative estimated weight size,
+    # never measured speed or coding ability. Do not invent missing candidates.
+    suitable = sorted(models, key=lambda m: m.get('memory_required_gb') or float('inf'))
+    picks = []
+    for label, index in [('Fast',0),('Balanced',len(suitable)//2),('Larger tasks',len(suitable)-1)]:
+        if suitable and suitable[index]['name'] not in {m['name'] for m in picks}:
+            picks.append({**suitable[index], 'purpose':label,
+                          'reason':'Relative memory estimate among fitting coding candidates; performance requires measurement.',
+                          'client_support':'Not qualified. Test the required client API and tool behavior explicitly.'})
     from .insights import profiles
-    return {"measured_profiles": profiles(root), "system": actual, "models": models[:12], "context": context, "headroom_percent": 15,
+    return {"measured_profiles": profiles(root), "system": actual, "models": picks, "context": context, "headroom_percent": 15,
             "note": "Predictions, not benchmarks. Verify a GGUF file, license and Ollama tool support before adopting a model."}
 
 

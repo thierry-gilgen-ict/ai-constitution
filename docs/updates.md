@@ -117,8 +117,8 @@ The dashboard now provides an **Update available** notification, public release 
 
 **In the dashboard · Review an update restart.** After verification, restart only when tracked and external clients are idle. Private settings and model storage are retained.
 
-![Review an update restart — demonstration data, UI 0.6.0](assets/screenshots/update-restart.png)
+![Review an update restart — demonstration data, UI 0.7.0](assets/screenshots/update-restart.png)
 
-[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:restart:end -->

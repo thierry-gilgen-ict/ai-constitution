@@ -45,6 +45,8 @@ Catalog counts describe the bundled [models.dev](https://models.dev) snapshot, n
 
 ## A control center that keeps up
 
+The [projects-first preview](docs/projects-first-usability.md) puts project readiness, three coding applications, private drafts and recovery behind six destinations. Try the isolated in-app demonstration from **Settings → Startup & help**.
+
 **[Constitution health preview](docs/constitution-health.md)** · **[Workspace workflows](docs/workspace-workflows.md)** · **[Try the synthetic demo](docs/demonstration.md)**
 
 Bring existing repositories through a conflict-aware onboarding wizard. Follow or pin architecture revisions. Keep private configuration encrypted with optional restic backups. Review new model definitions and measured local performance. When GitHub has a new release, the dashboard shows **Update available**, stages a verified package and guards the restart against active work.
@@ -55,80 +57,80 @@ Bring existing repositories through a conflict-aware onboarding wizard. Follow o
 
 ## See it before setting it up
 
-Actual UI **0.6.0**, with fictional data. Open an image at full size, or follow the **[122-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.
+Actual UI **0.7.0**, with fictional data. Open an image at full size, or follow the **[135-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.
 
 | Models and projects | Maintenance and visibility |
 | --- | --- |
-| **[Overview](docs/manual/overview.md)**<br>[![Overview — demonstration data](docs/assets/screenshots/overview.png)](docs/assets/screenshots/overview.png) | **[Project templates](docs/manual/architectures.md)**<br>[![Project templates — demonstration data](docs/assets/screenshots/architectures.png)](docs/assets/screenshots/architectures.png) |
+| **[Your workspace](docs/manual/usability.md)**<br>[![Your workspace — demonstration data](docs/assets/screenshots/usability-home.png)](docs/assets/screenshots/usability-home.png) | **[Connect a coding project](docs/manual/usability.md)**<br>[![Connect a coding project — demonstration data](docs/assets/screenshots/usability-onboarding.png)](docs/assets/screenshots/usability-onboarding.png) |
+| **[Project templates](docs/manual/architectures.md)**<br>[![Project templates — demonstration data](docs/assets/screenshots/architectures.png)](docs/assets/screenshots/architectures.png) | **[Publish reviewed candidates](docs/manual/usability.md)**<br>[![Publish reviewed candidates — demonstration data](docs/assets/screenshots/usability-draft-publication.png)](docs/assets/screenshots/usability-draft-publication.png) |
 | **[Apps & subscriptions](docs/manual/accounts.md)**<br>[![Apps & subscriptions — demonstration data](docs/assets/screenshots/accounts.png)](docs/assets/screenshots/accounts.png) | **[Set up a worker](docs/manual/workers.md)**<br>[![Set up a worker — demonstration data](docs/assets/screenshots/workers.png)](docs/assets/screenshots/workers.png) |
-| **[Updates & model inbox](docs/manual/updates.md)**<br>[![Updates & model inbox — demonstration data](docs/assets/screenshots/updates.png)](docs/assets/screenshots/updates.png) | **[Configs & backups](docs/manual/vault.md)**<br>[![Configs & backups — demonstration data](docs/assets/screenshots/vault.png)](docs/assets/screenshots/vault.png) |
 
 <details>
-<summary>Explore all 16 dashboard pages</summary>
+<summary>Explore advanced workspace views</summary>
 
 ### [Get started](docs/manual/setup.md)
 
-![Get started — fictional documentation data, UI 0.6.0](docs/assets/screenshots/setup.png)
+![Get started — fictional documentation data, UI 0.7.0](docs/assets/screenshots/setup.png)
 
 ### [Overview](docs/manual/overview.md)
 
-![Overview — fictional documentation data, UI 0.6.0](docs/assets/screenshots/overview.png)
+![Overview — fictional documentation data, UI 0.7.0](docs/assets/screenshots/overview.png)
 
 ### [Model library](docs/manual/models.md)
 
-![Model library — fictional documentation data, UI 0.6.0](docs/assets/screenshots/models.png)
+![Model library — fictional documentation data, UI 0.7.0](docs/assets/screenshots/models.png)
 
 ### [Your machines](docs/manual/machines.md)
 
-![Your machines — fictional documentation data, UI 0.6.0](docs/assets/screenshots/machines.png)
+![Your machines — fictional documentation data, UI 0.7.0](docs/assets/screenshots/machines.png)
 
 ### [Connect a project](docs/manual/connect.md)
 
-![Connect a project — fictional documentation data, UI 0.6.0](docs/assets/screenshots/connect.png)
+![Connect a project — fictional documentation data, UI 0.7.0](docs/assets/screenshots/connect.png)
 
 ### [Project templates](docs/manual/architectures.md)
 
-![Project templates — fictional documentation data, UI 0.6.0](docs/assets/screenshots/architectures.png)
+![Project templates — fictional documentation data, UI 0.7.0](docs/assets/screenshots/architectures.png)
 
 ### [Constitution files](docs/manual/constitution.md)
 
-![Constitution files — fictional documentation data, UI 0.6.0](docs/assets/screenshots/constitution.png)
+![Constitution files — fictional documentation data, UI 0.7.0](docs/assets/screenshots/constitution.png)
 
 ### [Projects](docs/manual/projects.md)
 
-![Projects — fictional documentation data, UI 0.6.0](docs/assets/screenshots/projects.png)
+![Projects — fictional documentation data, UI 0.7.0](docs/assets/screenshots/projects.png)
 
 ### [Apps & subscriptions](docs/manual/accounts.md)
 
-![Apps & subscriptions — fictional documentation data, UI 0.6.0](docs/assets/screenshots/accounts.png)
+![Apps & subscriptions — fictional documentation data, UI 0.7.0](docs/assets/screenshots/accounts.png)
 
 ### [Set up a worker](docs/manual/workers.md)
 
-![Set up a worker — fictional documentation data, UI 0.6.0](docs/assets/screenshots/workers.png)
+![Set up a worker — fictional documentation data, UI 0.7.0](docs/assets/screenshots/workers.png)
 
 ### [Storage & locations](docs/manual/storage.md)
 
-![Storage & locations — fictional documentation data, UI 0.6.0](docs/assets/screenshots/storage.png)
+![Storage & locations — fictional documentation data, UI 0.7.0](docs/assets/screenshots/storage.png)
 
 ### [Updates & model inbox](docs/manual/updates.md)
 
-![Updates & model inbox — fictional documentation data, UI 0.6.0](docs/assets/screenshots/updates.png)
+![Updates & model inbox — fictional documentation data, UI 0.7.0](docs/assets/screenshots/updates.png)
 
 ### [Measured performance](docs/manual/insights.md)
 
-![Measured performance — fictional documentation data, UI 0.6.0](docs/assets/screenshots/insights.png)
+![Measured performance — fictional documentation data, UI 0.7.0](docs/assets/screenshots/insights.png)
 
 ### [Configs & backups](docs/manual/vault.md)
 
-![Configs & backups — fictional documentation data, UI 0.6.0](docs/assets/screenshots/vault.png)
+![Configs & backups — fictional documentation data, UI 0.7.0](docs/assets/screenshots/vault.png)
 
 ### [Workspace workflows](docs/manual/workflows.md)
 
-![Workspace workflows — fictional documentation data, UI 0.6.0](docs/assets/screenshots/workflows.png)
+![Workspace workflows — fictional documentation data, UI 0.7.0](docs/assets/screenshots/workflows.png)
 
 ### [Constitution health](docs/manual/audit.md)
 
-![Constitution health — fictional documentation data, UI 0.6.0](docs/assets/screenshots/audit.png)
+![Constitution health — fictional documentation data, UI 0.7.0](docs/assets/screenshots/audit.png)
 
 </details>
 

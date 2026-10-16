@@ -1,6 +1,6 @@
 const {test,expect}=require('@playwright/test');
 const AxeBuilder=require('@axe-core/playwright').default;
-async function open(page){await page.goto('/#fixture');await expect(page.locator('#login')).not.toBeVisible();await page.locator('[data-page="audit"]').click();await expect(page.locator('#audit-scan')).toBeVisible();}
+async function open(page){await page.goto('/#fixture');await expect(page.locator('#login')).not.toBeVisible();await page.locator('[data-section="instructions"]').click();await page.locator('[data-page="audit"]').click();await expect(page.locator('#audit-scan')).toBeVisible();}
 
 test('health scan is structural and settings remain opt-in',async({page,request})=>{
   await open(page);await page.locator('#audit-scan').click();

@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "ui_version": "0.6.0",
-  "source_digest": "5bcba4c557ec57624a82dd0616e14254d4a92b3b4baa35617a6bf82194088b6a",
+  "ui_version": "0.7.0",
+  "source_digest": "52953b4b3757f0bfa21d82bad816dc4bc2eb3e26b40fbc7d35d6b0feaa1e57d7",
   "digest_format": "UTF-8 with LF newlines; filename + NUL + content + NUL",
   "digest_inputs": [
     "local_control/web/index.html",
@@ -13,6 +13,12 @@
     "local_control/web/workflows.js",
     "local_control/web/audit.js",
     "local_control/web/claude.js",
+    "local_control/web/shell.js",
+    "local_control/web/connection.js",
+    "local_control/web/projects.js",
+    "local_control/web/forms.js",
+    "local_control/web/demo.html",
+    "local_control/web/demo.js",
     "VERSION",
     "tests/fixtures/documentation.cjs",
     "scripts/documentation_scenarios.cjs",
@@ -137,232 +143,334 @@
     "claude": [
       "Claude Code",
       "claude-code.md"
+    ],
+    "usability": [
+      "Projects-first workspace",
+      "projects-first-usability.md"
     ]
   },
   "entries": [
+    {
+      "id": "usability-home",
+      "page": "home",
+      "chapter": "usability",
+      "title": "Your workspace",
+      "caption": "Synthetic preview of the projects-first workspace.",
+      "steps": [],
+      "overview": false,
+      "path": "docs/assets/screenshots/usability-home.png",
+      "sha256": "e9c3dee4ae143a90d0b83c2389e6c35868780897cadaa5d14038b7d29b0631eb",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 73879
+    },
+    {
+      "id": "usability-project-list",
+      "page": "project-list",
+      "chapter": "usability",
+      "title": "Choose a project",
+      "caption": "Synthetic preview of the projects-first workspace.",
+      "steps": [],
+      "overview": false,
+      "path": "docs/assets/screenshots/usability-project-list.png",
+      "sha256": "3e69fb591cbb00ebe0a8b6c9751503e543b1fc3553e243d322b1197dc0d8ebd5",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 49621
+    },
+    {
+      "id": "usability-onboarding",
+      "page": "onboarding",
+      "chapter": "usability",
+      "title": "Connect a coding project",
+      "caption": "Synthetic preview of the projects-first workspace.",
+      "steps": [],
+      "overview": false,
+      "path": "docs/assets/screenshots/usability-onboarding.png",
+      "sha256": "50ed13e66d9a324e44312369b6a9988cd1036e3e2ccdd8e88f5fc6b099b7ff61",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 81291
+    },
+    {
+      "id": "usability-worker-setup",
+      "page": "worker-setup",
+      "chapter": "usability",
+      "title": "Guided worker setup",
+      "caption": "Synthetic preview of the projects-first workspace.",
+      "steps": [],
+      "overview": false,
+      "path": "docs/assets/screenshots/usability-worker-setup.png",
+      "sha256": "73fc742595496b62001cbf0e70d3576a47269223428eae804c3466a77725f3f3",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 59045
+    },
+    {
+      "id": "usability-drafts",
+      "page": "drafts",
+      "chapter": "usability",
+      "title": "Private instruction candidates",
+      "caption": "Synthetic preview of the projects-first workspace.",
+      "steps": [],
+      "overview": false,
+      "path": "docs/assets/screenshots/usability-drafts.png",
+      "sha256": "3b3e551d391be3f97f66400af336d0d51979d57e6bd3592792b3a8f337c518b4",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 42680
+    },
+    {
+      "id": "usability-activity-page",
+      "page": "activity-page",
+      "chapter": "usability",
+      "title": "Operations and recovery",
+      "caption": "Synthetic preview of the projects-first workspace.",
+      "steps": [],
+      "overview": false,
+      "path": "docs/assets/screenshots/usability-activity-page.png",
+      "sha256": "e5cc3355c0c31daea1636eba3c95239bf920fd1637220440d8c5d1d556a6ad03",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 38011
+    },
+    {
+      "id": "usability-settings-page",
+      "page": "settings-page",
+      "chapter": "usability",
+      "title": "Startup and help",
+      "caption": "Synthetic preview of the projects-first workspace.",
+      "steps": [],
+      "overview": false,
+      "path": "docs/assets/screenshots/usability-settings-page.png",
+      "sha256": "bf88cb108a21ab007501a6dd58f0ab0437d2a4d954a85a4886a8fec3297d1f44",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 68169
+    },
     {
       "id": "setup",
       "page": "setup",
       "chapter": "setup",
       "title": "Get started",
-      "caption": "Open Get started from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Get started through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/setup.png",
-      "sha256": "f2c8b100eef16c5d5e840a86752fdd5a06da483ecfce750fe2d1ba99d3731e3e",
+      "sha256": "b90e89d2f8b3d5a00d583c7e117d92f428431800d42ecf2dfc369bc1be8b8564",
       "width": 1440,
-      "height": 1218,
-      "bytes": 111061
+      "height": 1485,
+      "bytes": 121202
     },
     {
       "id": "overview",
       "page": "overview",
       "chapter": "overview",
       "title": "Overview",
-      "caption": "Open Overview from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Overview through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/overview.png",
-      "sha256": "dfa206a1226c0854fda7aa6f0ea8057e3af915aa52de0b53260ca9e1ace3c6f2",
+      "sha256": "bdde9ff4060ca3b0b8c6c574037690c8a2958cb983d251c2e8d7506c45c99ebc",
       "width": 1440,
-      "height": 1507,
-      "bytes": 138922
+      "height": 1654,
+      "bytes": 139949
     },
     {
       "id": "models",
       "page": "models",
       "chapter": "models",
       "title": "Model library",
-      "caption": "Open Model library from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Model library through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/models.png",
-      "sha256": "01f7c316275f3d1ca460478a017e6d644ae442bcd9ea96ed15a735381d29b9b4",
+      "sha256": "1211c62fc93189f5653c00c1739aa5889f7f480ab553c0e8f4accca203b5209a",
       "width": 1440,
-      "height": 1130,
-      "bytes": 92208
+      "height": 1281,
+      "bytes": 93153
     },
     {
       "id": "machines",
       "page": "machines",
       "chapter": "machines",
       "title": "Your machines",
-      "caption": "Open Your machines from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Your machines through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/machines.png",
-      "sha256": "5d68137941e8d582edbdb1cadf860f6daed7d92f03876e009d7fbd8e186e863f",
+      "sha256": "1bc932dec159d65a09e329ca9b88a7b064d43282ed6551e7fd46d17de0e53bb8",
       "width": 1440,
-      "height": 3025,
-      "bytes": 194475
+      "height": 3229,
+      "bytes": 198877
     },
     {
       "id": "connect",
       "page": "connect",
       "chapter": "connect",
       "title": "Connect a project",
-      "caption": "Open Connect a project from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Connect a project through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/connect.png",
-      "sha256": "01eee499beb944cce636f874993896f85fda78da44b963b555cd442e8d7fa1e6",
+      "sha256": "745777330d58481e6cb79ac029a65d27f86afb9a209fdeade01180fec24a79ca",
       "width": 1440,
-      "height": 1621,
-      "bytes": 130001
+      "height": 1813,
+      "bytes": 133765
     },
     {
       "id": "architectures",
       "page": "architectures",
       "chapter": "architectures",
       "title": "Project templates",
-      "caption": "Open Project templates from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Project templates through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/architectures.png",
-      "sha256": "976557d4eff0e403573bfcabda4fe38af320f4485d20bc344d78e9bbc5ba8e1c",
+      "sha256": "0fd50758fd7175b70e9f3419ca16d4ffc9d36795a7368af3ffba00b768d11da8",
       "width": 1440,
-      "height": 1000,
-      "bytes": 96295
+      "height": 1119,
+      "bytes": 95117
     },
     {
       "id": "constitution",
       "page": "constitution",
       "chapter": "constitution",
       "title": "Constitution files",
-      "caption": "Open Constitution files from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Constitution files through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/constitution.png",
-      "sha256": "15dd475408efae08733955e03da3100e7ef69af5f5c472c83d2463944720b800",
+      "sha256": "152fa86d9d20c28085de37b62e5674df74522380e99b2a63b9f591dd8d43c8db",
       "width": 1440,
-      "height": 1259,
-      "bytes": 125232
+      "height": 1400,
+      "bytes": 120260
     },
     {
       "id": "projects",
       "page": "projects",
       "chapter": "projects",
       "title": "Projects",
-      "caption": "Open Projects from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Projects through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/projects.png",
-      "sha256": "39c5b1f545bc1dff31e388e24f0d5335353a8b14b74b7808575f019a38252653",
+      "sha256": "1e1c768afcdc5d6be942950bd5967d1a474c447846843924dff1b3e3343ada2a",
       "width": 1440,
-      "height": 1189,
-      "bytes": 92586
+      "height": 1369,
+      "bytes": 94694
     },
     {
       "id": "accounts",
       "page": "accounts",
       "chapter": "accounts",
       "title": "Apps & subscriptions",
-      "caption": "Open Apps & subscriptions from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Apps & subscriptions through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/accounts.png",
-      "sha256": "0bf1f3082003c2456518583417b9ee67e9b769d0180ad85dec383d7b0d27a3fb",
+      "sha256": "5721e5151aecced3112a51b411c8d54a4a50ffff60090a8358e97d3ff02bfe87",
       "width": 1440,
-      "height": 2336,
-      "bytes": 165958
+      "height": 2603,
+      "bytes": 174099
     },
     {
       "id": "workers",
       "page": "workers",
       "chapter": "workers",
       "title": "Set up a worker",
-      "caption": "Open Set up a worker from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Set up a worker through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/workers.png",
-      "sha256": "9f6c7ed1d537cad3959cbc52c16a66af1f76f452968231598d655c1e36327929",
+      "sha256": "b56c2063de5b162f3136ff7e5020f31f572a014ddca5c3188a22ded0612996eb",
       "width": 1440,
-      "height": 2382,
-      "bytes": 183175
+      "height": 2693,
+      "bytes": 197477
     },
     {
       "id": "storage",
       "page": "storage",
       "chapter": "storage",
       "title": "Storage & locations",
-      "caption": "Open Storage & locations from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Storage & locations through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/storage.png",
-      "sha256": "3e3ea97dbc3d918564d73c51ae4cebea06d5cd691f612d95c086ef776fe779d0",
+      "sha256": "eaae69b311094ddb878750e2f1bf13b746e765ab3bd19c7c89cf366939f39da5",
       "width": 1440,
-      "height": 1496,
-      "bytes": 113241
+      "height": 1797,
+      "bytes": 121317
     },
     {
       "id": "updates",
       "page": "updates",
       "chapter": "updates",
       "title": "Updates & model inbox",
-      "caption": "Open Updates & model inbox from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Updates & model inbox through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/updates.png",
-      "sha256": "9707e5cce5196cb749ed2ebc90928eec6890f477268ca23121ef7d6506d3055f",
+      "sha256": "d95c9297df1ef776f4453f0807846c42e25fb644500a53ad211bc90faf6d0bfb",
       "width": 1440,
-      "height": 1321,
-      "bytes": 95802
+      "height": 1502,
+      "bytes": 96071
     },
     {
       "id": "insights",
       "page": "insights",
       "chapter": "insights",
       "title": "Measured performance",
-      "caption": "Open Measured performance from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Measured performance through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/insights.png",
-      "sha256": "d26b0225e13c12f8c3dbd0b164a1089c44b442398d731c34de20f7b0e18b1ed7",
+      "sha256": "821db04034dd9e8ad0e35e07f52f07f210bd8c075e30638f9ac85bffd8eda1fd",
       "width": 1440,
-      "height": 1040,
-      "bytes": 87399
+      "height": 1249,
+      "bytes": 92208
     },
     {
       "id": "vault",
       "page": "vault",
       "chapter": "vault",
       "title": "Configs & backups",
-      "caption": "Open Configs & backups from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Configs & backups through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/vault.png",
-      "sha256": "967ce822f1ee26968241f5dc375528e07a5c8e320d827607b3ade3e06ce04fb6",
+      "sha256": "5e7c0af023c23e330af3e4de62a3f7cb55992ec02948f3d1de127be36563deeb",
       "width": 1440,
-      "height": 1675,
-      "bytes": 113188
+      "height": 1925,
+      "bytes": 116959
     },
     {
       "id": "workflows",
       "page": "workflows",
       "chapter": "workflows",
       "title": "Workspace workflows",
-      "caption": "Open Workspace workflows from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Workspace workflows through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/workflows.png",
-      "sha256": "b1447fb9c1610eb47e7980a3e0d8140229b7cf627a1e8427d94b407d9b57cf77",
+      "sha256": "72b92ddd2e4e69ab29270cf575a5f1d4b61e1c395596c57a1e7b9b121b85bd40",
       "width": 1440,
       "height": 1000,
-      "bytes": 73504
+      "bytes": 71039
     },
     {
       "id": "audit",
       "page": "audit",
       "chapter": "audit",
       "title": "Constitution health",
-      "caption": "Open Constitution health from the sidebar. The page below uses fictional documentation data.",
+      "caption": "Open Constitution health through the primary destination and contextual tabs. The page below uses fictional documentation data.",
       "steps": [],
       "overview": true,
       "path": "docs/assets/screenshots/audit.png",
-      "sha256": "5d8ad8e4e07a37100a8cd5feb302e22b3b27891d24819ead2da97cef6e5e34a5",
+      "sha256": "1a7da021091f52888985061c81d66c59f945a1ea04cd6f23021dc107d3e5ce33",
       "width": 1440,
-      "height": 1170,
-      "bytes": 90271
+      "height": 1480,
+      "bytes": 91246
     },
     {
       "id": "welcome",
@@ -374,10 +482,10 @@
       "scenario": "login",
       "scope": "#login",
       "path": "docs/assets/screenshots/welcome.png",
-      "sha256": "3560d485fbe8dc621dae64fc94d9b74c15a3274303397e9023b7eeb354ee2a7d",
+      "sha256": "eb778807a23c362a722f3617f4e38829df2a29a706e50b9cdfd293a661102526",
       "width": 510,
-      "height": 308,
-      "bytes": 16243
+      "height": 298,
+      "bytes": 18129
     },
     {
       "id": "audit-findings",
@@ -392,10 +500,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/audit-findings.png",
-      "sha256": "034777b2f17f03bc813360714709f0a9603059f2e335adb85fccb3f42f639296",
+      "sha256": "0d2f08b8aae6e01f3801d3399a87aa2fdf33d3df527dd73782b483e89b6b7188",
       "width": 1440,
       "height": 1000,
-      "bytes": 81149
+      "bytes": 70928
     },
     {
       "id": "audit-chain",
@@ -406,15 +514,19 @@
       "steps": [
         [
           "click",
+          "[data-audit-tab=\"inventory\"]"
+        ],
+        [
+          "click",
           "[data-audit-chain]"
         ]
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-chain.png",
-      "sha256": "095ac1fa16c24282f6ad24fe883af7e792c1b003fcbb939d60b6e9219e4303df",
+      "sha256": "4318624fbbb7f0717e5b4c2048f1f06b39fd7b9a03faa92a3b45ec2fab2f55cc",
       "width": 860,
-      "height": 622,
-      "bytes": 29869
+      "height": 654,
+      "bytes": 32022
     },
     {
       "id": "audit-settings",
@@ -430,10 +542,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-settings.png",
-      "sha256": "19d76e8c25886a039c1409545980c63749c25a1defc33e207406073e091b2c2e",
+      "sha256": "396d54c6abfcc3bdbfe511917914c5b3162e461339172166475e791ca0fd3e69",
       "width": 860,
       "height": 880,
-      "bytes": 30471
+      "bytes": 29328
     },
     {
       "id": "audit-corrections",
@@ -448,10 +560,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/audit-corrections.png",
-      "sha256": "3871f0095150f78f157ce14d4be9ca7e15c9d74524a1a8d78383ac7190148da0",
+      "sha256": "1df8c19528a01bc5cea531da48d26cd26f877dd92f9dd76d0dbedcaaecf6f3f6",
       "width": 1440,
       "height": 1000,
-      "bytes": 83774
+      "bytes": 75052
     },
     {
       "id": "audit-preview",
@@ -471,10 +583,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-preview.png",
-      "sha256": "15f77d11eb5e0b592de96038ffc748a85f3fab2367e95463e963f70aa88eaacc",
+      "sha256": "9283a2466d76397c4fee3c5a3702a0377c3582229e9c97bd1ad5a988e2a76120",
       "width": 860,
-      "height": 538,
-      "bytes": 26391
+      "height": 556,
+      "bytes": 27295
     },
     {
       "id": "audit-history",
@@ -489,10 +601,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/audit-history.png",
-      "sha256": "9d11a51761360c096dc227b8d20372d9fb057f5bdbe61f619ca1874d94b699a1",
+      "sha256": "fba0986823044719d8b0bf810d53e8439fcb7a0fc40a4b1492574a25ade2b089",
       "width": 1440,
       "height": 1000,
-      "bytes": 81607
+      "bytes": 72696
     },
     {
       "id": "audit-semantic",
@@ -512,10 +624,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-semantic.png",
-      "sha256": "515a7af7e6eddcdf26bf2e15107bd0f862dc1d8c1baef1d08a795563663f7c99",
+      "sha256": "23982b8b1f44c47e899e0ce22fb657bfecb67e4d14f46f5bc14af7011d68f9c1",
       "width": 860,
-      "height": 384,
-      "bytes": 20959
+      "height": 420,
+      "bytes": 22371
     },
     {
       "id": "audit-worker",
@@ -531,10 +643,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-worker.png",
-      "sha256": "09c88bc28a7f83359bf359aea075fb2bed4e1068c54e9febb8c5b9405ea4f2cc",
+      "sha256": "5c1aea3a7866f74562390a7f07337bb70fb3911cd2f186a52dd266f51adbc50f",
       "width": 860,
-      "height": 774,
-      "bytes": 56809
+      "height": 810,
+      "bytes": 60324
     },
     {
       "id": "audit-profile",
@@ -550,10 +662,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-profile.png",
-      "sha256": "60814e14c4a5b280f50469619cf6086d907d9a425e4fec70f9e58a8d784b7fed",
+      "sha256": "f071bb0dfb6a061882f4aadd3563af18f612d88dba5a18cc7b94c20cc001f4cb",
       "width": 860,
-      "height": 590,
-      "bytes": 20277
+      "height": 616,
+      "bytes": 20488
     },
     {
       "id": "audit-policy",
@@ -573,10 +685,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-policy.png",
-      "sha256": "c8517a3dfc77c0de5b6de7c278de0fb5b72aefa8ffaa431fbe7044a6a518c3d5",
+      "sha256": "88c887dc088c6180911e6eb0e658ae3e4d4df5062c909336fe77dff17deff730",
       "width": 860,
-      "height": 528,
-      "bytes": 24821
+      "height": 540,
+      "bytes": 25428
     },
     {
       "id": "audit-mcp",
@@ -592,10 +704,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-mcp.png",
-      "sha256": "1cdc15fc4be7704dd90d98f7c4e6ffaea3d7bd6424d86e9d321c37d3fe5d14c7",
+      "sha256": "63e3deb63782760eaf79b2aa59245f99e28755ec2be4cf2dd6378b6bb3f8c0b6",
       "width": 860,
-      "height": 420,
-      "bytes": 22924
+      "height": 432,
+      "bytes": 24023
     },
     {
       "id": "audit-receipt",
@@ -615,10 +727,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-receipt.png",
-      "sha256": "747c3d65c32ec036d88a17544c1914093e43689408bfc83661f4662531e8f9b8",
+      "sha256": "44318cad3076e7e7e784c4fff4781c9d061d3be2bd2040bc5a455a435ed4be7d",
       "width": 860,
       "height": 880,
-      "bytes": 25272
+      "bytes": 24580
     },
     {
       "id": "audit-github",
@@ -638,10 +750,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/audit-github.png",
-      "sha256": "927e54d063f5b1631dc0d20d58a522ec872267bca7330499231e663327a12329",
+      "sha256": "1c7b840742b397e4f0163f427b210fe84baeac35cbdfccadb632fcfa5ad8c8d3",
       "width": 860,
-      "height": 570,
-      "bytes": 27049
+      "height": 596,
+      "bytes": 28156
     },
     {
       "id": "audit-mobile",
@@ -656,10 +768,10 @@
       },
       "fullPage": true,
       "path": "docs/assets/screenshots/audit-mobile.png",
-      "sha256": "36e102dda0cebdd1fe15ba8f42dd1436fe235db22e273234f44cf1f93b7d9982",
-      "width": 435,
-      "height": 1627,
-      "bytes": 68226
+      "sha256": "ef7eff0f358e4fbff2597dc38ba77f3d08cad08a52e4debfbcc90b7715d0b22a",
+      "width": 390,
+      "height": 1968,
+      "bytes": 73137
     },
     {
       "id": "gpu-gaming",
@@ -670,10 +782,10 @@
       "steps": [],
       "scenario": "gaming",
       "path": "docs/assets/screenshots/gpu-gaming.png",
-      "sha256": "84e1a12a4bcb30976fabbd775907716dc3aa31ee75ad968944b0db7561121200",
+      "sha256": "78f3327d327297e6bd2aa28d3bb3d05aa4a5a3615a9b351df961fcf401ecf765",
       "width": 1440,
       "height": 1000,
-      "bytes": 115402
+      "bytes": 105982
     },
     {
       "id": "gpu-draining",
@@ -684,10 +796,10 @@
       "steps": [],
       "scenario": "draining",
       "path": "docs/assets/screenshots/gpu-draining.png",
-      "sha256": "af64e64de8c574263bb680b8d723622245110becbe84e850153763f2e26f826a",
+      "sha256": "02dfb5b15ebbdea12f86a7dbf7d5c7afc2751f8d28169cb74de09b50ae73e876",
       "width": 1440,
       "height": 1000,
-      "bytes": 115390
+      "bytes": 106273
     },
     {
       "id": "model-fit",
@@ -703,10 +815,10 @@
       ],
       "scope": "#recommendations",
       "path": "docs/assets/screenshots/model-fit.png",
-      "sha256": "5c8882fe2810efc8bdacdde65f7f3c8e47ccd0e050e74aa83138a70091337d3d",
+      "sha256": "3724bbddf3a1fa3a7d75c15582b491d6e48ff5df1f2d45dc54e186ff52e20f1c",
       "width": 1120,
-      "height": 355,
-      "bytes": 18601
+      "height": 448,
+      "bytes": 22996
     },
     {
       "id": "hugging-face",
@@ -731,10 +843,10 @@
       ],
       "scope": "#models .panel:has(#hf-form)",
       "path": "docs/assets/screenshots/hugging-face.png",
-      "sha256": "f58e4a61085a07f346638a10a52463c7801ac18cbb23892a5d871716651a7ca4",
+      "sha256": "27e459412869a01ff468ec9f689c7cd6ee659a0409896a370d0a762af4b348c7",
       "width": 1120,
-      "height": 425,
-      "bytes": 25203
+      "height": 429,
+      "bytes": 25205
     },
     {
       "id": "model-route",
@@ -750,10 +862,10 @@
       ],
       "scope": "#configure-dialog",
       "path": "docs/assets/screenshots/model-route.png",
-      "sha256": "f646c0f0bc810c0e8159e70a630ab3d93462b2fd2d5f3042fc7da47c4c148467",
+      "sha256": "0ad49bc6255adb15932ebb87768fe3c7f8c4c201d4df3091b7799c2af3c26806",
       "width": 510,
-      "height": 400,
-      "bytes": 17741
+      "height": 448,
+      "bytes": 20561
     },
     {
       "id": "models-empty",
@@ -764,10 +876,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/models-empty.png",
-      "sha256": "bdb0fa900cb4cd672d4386043f3ec4ef55f272a96a16798e132bc326956850d9",
+      "sha256": "a63f7c3fe1cdd8e237ba1e40408658dc465566d0d83ee9124319f31bcf9be22f",
       "width": 1440,
       "height": 1000,
-      "bytes": 84452
+      "bytes": 77969
     },
     {
       "id": "driver-update",
@@ -783,10 +895,10 @@
       ],
       "scope": "#driver-dialog",
       "path": "docs/assets/screenshots/driver-update.png",
-      "sha256": "bbf1c8ff1519feb74fae99fbc09b0dfe1f6e7f1af2d0aade6d1382bce829fe57",
+      "sha256": "1e69eab5b7ddd1bdcbccc7410a48b46ccb5d02e714792e2a7de8ac20436e77ca",
       "width": 510,
-      "height": 616,
-      "bytes": 35713
+      "height": 662,
+      "bytes": 40087
     },
     {
       "id": "machine-pairing",
@@ -803,10 +915,10 @@
       ],
       "scope": "#pair-form",
       "path": "docs/assets/screenshots/machine-pairing.png",
-      "sha256": "9cbbc3784df057ccd7696226a4c8e741e56612046fcb3386563f01ce370947fd",
+      "sha256": "f86518a648ce8f54d12b994f7424f7a2089f76bb21038fb61b138fae22ccd44e",
       "width": 1070,
-      "height": 287,
-      "bytes": 9688
+      "height": 308,
+      "bytes": 9796
     },
     {
       "id": "connect-launch",
@@ -828,10 +940,10 @@
       ],
       "scope": "#launch-form",
       "path": "docs/assets/screenshots/connect-launch.png",
-      "sha256": "23f6757ee88cabab8afd2ceb238c1c379995b67095c1de891cca9d97b3fc2d34",
+      "sha256": "3ec71473f628ae366cc35f63bbd6b35ba4e7941dcb91952b9d97477cae5f4660",
       "width": 1120,
-      "height": 408,
-      "bytes": 17429
+      "height": 427,
+      "bytes": 18420
     },
     {
       "id": "cursor-task",
@@ -842,10 +954,10 @@
       "steps": [],
       "scope": "#connect .connect-grid",
       "path": "docs/assets/screenshots/cursor-task.png",
-      "sha256": "b3224d71512adaccf6abe4cd1747cd9f99e8bf7d3149b5f2acd746e96468c39a",
+      "sha256": "06a3a422a609081b10c9330fadd8943a92b77135b3ba4a7bf500071c87ac75ca",
       "width": 1120,
       "height": 648,
-      "bytes": 35289
+      "bytes": 35020
     },
     {
       "id": "coding-evaluation",
@@ -861,10 +973,10 @@
       ],
       "scope": "#connect .panel:has(#evaluation-results)",
       "path": "docs/assets/screenshots/coding-evaluation.png",
-      "sha256": "1635fd8ea2cb13d036aa30304ad7a0689e90da6c6edb403185492fd5792af3f4",
+      "sha256": "239b58a0943f5458c9f582230e8845ac020f0fe7fbdcd3b32fd9bb088edcf2dc",
       "width": 1120,
-      "height": 542,
-      "bytes": 32339
+      "height": 577,
+      "bytes": 35565
     },
     {
       "id": "template-editor",
@@ -880,10 +992,10 @@
       ],
       "scope": "#template-workbench",
       "path": "docs/assets/screenshots/template-editor.png",
-      "sha256": "32a5c5fe9021a3f864e7c3cffb72a00a02ae513783a880f6a236b2208fddffe1",
+      "sha256": "e63fe24cf45dedefa0475d6776abd9e6acac55ad92dd7f47c3b323fe8bd66672",
       "width": 1120,
-      "height": 2100,
-      "bytes": 105414
+      "height": 2301,
+      "bytes": 115266
     },
     {
       "id": "template-component",
@@ -903,10 +1015,10 @@
       ],
       "scope": "#component-dialog",
       "path": "docs/assets/screenshots/template-component.png",
-      "sha256": "d7d0cf3e2a3306b6660aaa27e2c2d13c1fcb77c5ae3e0ca99c633b9eb6b9cabc",
+      "sha256": "e71dc3627478c0bf6ce083459f74507ee7f3a79404e6ea526932c3a49d58d211",
       "width": 860,
       "height": 880,
-      "bytes": 38979
+      "bytes": 39086
     },
     {
       "id": "template-environment",
@@ -936,10 +1048,10 @@
       ],
       "scope": "#component-dialog",
       "path": "docs/assets/screenshots/template-environment.png",
-      "sha256": "4341d52a6794fdf42456dfc941eda101c61cf209b5bbc2c78a51af9c570d8692",
+      "sha256": "9a038679f5aefd43fb5e2f44c1106552ef07b18b3d81e6c9334fb659ae2e4654",
       "width": 860,
       "height": 880,
-      "bytes": 36897
+      "bytes": 35347
     },
     {
       "id": "template-revisions",
@@ -959,10 +1071,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-revisions.png",
-      "sha256": "1e499d73878af6f533907372f31098ca27dcc49c8195618bf70071f9deae77d9",
+      "sha256": "f518f0ca24a67f8084aeec9a3cce8d4d6123b4203b39e563ed205214b95bd72d",
       "width": 860,
-      "height": 626,
-      "bytes": 33431
+      "height": 658,
+      "bytes": 36782
     },
     {
       "id": "template-capture",
@@ -988,10 +1100,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-capture.png",
-      "sha256": "bdb840aba5b9f2f09af60b16694e24ac975238e2ba30980f4b8c93e1fb2cfd1c",
+      "sha256": "35dffdbf9340d0883ddd34eb0653c1c877949bf20b80167291154373d0b1bd17",
       "width": 860,
-      "height": 648,
-      "bytes": 32754
+      "height": 690,
+      "bytes": 35945
     },
     {
       "id": "template-capture-review",
@@ -1016,17 +1128,17 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/template-capture-review.png",
-      "sha256": "367f2132dbab9571a75823b25fe604317e508a01c127ef30b030819a7d156cac",
+      "sha256": "a4f9eaaecd0824dc5fdafb0e9102347a125afc2aadfb01743d68d51d98569790",
       "width": 860,
-      "height": 474,
-      "bytes": 24441
+      "height": 498,
+      "bytes": 26070
     },
     {
       "id": "template-save",
       "page": "architectures",
       "chapter": "architectures",
-      "title": "Review a baseline save",
-      "caption": "Saving first shows a managed-file preview. Review it before adding the baseline to your private library.",
+      "title": "Save a private template candidate",
+      "caption": "Save keeps this candidate separate from the published library. Review publication under Instructions → Saved drafts.",
       "steps": [
         [
           "click",
@@ -1035,18 +1147,14 @@
         [
           "click",
           "#template-save"
-        ],
-        [
-          "click",
-          "#studio-preview .diff-file summary"
         ]
       ],
-      "scope": "#studio-preview",
+      "scope": "#template-workbench",
       "path": "docs/assets/screenshots/template-save.png",
-      "sha256": "7d3d5e4b735b74cab04c1e4649adee4226c62dc9ed02e67d65cab8e14fe715b1",
-      "width": 860,
-      "height": 556,
-      "bytes": 25583
+      "sha256": "468c64727118b6fb9ea798706b1f1a0275842ef9a840eb7d7e74705c02f929f7",
+      "width": 1120,
+      "height": 2301,
+      "bytes": 115163
     },
     {
       "id": "template-apply",
@@ -1085,10 +1193,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/template-apply.png",
-      "sha256": "15a0a65fab0f9c7a30b6a23ffd94c1a23e8e36f4c05af1188b83fe5e31d90d4f",
+      "sha256": "7f54d2b8194db4bbb6349a7ac5f17a3c25cae1d8bf6ca9506c0fd3ab0d0ccc50",
       "width": 860,
-      "height": 598,
-      "bytes": 28695
+      "height": 640,
+      "bytes": 30783
     },
     {
       "id": "constitution-edit",
@@ -1113,10 +1221,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-edit.png",
-      "sha256": "0a7478fa35902926aab4f1cb13e1028491edeef142bea661721272183914041c",
+      "sha256": "f2d6f143916d0f73a02806731409558d072b9d464cb94f9d449cb2d1015b458d",
       "width": 860,
-      "height": 598,
-      "bytes": 27002
+      "height": 614,
+      "bytes": 28254
     },
     {
       "id": "constitution-generated",
@@ -1132,10 +1240,10 @@
       ],
       "scope": "#constitution .file-workspace",
       "path": "docs/assets/screenshots/constitution-generated.png",
-      "sha256": "c7a1c85a0d349cf16e9e254efa149a8246a5730ddcb7adf47cb628bb2bd04a3d",
+      "sha256": "7b51c95321a54897bd93b13f525530d108f4f24fef6ba5ad1a57d08febca7fa2",
       "width": 1120,
-      "height": 1357,
-      "bytes": 50024
+      "height": 1469,
+      "bytes": 51486
     },
     {
       "id": "constitution-activation",
@@ -1151,10 +1259,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-activation.png",
-      "sha256": "f74f9ab25c806920967ba8ca4859c930e04d1cdd89d80b14403c17b8600a889e",
+      "sha256": "6dc38ec01dfc9c16b40d7b523dc1e785e09e46473b89194828b33246ba97e6ae",
       "width": 860,
-      "height": 476,
-      "bytes": 26263
+      "height": 554,
+      "bytes": 30249
     },
     {
       "id": "constitution-history",
@@ -1170,10 +1278,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-history.png",
-      "sha256": "5c61cbcbc10ca867ad52578e70e83f7cfebd8bf1a2c113b67944313d10d52b49",
+      "sha256": "a42f3482a41cc095304ad7137460f4ad99381770723ae11d317435688894cf85",
       "width": 860,
-      "height": 422,
-      "bytes": 18853
+      "height": 442,
+      "bytes": 19888
     },
     {
       "id": "constitution-refresh",
@@ -1193,10 +1301,10 @@
       ],
       "scope": "#studio-preview",
       "path": "docs/assets/screenshots/constitution-refresh.png",
-      "sha256": "0390ec1fa5877e302210141badf101de4a1daddcf71b978d45677efb3c2b55ba",
+      "sha256": "53a92c20814e1ee78397e123ba0743868a926501228d3326c10b46480a47d813",
       "width": 860,
-      "height": 534,
-      "bytes": 23682
+      "height": 552,
+      "bytes": 25830
     },
     {
       "id": "project-discovery",
@@ -1217,10 +1325,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-discovery.png",
-      "sha256": "c3c2e52c8e2e3ba838d62d00f6d46e0b355d45f10320593c72b1032cdc17e412",
+      "sha256": "3d34acb9f15c1874ab3062c9e89ef53d94b1e6559d8df6273dc5cc529f52e415",
       "width": 860,
-      "height": 414,
-      "bytes": 19686
+      "height": 434,
+      "bytes": 20467
     },
     {
       "id": "project-selection",
@@ -1245,10 +1353,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-selection.png",
-      "sha256": "9af9eb1407747b6deda50a1e321fdc6d003a2dc9e1a396cfd135bdb7e44b00a0",
+      "sha256": "ea58299bd8503da726d54c55130a24c7e2825405211766d414e88056f3080ec2",
       "width": 860,
-      "height": 776,
-      "bytes": 28339
+      "height": 810,
+      "bytes": 30307
     },
     {
       "id": "project-preview",
@@ -1277,10 +1385,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/project-preview.png",
-      "sha256": "913a3b17e79ce3d79addb553877f19085dea101ad4028850d0adadfe088c04ba",
+      "sha256": "478aeec4bfa1a8995a7e909b1569c8322adf471a8a7985c766c64798010c5c40",
       "width": 860,
-      "height": 502,
-      "bytes": 25258
+      "height": 530,
+      "bytes": 26959
     },
     {
       "id": "project-conflict",
@@ -1291,10 +1399,10 @@
       "steps": [],
       "scenario": "conflict",
       "path": "docs/assets/screenshots/project-conflict.png",
-      "sha256": "b1093654d1079bc7d5077fd86931bc2c5929fee80bf98fa15b3363095e4976ee",
+      "sha256": "ba9b7bc220180229eab8a210a1194957454f3601a529d42f38632d18f7bb7afb",
       "width": 1440,
       "height": 1000,
-      "bytes": 85949
+      "bytes": 75690
     },
     {
       "id": "projects-empty",
@@ -1305,10 +1413,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/projects-empty.png",
-      "sha256": "2f2ed619b9c30ce05ae3b2359bd620f4d2df63464e04b634d692ea614492020a",
+      "sha256": "7c96152f137775dddb232072fd1dab9453932b2648ca41e0008524ebef234b6c",
       "width": 1440,
       "height": 1000,
-      "bytes": 77518
+      "bytes": 74212
     },
     {
       "id": "subscription-edit",
@@ -1324,10 +1432,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-edit.png",
-      "sha256": "b6e604d7dbcd5d17c99a771da020ec30483345e0ba3d0c21f9c206db847f958f",
+      "sha256": "aa4cd520689feccdb1304b61861c07dd668fa57e871f0e46da2c7e3d79e06dc8",
       "width": 860,
-      "height": 628,
-      "bytes": 27145
+      "height": 664,
+      "bytes": 28643
     },
     {
       "id": "subscription-usage",
@@ -1343,10 +1451,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-usage.png",
-      "sha256": "7e1b919098658249814a165974bff28ff415d12726c0ad9bfc1365491b11675b",
+      "sha256": "2d0a24dbf020eb6d5d7c3b5630df5e2d298fa80e3252fa3a5b95472d4578d4cc",
       "width": 860,
-      "height": 698,
-      "bytes": 31447
+      "height": 738,
+      "bytes": 33704
     },
     {
       "id": "cost-connector",
@@ -1362,10 +1470,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/cost-connector.png",
-      "sha256": "9df59700a4eb79d6d3ba1de975ab6597353fc5bbb1514a1c0deeee7c938fbfc6",
+      "sha256": "08ba7d761b157151c6341ec805a33c2608b9712e531c2e97dfc47201a67df902",
       "width": 860,
-      "height": 490,
-      "bytes": 26221
+      "height": 508,
+      "bytes": 26671
     },
     {
       "id": "subscription-log",
@@ -1381,10 +1489,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/subscription-log.png",
-      "sha256": "234b65227908eca0da3ce6b25834a7292a44f82d167c4cc4c5743be480458078",
+      "sha256": "d7bdfe734f1ca43632fc7ef076b0a6940ab1c8236b09035111f828df92e6283e",
       "width": 860,
-      "height": 352,
-      "bytes": 15721
+      "height": 364,
+      "bytes": 16448
     },
     {
       "id": "machine-diagnostics",
@@ -1400,10 +1508,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/machine-diagnostics.png",
-      "sha256": "687dfb7ac33c0c07f217510cb7955c69eb7780cade9fdd2a824374c728158636",
+      "sha256": "2a561bb0491f8525ecda28040852f1c3ade61f07aa61e681089988666bc49496",
       "width": 860,
-      "height": 614,
-      "bytes": 27666
+      "height": 672,
+      "bytes": 30095
     },
     {
       "id": "collector-failure",
@@ -1414,10 +1522,10 @@
       "steps": [],
       "scenario": "collector-failed",
       "path": "docs/assets/screenshots/collector-failure.png",
-      "sha256": "58ad398dc6509e0174bc006ec25404b2e13c3d4fa7d7fc85dc43226449eaaa54",
+      "sha256": "50ee5fe6f37b413410169acd692506c02ea4de47728019ff0324036f29c9055b",
       "width": 1440,
       "height": 1000,
-      "bytes": 95614
+      "bytes": 84119
     },
     {
       "id": "worker-download",
@@ -1433,10 +1541,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/worker-download.png",
-      "sha256": "6ebf2d70b88b9cb49442f7e5ebfe47a918903c3f42b941fbfc8b6ea6c7024976",
+      "sha256": "b049cfd3fce481cc749509172f7ef5d9a210c62fde49be614bc50bc9565d1ef0",
       "width": 860,
-      "height": 408,
-      "bytes": 23509
+      "height": 420,
+      "bytes": 24333
     },
     {
       "id": "worker-windows",
@@ -1457,10 +1565,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-windows.png",
-      "sha256": "ed70c14d5200616e2a4b7e704c9f64e642ae40199691e171a0c8361b685ed295",
+      "sha256": "a9511cb15ac46aee6ceb0323080bb6ce44333e235167a0ec14057a512f382fa9",
       "width": 1120,
-      "height": 1089,
-      "bytes": 74201
+      "height": 1194,
+      "bytes": 83013
     },
     {
       "id": "worker-macos",
@@ -1481,10 +1589,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-macos.png",
-      "sha256": "e7b70414b58d40f9c0f5d67d6fc29f1d5f4e1a190910a3ce8e86a0338e3d0d2c",
+      "sha256": "912a7fd06ad1c358282a408a51f99651eba9347dad7d85190173fc37382677e1",
       "width": 1120,
-      "height": 1007,
-      "bytes": 68025
+      "height": 1146,
+      "bytes": 77412
     },
     {
       "id": "worker-linux",
@@ -1505,10 +1613,10 @@
       ],
       "scope": "#workers .panel:has(#worker-commands)",
       "path": "docs/assets/screenshots/worker-linux.png",
-      "sha256": "87f5bc8a0b07942bedb87c04f8bca868fd46017ee33e8debb04a0e99aaaf5c60",
+      "sha256": "60dcfcaf081e4a38bc9b93153354b7b1e690367c421187330081893e668cabf7",
       "width": 1120,
-      "height": 1007,
-      "bytes": 67813
+      "height": 1146,
+      "bytes": 77195
     },
     {
       "id": "worker-maintenance",
@@ -1524,10 +1632,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/worker-maintenance.png",
-      "sha256": "bc2bc4690543cacb223df692eacfbd72d708ba278864a3aaf6063d4493da18a6",
+      "sha256": "9a95c55c78766ce06e70e1df0b9de50483d83fb32348f8787afdaf62fc8667ec",
       "width": 860,
-      "height": 482,
-      "bytes": 22692
+      "height": 508,
+      "bytes": 23385
     },
     {
       "id": "storage-preview",
@@ -1548,10 +1656,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/storage-preview.png",
-      "sha256": "9df0990e018760f5def201e60938e08e4556db37c5135f3590418a38a47e0f6c",
+      "sha256": "c86a2bea3d354364ba949dfb4fe9fff629da915bcd46e3d7c45f29dfa2c01484",
       "width": 860,
-      "height": 360,
-      "bytes": 20508
+      "height": 376,
+      "bytes": 21866
     },
     {
       "id": "model-storage-copy",
@@ -1567,10 +1675,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/model-storage-copy.png",
-      "sha256": "ba7a00b21abcd21cc793951d36e66779df3d55807211e882e3de1577ad6278a8",
+      "sha256": "4614f9385d5142a6088cb17757665d9ea94f20f13151d8837952e748750a3a9a",
       "width": 860,
-      "height": 374,
-      "bytes": 22307
+      "height": 416,
+      "bytes": 23245
     },
     {
       "id": "update-release-notes",
@@ -1585,10 +1693,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/update-release-notes.png",
-      "sha256": "80ebbfff6effd1f3a604412bf50d2498203fdfd854f880f571aa380927955600",
+      "sha256": "1d926217c0cb33551e55ba5c038f6bf30c6e8ae94725e7df9c725ede89c7540a",
       "width": 1440,
       "height": 1000,
-      "bytes": 87605
+      "bytes": 74422
     },
     {
       "id": "update-restart",
@@ -1605,10 +1713,10 @@
       "scenario": "staged",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-restart.png",
-      "sha256": "05e2466da17c2ec4d27873d12ae9dc493ae6fc950db567c4c8cf444afd86d240",
+      "sha256": "ce7696f77d9854a55cdfa54b54196066791e2274fd0349b6866690e42e7bc4c6",
       "width": 860,
-      "height": 376,
-      "bytes": 19080
+      "height": 386,
+      "bytes": 19557
     },
     {
       "id": "update-blocked",
@@ -1625,10 +1733,10 @@
       "scenario": "blocked",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-blocked.png",
-      "sha256": "e776566987e087b840bd044f0ec7af7925d5cddfc85b1802441746d5d6f74d32",
+      "sha256": "61fbe61ba388f4ff4de63629903691f2c2caee16fa8cd8ea805a09f02efa85b6",
       "width": 860,
-      "height": 450,
-      "bytes": 23233
+      "height": 470,
+      "bytes": 25030
     },
     {
       "id": "update-rollback",
@@ -1644,10 +1752,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/update-rollback.png",
-      "sha256": "e0c2781439d63ca13aa0b5c0eb13ab4663e43250ce53b5a525a8cbf854a46fb6",
+      "sha256": "88ea136319991250235f181cfbb2e7ace3ff818de2b745ac6ed7c1d53dd12089",
       "width": 860,
-      "height": 376,
-      "bytes": 19853
+      "height": 386,
+      "bytes": 20235
     },
     {
       "id": "model-inbox-detail",
@@ -1663,10 +1771,10 @@
       ],
       "scope": "#updates-content .panel >> nth=1",
       "path": "docs/assets/screenshots/model-inbox-detail.png",
-      "sha256": "4ed7872c5b09da41ab0a881fe2c2bf04291cdbb360bcdffc33a08b84ab5e2b59",
+      "sha256": "850634896f3a6f69b0336cf6688faba22bf58075bfdbac12dc20441af7c7a40f",
       "width": 1120,
-      "height": 869,
-      "bytes": 32960
+      "height": 898,
+      "bytes": 34315
     },
     {
       "id": "model-inbox-apply",
@@ -1682,10 +1790,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/model-inbox-apply.png",
-      "sha256": "aa382072bac7ed979d658333b71f1dff31f2e976d20362202e6870ee7f5ba51c",
+      "sha256": "a70b9e191fb597afa70dbf21b48f8046ff4b93e1f5c351f1c4ad0439be31cd7f",
       "width": 860,
-      "height": 336,
-      "bytes": 19946
+      "height": 350,
+      "bytes": 20628
     },
     {
       "id": "performance-empty",
@@ -1696,10 +1804,10 @@
       "steps": [],
       "scenario": "empty",
       "path": "docs/assets/screenshots/performance-empty.png",
-      "sha256": "41ba1396becaef2951a0ebb3b0e61af3fd5860f9cff9342c6d01c864e75d31fe",
+      "sha256": "5f19dd0527feeff91e21945377bd9d859d116456d327fc51a7749740b21cf6b8",
       "width": 1440,
       "height": 1000,
-      "bytes": 81943
+      "bytes": 78689
     },
     {
       "id": "config-mapping",
@@ -1715,10 +1823,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/config-mapping.png",
-      "sha256": "5fd67c8fbab1da72c2d8f5a63c5fd2c8a8a128755f3da2b4a232b64eb3cbf74d",
+      "sha256": "b36ea60591fc2c029f7fb3398c3ac5185b63675953910df7f1eb5e6c7024370f",
       "width": 860,
-      "height": 576,
-      "bytes": 27721
+      "height": 604,
+      "bytes": 28178
     },
     {
       "id": "backup-preview",
@@ -1734,10 +1842,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-preview.png",
-      "sha256": "73e6b4b88cc7643a7aab0f39f46698527b89c31c2b885eadc74f00eeb12de74e",
+      "sha256": "d40684183a4ae418b5bce858ed4e8375156ae4482b01ee29e020f96821903272",
       "width": 860,
-      "height": 414,
-      "bytes": 23179
+      "height": 436,
+      "bytes": 24702
     },
     {
       "id": "backup-encryption",
@@ -1753,10 +1861,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-encryption.png",
-      "sha256": "df925c3e6762844efb5cf042d535159088c0f216497665f33d6aa6b0e198be55",
+      "sha256": "248bef5e02b4aa265e7bbcfc8fe85e4ac62dddb1828137ae2d978dfc7089d965",
       "width": 860,
-      "height": 664,
-      "bytes": 32900
+      "height": 702,
+      "bytes": 35190
     },
     {
       "id": "backup-initialize",
@@ -1772,10 +1880,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-initialize.png",
-      "sha256": "ab979652081d39e4f0f6415013d876fa9fad2349f51c0574980e90c05e9c8616",
+      "sha256": "ff7f08b466f469481960dd3046e6050ab93652694bb011ff78ff5e042c5660a1",
       "width": 860,
-      "height": 298,
-      "bytes": 17323
+      "height": 334,
+      "bytes": 19042
     },
     {
       "id": "backup-schedule",
@@ -1791,10 +1899,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-schedule.png",
-      "sha256": "960a45efb7e358ebd124d78bdc0b7a3ba82546564ccc50dcb1536a2bb1f9c504",
+      "sha256": "109df7a656b5b6ff5c1c36a4060e4d623d6e36d9a783a2521cc57811bd2c4266",
       "width": 860,
-      "height": 466,
-      "bytes": 28619
+      "height": 484,
+      "bytes": 30731
     },
     {
       "id": "backup-retention",
@@ -1810,10 +1918,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-retention.png",
-      "sha256": "136030ab0b34250f0ca49714d11b8e28ad43dddf42c665fbdb66b685cf52f670",
+      "sha256": "1bb4eaf764fd106dd3a851ce8d96cdcdefe61c3118c7586554e66fdde14f5e5d",
       "width": 860,
-      "height": 406,
-      "bytes": 18970
+      "height": 420,
+      "bytes": 19559
     },
     {
       "id": "backup-restore",
@@ -1834,10 +1942,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-restore.png",
-      "sha256": "65852f503522b17db38c5f571c2afd260b95ccc3ff7e5c1b34bacb5f4b33e2b3",
+      "sha256": "5e4f72580a461bdc7b464c77556a49fc5ce08d42fd590eb07fc6bb590d426ea8",
       "width": 860,
-      "height": 428,
-      "bytes": 20639
+      "height": 442,
+      "bytes": 20909
     },
     {
       "id": "backup-restore-preview",
@@ -1862,10 +1970,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/backup-restore-preview.png",
-      "sha256": "712a6fea7c21b2841a89c85185cb038cae9864d279c817a754ae4904c9aa721e",
+      "sha256": "6e33f908d6cedbb4325e696e6b46938fa6d5439551dab804f65d9c8d0be17e29",
       "width": 860,
-      "height": 336,
-      "bytes": 18481
+      "height": 350,
+      "bytes": 19755
     },
     {
       "id": "local-restore-preview",
@@ -1890,10 +1998,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/local-restore-preview.png",
-      "sha256": "b502a41b2d0c67e77c1a91a8abdb7c750613b39f3b7417b5b4911becddbe6270",
+      "sha256": "67b20a17ca55dcbfffc7f7a1f6d0354cc12b69c8c955a6ce430ca4f25909614d",
       "width": 860,
-      "height": 360,
-      "bytes": 18382
+      "height": 376,
+      "bytes": 19123
     },
     {
       "id": "notifications",
@@ -1910,10 +2018,10 @@
       "scenario": "failure",
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/notifications.png",
-      "sha256": "7ccf2ae92c7db26db4346abd09b86d4e0adec3e5d9e17b73c39c4d0801e7098c",
+      "sha256": "08d10a243d865aba7c5920bb4f82dca2b7e756a1ae1b60d4aaa0aa309f7ca545",
       "width": 860,
-      "height": 504,
-      "bytes": 23059
+      "height": 524,
+      "bytes": 23270
     },
     {
       "id": "operation-progress",
@@ -1933,10 +2041,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/operation-progress.png",
-      "sha256": "67f34d009ca371b099fa4da927f9fe2e36e377c871cf8f8e2a5af7023ffd56a3",
+      "sha256": "8254a76542ff36411d36afd7808497a6728f774d818eaaf1c730829b83973d57",
       "width": 1440,
       "height": 1000,
-      "bytes": 94879
+      "bytes": 76165
     },
     {
       "id": "support-report",
@@ -1952,10 +2060,10 @@
       ],
       "scope": "#overview .service-panel",
       "path": "docs/assets/screenshots/support-report.png",
-      "sha256": "f8633d66f84505d240e0ca28a584a13a4e4716395243b9f815d2a741d87aa2fa",
+      "sha256": "37da7caf6005e8a5989301fdd9b85afc1b4ab276c9db9ef1e12c26c3d6674175",
       "width": 1120,
-      "height": 686,
-      "bytes": 30931
+      "height": 699,
+      "bytes": 31942
     },
     {
       "id": "mobile-updates",
@@ -1970,10 +2078,10 @@
       },
       "fullPage": true,
       "path": "docs/assets/screenshots/mobile-updates.png",
-      "sha256": "72530f485fc3c1f14f0f0c56c294867998796b7b871bf57fee430e38d4231787",
-      "width": 435,
-      "height": 1600,
-      "bytes": 71340
+      "sha256": "3969018f137321908aaa29bf396aa1e09c80e3ff36ee104b944c902fb12018ea",
+      "width": 390,
+      "height": 2013,
+      "bytes": 75735
     },
     {
       "id": "tablet-projects",
@@ -1988,10 +2096,10 @@
       },
       "fullPage": true,
       "path": "docs/assets/screenshots/tablet-projects.png",
-      "sha256": "03e51d8f9fe7f76edc1136573b60d47c5ae04d668f9fe551631117c6e58f778a",
-      "width": 820,
-      "height": 1367,
-      "bytes": 95121
+      "sha256": "0bd33e3b328bf4ee21a14523d7ed6f3f5b496ce435b6a6cd10e3626f41dea6ad",
+      "width": 896,
+      "height": 1588,
+      "bytes": 94882
     },
     {
       "id": "toolkit-check",
@@ -2002,10 +2110,10 @@
       "steps": [],
       "transcript": "check",
       "path": "docs/assets/screenshots/toolkit-check.png",
-      "sha256": "30c3e682a8482320506d0d1721495cbc444713964f8b50360e61e33b40f9158c",
+      "sha256": "ff7482f778f61e5e1a9fa6dbd0e1a846b36a1cca0bf5f02de8a9ba0e08ef73ff",
       "width": 1440,
       "height": 1000,
-      "bytes": 28644
+      "bytes": 28595
     },
     {
       "id": "toolkit-install-preview",
@@ -2016,10 +2124,10 @@
       "steps": [],
       "transcript": "install",
       "path": "docs/assets/screenshots/toolkit-install-preview.png",
-      "sha256": "05a95c2f93370b19237dbfd0ea4a50fa0ed480f419722f49f7c37fa3bfe95c05",
+      "sha256": "6380600c78fddc1c61f695bfc5a2e3b4f629edd7506eaea10d90e35bc6e92c44",
       "width": 1440,
       "height": 1000,
-      "bytes": 51612
+      "bytes": 51562
     },
     {
       "id": "workflow-inspector",
@@ -2035,10 +2143,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-inspector.png",
-      "sha256": "6488333001f76e4087a6e8aeb8042332cba3538b54d2607ffbcc35065aebce38",
+      "sha256": "d16b2de5ec7338ae325e335c9acffd7e6e605354cac2876ce0441699dbb02ae5",
       "width": 860,
       "height": 880,
-      "bytes": 39567
+      "bytes": 41734
     },
     {
       "id": "workflow-preparation",
@@ -2054,10 +2162,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-preparation.png",
-      "sha256": "f117561e798dab115c75df452bd4acec50028e5d50b96c7b4d35306bcef7189f",
+      "sha256": "68f867068166855868f40f9c93b11048cea658708e9d3617202692fc1ec768f9",
       "width": 860,
-      "height": 794,
-      "bytes": 37655
+      "height": 880,
+      "bytes": 41325
     },
     {
       "id": "workflow-preparation-preview",
@@ -2077,10 +2185,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-preparation-preview.png",
-      "sha256": "e5fe168d91b066c67a467b1e60d919f2b929997a6b12d14b4207fe4da76e7f7d",
+      "sha256": "039f9d4d19b69b48998a27402319e90dac1379ce2ce007f5e48c1a330f958ee1",
       "width": 860,
       "height": 880,
-      "bytes": 28871
+      "bytes": 29003
     },
     {
       "id": "workflow-launch",
@@ -2096,10 +2204,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-launch.png",
-      "sha256": "3b2fb7fb09a2dcf0d7471b9bc5fc97345ac81ef1c359142e2c38839ea850fd9d",
+      "sha256": "70cccd837a8be30d80cfe285bce7031f686b6d8b16ce5905b365f67cca3c5f3e",
       "width": 860,
-      "height": 686,
-      "bytes": 28861
+      "height": 786,
+      "bytes": 36878
     },
     {
       "id": "workflow-rollout",
@@ -2115,10 +2223,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-rollout.png",
-      "sha256": "2d06d73fdbe8e8891f1fad22f007dc1c78f1cf813a2ff1d15c0a4fc7bd1fcdcf",
+      "sha256": "117c1d9ed83280c97920955d0ef36f1ba10f6723a77ba7696080773fe1ac5c5f",
       "width": 860,
-      "height": 566,
-      "bytes": 24561
+      "height": 594,
+      "bytes": 26277
     },
     {
       "id": "workflow-canary",
@@ -2138,10 +2246,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-canary.png",
-      "sha256": "92a576993a41d66bca6db32a915e886e5da9011b4c19f5c001aceaf96690a62f",
+      "sha256": "e37b62e4869f0a9d927c18724e35425738236e6b16e997929e02cc04b23b3754",
       "width": 860,
-      "height": 398,
-      "bytes": 19183
+      "height": 418,
+      "bytes": 20362
     },
     {
       "id": "workflow-toolkit-library",
@@ -2156,10 +2264,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-toolkit-library.png",
-      "sha256": "46d6f73779d2608eb5dde9bbe72122d69a8cdecf16af9f9229d18ad01c9e4f37",
+      "sha256": "f748ede78ba9f3429a88b80218489bdc68cd84d56333a94b535dfca1dc295170",
       "width": 1440,
       "height": 1000,
-      "bytes": 77973
+      "bytes": 72217
     },
     {
       "id": "workflow-toolkit-edit",
@@ -2179,10 +2287,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-toolkit-edit.png",
-      "sha256": "79a81aa9555ca981938ce526c56ed415cb24e922782acc749cb2c073f82672fc",
+      "sha256": "4ce68ab437591f4fad5400686e930d9bebcc4b90405f942975dfbbec63eaf66d",
       "width": 860,
-      "height": 640,
-      "bytes": 31913
+      "height": 880,
+      "bytes": 41042
     },
     {
       "id": "workflow-toolkit-install",
@@ -2202,10 +2310,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-toolkit-install.png",
-      "sha256": "9e877cc3678f82172b2e9c0c7772b2d18ca4bf1fcb7ca3d7cf9e830ce2e6d3b8",
+      "sha256": "a72711c108d35d82a4d026d66704622acfe3e5e610aae3b44dcaf031ad8c8a5f",
       "width": 860,
-      "height": 476,
-      "bytes": 22429
+      "height": 500,
+      "bytes": 23419
     },
     {
       "id": "workflow-toolkit-import",
@@ -2225,10 +2333,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-toolkit-import.png",
-      "sha256": "0dd76487db51dcff1931b0a7cc499215d8544c678784cbef8a1b7e7f6aa1139d",
+      "sha256": "0868c42782a5d3a52e7f900a4d97f0acf9678e844cbb71d8328fff9a1635a255",
       "width": 860,
-      "height": 662,
-      "bytes": 29000
+      "height": 708,
+      "bytes": 30914
     },
     {
       "id": "workflow-controllers",
@@ -2243,10 +2351,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-controllers.png",
-      "sha256": "18a48863291cdbeb4c73207c9d3e64ab926e7b241a8a3e52f3c30fc431ed3472",
+      "sha256": "e4594b7769bbd8e92b4c44b31d2f254cb8fb7cd4429a3eddbc598ce557acdebc",
       "width": 1440,
       "height": 1000,
-      "bytes": 84768
+      "bytes": 77215
     },
     {
       "id": "workflow-listener",
@@ -2266,10 +2374,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-listener.png",
-      "sha256": "f321f9af4eadd2827914c24cb8028003d273ca63160e3cde01e5a6bd6e02c6e9",
+      "sha256": "78ba414fafbc2f0e6cdea9b0da6ff27e954bfde2f538ba3af6224a4a9da37054",
       "width": 860,
-      "height": 488,
-      "bytes": 24429
+      "height": 510,
+      "bytes": 24927
     },
     {
       "id": "workflow-peer-conflicts",
@@ -2289,10 +2397,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-peer-conflicts.png",
-      "sha256": "fc796154450e0a993cf355b8b4a15d21b20416bc0d1befd706add440f358cf12",
+      "sha256": "cc981f98e3debf8f63b6ff2459d30460c3eaf6b44aecf1a3e1f4e162adccebeb",
       "width": 860,
-      "height": 432,
-      "bytes": 22746
+      "height": 440,
+      "bytes": 23667
     },
     {
       "id": "workflow-recovery",
@@ -2307,10 +2415,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-recovery.png",
-      "sha256": "05df499be6fea278f7239a4df7a39894d36380dd38e7e09400149138b9113873",
+      "sha256": "53edef9981d163213b27824840aebca7ad96674a6db4efb224fa1288a7230b8f",
       "width": 1440,
       "height": 1000,
-      "bytes": 92179
+      "bytes": 91348
     },
     {
       "id": "workflow-lab",
@@ -2325,10 +2433,10 @@
         ]
       ],
       "path": "docs/assets/screenshots/workflow-lab.png",
-      "sha256": "f813855a8ddf077d47861427abb5d3ef05fa7cc032bac9b891dcfcf7044e52d7",
+      "sha256": "bf65ea3e46ff7a36535faad3c42147dd2ebd9deee4ba0485e8105c3d5eacbd00",
       "width": 1440,
       "height": 1000,
-      "bytes": 78492
+      "bytes": 70593
     },
     {
       "id": "workflow-lab-preview",
@@ -2348,10 +2456,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/workflow-lab-preview.png",
-      "sha256": "64b3cb35908c66a775c6a0d0fd529e420c97606a28a0a6b5034087e89ae5d0e7",
+      "sha256": "19adbb82d3c25b5d8606c93564dbc8cad1bdba452b9e0cae7a0e3b76a30f5668",
       "width": 860,
-      "height": 534,
-      "bytes": 25905
+      "height": 546,
+      "bytes": 26299
     },
     {
       "id": "workflow-profiles",
@@ -2367,10 +2475,10 @@
       ],
       "fullPage": true,
       "path": "docs/assets/screenshots/workflow-profiles.png",
-      "sha256": "d0bef4b41dc47b35b9b0e2797860fcba56b99100918ee4a0773a93f841a24f4f",
+      "sha256": "87827b58967d9dc7110b69f9982fb8094d961a23479fbc31395df249cc634f9f",
       "width": 1440,
-      "height": 1553,
-      "bytes": 110621
+      "height": 1749,
+      "bytes": 111952
     },
     {
       "id": "workflow-search",
@@ -2391,10 +2499,10 @@
       ],
       "scope": "#workspace-palette",
       "path": "docs/assets/screenshots/workflow-search.png",
-      "sha256": "b3779c6fd832feb56889108cab862eb78b588972d31a0414dbfdd9325d54c058",
+      "sha256": "217681190be3eb563046c14b206a9b9989bc6a239050e1b6c0e6c72ab6bc01d6",
       "width": 510,
-      "height": 360,
-      "bytes": 11886
+      "height": 404,
+      "bytes": 13720
     },
     {
       "id": "claude-workspace",
@@ -2414,10 +2522,10 @@
         "height": 1400
       },
       "path": "docs/assets/screenshots/claude-workspace.png",
-      "sha256": "86610f823a2588e67be1912fc6046835fe89f6b1368beff73d6e27fc8a96c3ae",
+      "sha256": "a1078ff54fa5454552b7590706ace0c4fb3db522e1d365f77a90ece2924e45aa",
       "width": 860,
-      "height": 1196,
-      "bytes": 68767
+      "height": 1232,
+      "bytes": 68409
     },
     {
       "id": "claude-onboarding",
@@ -2442,10 +2550,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/claude-onboarding.png",
-      "sha256": "3517d0733bea07d354f5ac81a2836f3925e00fd177b3fd7d476a60b44ed3ccde",
+      "sha256": "a05edaa49146abbc32921d57afa9839ee0f4754ec4ca93bfc23e566f1df0fb0a",
       "width": 860,
-      "height": 440,
-      "bytes": 23065
+      "height": 452,
+      "bytes": 23886
     },
     {
       "id": "claude-hosted-launch",
@@ -2470,10 +2578,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/claude-hosted-launch.png",
-      "sha256": "32d3ad6b28b0e8b99258bd67d0bdf8b33604457910cf8e7a227518f3d6df94cb",
+      "sha256": "d27da95ae66f81dc2aff3432f06614846d02be760d74fe5105aed0628b8a319d",
       "width": 860,
-      "height": 440,
-      "bytes": 21871
+      "height": 454,
+      "bytes": 22863
     },
     {
       "id": "claude-local-launch",
@@ -2498,10 +2606,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/claude-local-launch.png",
-      "sha256": "2c02dc0fc8988f432676e049b8c0f68d20fb365f41bdd982bf0ac8cd7294770c",
+      "sha256": "3dc30602615d1230dfe9cf6e72ee37cd6207485c1a6ae5701d3c8f48d961e61a",
       "width": 860,
-      "height": 440,
-      "bytes": 21737
+      "height": 454,
+      "bytes": 22729
     },
     {
       "id": "claude-review-settings",
@@ -2526,10 +2634,10 @@
         "height": 1400
       },
       "path": "docs/assets/screenshots/claude-review-settings.png",
-      "sha256": "926415bba44d57ab66d196f416cd1c81e4e8136f22b2b48f64dd56e31abf55b7",
+      "sha256": "9cbf4e02e9ee0f35dd65ce8d6f718b494db204df98ae4ead14aa3e248a6caf63",
       "width": 860,
-      "height": 1196,
-      "bytes": 69756
+      "height": 1232,
+      "bytes": 69700
     },
     {
       "id": "claude-review-handoff",
@@ -2558,10 +2666,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/claude-review-handoff.png",
-      "sha256": "f54ba46dc7a8bbd6e8caee94628d642bc4c7719b9d581a6fc6979d24aa07c06f",
+      "sha256": "cf86cc6ace583ccd5aff0483ef332150de7187871bfc80c189ab06c645142d05",
       "width": 860,
-      "height": 652,
-      "bytes": 28001
+      "height": 700,
+      "bytes": 29726
     },
     {
       "id": "claude-isolated-review",
@@ -2594,10 +2702,10 @@
       ],
       "scope": "#center-dialog",
       "path": "docs/assets/screenshots/claude-isolated-review.png",
-      "sha256": "fd0502f6d80b3886ee680338295d653c22244ce1dd6b27187d5ad05d0dfe198e",
+      "sha256": "a96f4f9c0edbef289d4c16164d250c79ba18d59a4cc573ff6b77ecc36b9d321e",
       "width": 860,
-      "height": 408,
-      "bytes": 22178
+      "height": 420,
+      "bytes": 23211
     },
     {
       "id": "claude-schedule",
@@ -2627,10 +2735,127 @@
         "height": 1600
       },
       "path": "docs/assets/screenshots/claude-schedule.png",
-      "sha256": "f5420e86ce3c6be1dcaeb1664dbd957b1ce7e09a0edcf0ee38c2a686e16c4547",
+      "sha256": "e71afcfa08d6faec2a54e9dbc232e72641000ddbfd6eb6168c13bcf229e6a1b9",
       "width": 860,
       "height": 1408,
-      "bytes": 44884
+      "bytes": 43008
+    },
+    {
+      "id": "usability-project-detail",
+      "page": "home",
+      "chapter": "usability",
+      "title": "One project home",
+      "caption": "Read installation, loading and model evidence separately.",
+      "steps": [
+        [
+          "click",
+          "[data-open-project]"
+        ]
+      ],
+      "scope": "#project-detail",
+      "path": "docs/assets/screenshots/usability-project-detail.png",
+      "sha256": "14c681b3c0699a3b7865ecf4c4d3ceb08b8d1994c4015017d1faae83e99e92aa",
+      "width": 1120,
+      "height": 564,
+      "bytes": 29805
+    },
+    {
+      "id": "usability-project-apps",
+      "page": "home",
+      "chapter": "usability",
+      "title": "Choose an application and account",
+      "caption": "Native sign-in is unchanged; hosted operation does not require a local model.",
+      "steps": [
+        [
+          "click",
+          "[data-open-project]"
+        ],
+        [
+          "click",
+          "#project-launch"
+        ]
+      ],
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/usability-project-apps.png",
+      "sha256": "c514c51a61fa560b458e8698f0fbe60932a6cd97d50800970e4c4a0de6c5ecbc",
+      "width": 860,
+      "height": 786,
+      "bytes": 36870
+    },
+    {
+      "id": "usability-worker-commands",
+      "page": "worker-setup",
+      "chapter": "usability",
+      "title": "Start in a fresh terminal",
+      "caption": "Every command names the executable and private state location; pairing and file grants remain separate.",
+      "steps": [
+        [
+          "click",
+          "#worker-next"
+        ],
+        [
+          "click",
+          "#worker-next"
+        ]
+      ],
+      "scope": "#worker-setup",
+      "path": "docs/assets/screenshots/usability-worker-commands.png",
+      "sha256": "8ce8bd241f262c9eae971298c1663fee9b53f810b8f3754d7449260770731aac",
+      "width": 1120,
+      "height": 934,
+      "bytes": 55329
+    },
+    {
+      "id": "usability-draft-publication",
+      "page": "drafts",
+      "chapter": "usability",
+      "title": "Publish reviewed candidates",
+      "caption": "Candidates do not propagate until publication. Existing follow, pause and pin policies remain authoritative.",
+      "steps": [
+        [
+          "click",
+          "#publish-drafts"
+        ]
+      ],
+      "scenario": "drafts",
+      "scope": "#center-dialog",
+      "path": "docs/assets/screenshots/usability-draft-publication.png",
+      "sha256": "2399b0180e268bb919f0ec26efad44b56916eb044c4563b8ae671bf947a01fc5",
+      "width": 860,
+      "height": 588,
+      "bytes": 39078
+    },
+    {
+      "id": "usability-routing-form",
+      "page": "constitution",
+      "chapter": "usability",
+      "title": "Edit routing preferences",
+      "caption": "Structured fields preserve the source document; save a candidate and review publication before affecting projects.",
+      "steps": [
+        [
+          "click",
+          "[data-file=\"registry/routes.json\"]"
+        ]
+      ],
+      "scope": ".file-panel",
+      "path": "docs/assets/screenshots/usability-routing-form.png",
+      "sha256": "970ad45db3c3458a97a4ce9e28d634cbb444afe59d42f74f8a9c9e61b3453131",
+      "width": 828,
+      "height": 1132,
+      "bytes": 55959
+    },
+    {
+      "id": "usability-demo",
+      "page": "demo",
+      "chapter": "usability",
+      "title": "Explore without host access",
+      "caption": "Fictional projects and simulated operations live only in memory; network connections are blocked.",
+      "steps": [],
+      "path": "docs/assets/screenshots/usability-demo.png",
+      "sha256": "8d17762da0134da391533a9199965bda0df81720364ebc62564d1766c57a47c1",
+      "width": 1440,
+      "height": 1000,
+      "bytes": 47558
     }
   ],
   "external_captures": [

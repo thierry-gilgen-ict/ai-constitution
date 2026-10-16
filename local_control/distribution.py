@@ -79,6 +79,7 @@ def _register(root, path):
     value = index(root)
     value['packages'][sha] = {'id': sha, 'filename': name, 'platform': system, 'architecture': arch,
                               'bytes': target.stat().st_size, 'sha256': sha, 'kind': 'portable',
+                              'version': manifest.get('version'),
                               'signing': 'Unsigned preview; checksums verify integrity, not publisher identity'}
     atomic(Path(root) / 'worker-packages.json', value)
     return value['packages'][sha]
@@ -101,6 +102,7 @@ def _source_bundle(root):
     value = index(root)
     value['packages'][result['sha256']] = {'id': result['sha256'], 'filename': name, 'platform': 'all',
         'architecture': 'Python 3.11+', 'bytes': path.stat().st_size, 'sha256': result['sha256'], 'kind': 'source',
+        'version': (bundled_source()/'VERSION').read_text().strip(),
         'signing': 'Source bundle from this controller version; review before running'}
     atomic(Path(root) / 'worker-packages.json', value)
     return value['packages'][result['sha256']]

@@ -1,6 +1,7 @@
 /* Private library studio. User text is displayed as text, never executable HTML. */
 (() => {
   let templates = [], components = [], roles = [], baseline = null, baselineHash = null;
+  let templateRevision = null, templateCandidate = false;
   let templateDirty = false, fileDirty = false, currentFile = null, fileList = [], editingComponent = -1;
   let previewAction = null, templatesLoaded = false, filesLoaded = false;
   const clone = value => JSON.parse(JSON.stringify(value));
@@ -16,7 +17,8 @@
       message.textContent = e.message; message.scrollIntoView({block:'nearest'});
     }
   } };
-  const changed = () => { templateDirty = true; $('template-status').textContent = 'Unsaved changes'; };
+  let templateCheckTimer=0,checkGeneration=0;
+  const changed = () => { templateDirty = true; $('template-status').textContent = 'Unsaved changes';clearTimeout(templateCheckTimer);const generation=++checkGeneration;templateCheckTimer=setTimeout(async()=>{try{const v=await call('template-validate',{template:readTemplate()});if(generation===checkGeneration)$('template-inline-review').innerHTML=reviewHTML(v.review);}catch(error){if(generation===checkGeneration)$('template-inline-review').textContent=error.message;}},500); };
   const reviewHTML = value => !value ? '' : `<div class="studio-review">${value.errors.map(v => `<p class="review-error">${escapeHTML(v)}</p>`).join('')}${value.warnings.map(v => `<p>${escapeHTML(v)}</p>`).join('')}<p class="caption">${escapeHTML(value.evidence)}</p></div>`;
   const changesHTML = value => (value.changes || []).map(v => `<details class="diff-file"><summary><span class="pill">${escapeHTML(v.status)}</span> ${escapeHTML(v.path)}</summary><pre>${escapeHTML(v.diff || 'Binary content changed.')}</pre></details>`).join('') || '<p>No file changes.</p>';
 
@@ -41,7 +43,7 @@
   async function loadTemplates() {
     const data = await call('templates');
     templates = data.templates; components = data.components; roles = data.roles;
-    $('template-gallery').innerHTML = templates.map((item, i) => `<article class="template-card"><span class="step">${String(i + 1).padStart(2, '0')} / ${escapeHTML(item.template.version)}</span><h2>${escapeHTML(item.template.name)}</h2><p>${escapeHTML(item.template.description)}</p><div class="component-tags">${item.template.components.map(c => `<span>${escapeHTML(c.name)}</span>`).join('')}</div><button data-template="${i}">Explore baseline →</button></article>`).join('');
+    $('template-gallery').innerHTML = templates.map((item, i) => `<article class="template-card"><span class="step">${String(i + 1).padStart(2, '0')} / ${escapeHTML(item.template.version)}</span><h2>${escapeHTML(item.template.name)}</h2><p>${escapeHTML(item.template.description)}</p><div class="component-tags">${item.template.components.map(c => `<span>${escapeHTML(c.name)}</span>`).join('')}</div><button data-template="${i}" data-template-id="${escapeHTML(item.template.id)}">Explore baseline →</button></article>`).join('');
     $('template-gallery').querySelectorAll('[data-template]').forEach(b => b.onclick = () => selectTemplate(templates[Number(b.dataset.template)].template, templates[Number(b.dataset.template)].sha256));
     $('component-catalog').innerHTML = components.map((c, i) => `<option value="${i}">${escapeHTML(c.name)} · ${escapeHTML(c.role)}</option>`).join('');
     $('component-role').innerHTML = roles.map(v => `<option>${escapeHTML(v)}</option>`).join('');
@@ -49,15 +51,15 @@
   }
   function selectTemplate(value, hash = null) {
     if (templateDirty && !confirm('Discard unsaved baseline changes?')) return;
-    baseline = clone(value); baselineHash = hash; templateDirty = false;
+    baseline = clone(value); baselineHash = hash; templateRevision = null; templateCandidate = false; templateDirty = false;
     $('template-workbench').hidden = false;
     for (const key of ['name', 'id', 'version', 'description']) $('template-' + key).value = baseline[key];
     $('template-heading').textContent = baseline.name;
     $('template-decisions').value = (baseline.decisions || []).join('\n');
     $('template-files').value = JSON.stringify(baseline.files || {}, null, 2);
-    $('template-status').textContent = hash ? 'Saved in private draft' : 'New draft';
+    $('template-status').textContent = hash ? 'Published baseline' : 'New draft';
     $('template-result').textContent = '';
-    renderComponents();
+    $('template-inline-review').textContent='';renderComponents();
     $('template-workbench').scrollIntoView({behavior:'smooth', block:'start'});
   }
   function readTemplate() {
@@ -70,7 +72,7 @@
     return value;
   }
   function renderComponents() {
-    $('template-components').innerHTML = baseline.components.map((c,i) => `<article class="component-item"><div><span class="step">${escapeHTML(c.role)}</span><h3>${escapeHTML(c.name)}</h3><p class="caption">${escapeHTML(c.reference || 'Version selected during implementation')}</p>${c.repository ? `<p class="component-link">${escapeHTML(c.repository)}</p>` : ''}</div><div class="button-row"><button data-edit-component="${i}" aria-label="Edit ${escapeHTML(c.name)}">Edit</button><button data-remove-component="${i}" aria-label="Remove ${escapeHTML(c.name)}">Remove</button></div></article>`).join('') || '<p class="muted">Add a component from the library, or define your own repository and setup guidance.</p>';
+    $('template-components').innerHTML = baseline.components.map((c,i) => `<article class="component-item"><div><span class="step">${escapeHTML(c.role)}</span><h3>${escapeHTML(c.name)}</h3><p class="caption">${escapeHTML(c.reference || 'Version selected during implementation')}</p>${c.requires?.length?'<p>Requires: '+escapeHTML(c.requires.join(', '))+'</p>':''}${c.conflicts?.length?'<p>Conflicts with: '+escapeHTML(c.conflicts.join(', '))+'</p>':''}${c.repository ? `<p class="component-link">${escapeHTML(c.repository)}</p>` : ''}</div><div class="button-row"><button data-edit-component="${i}" aria-label="Edit ${escapeHTML(c.name)}">Edit</button><button data-remove-component="${i}" aria-label="Remove ${escapeHTML(c.name)}">Remove</button></div></article>`).join('') || '<p class="muted">Add a component from the library, or define your own repository and setup guidance.</p>';
     $('template-components').querySelectorAll('[data-edit-component]').forEach(b => b.onclick = () => editComponent(Number(b.dataset.editComponent)));
     $('template-components').querySelectorAll('[data-remove-component]').forEach(b => b.onclick = () => { baseline.components.splice(Number(b.dataset.removeComponent), 1); changed(); renderComponents(); });
   }
@@ -119,16 +121,16 @@
     // Renaming creates a new template, never overwrites another baseline implicitly.
     return {template:value, sha256:value.id === baseline.id ? baselineHash : null};
   }
-  $('template-save').onclick = safely(async () => {
-    const value = readTemplate(), body = templateRequest(value), plan = await call('template-preview', body);
-    preview('Save this baseline', plan, 'Save to private library', async () => {
-      await call('template-save', {...body, plan:plan.plan});
-      templateDirty = false; await loadTemplates();
-      const saved = templates.find(v => v.template.id === value.id); selectTemplate(saved.template, saved.sha256);
-      filesLoaded = false; notice('Baseline saved in your private library.');
-    });
-  });
+  async function saveTemplateDraft() {
+    const value=readTemplate(), body=templateRequest(value);
+    const result=await api('/api/ui/draft-save',{path:'templates/architectures/'+value.id+'.json',content:JSON.stringify(value,null,2)+'\n',sha256:body.sha256,revision:templateRevision});
+    templateRevision=result.revision;templateDirty=false;templateCandidate=true;
+    $('template-status').textContent='Private candidate · publication required';
+    notice(result.note);
+  }
+  $('template-save').onclick = safely(saveTemplateDraft);
   $('template-apply-preview').onclick = safely(async () => {
+    if(templateDirty || templateCandidate || !baselineHash) throw new Error('Save and publish this candidate in Instructions → Saved drafts, then reload the published baseline before applying it.');
     const body = {policy: $('template-follow-policy')?.value || (templateDirty || !baselineHash ? 'pinned' : 'latest'), template:readTemplate(), project:$('template-project').value.trim(), name:$('template-project-name').value.trim()};
     const plan = await call('project-preview', body);
     preview('Review project: ' + body.name, {...plan, note: plan.note + ' Architecture policy: ' + plan.policy + ' · revision ' + plan.revision.slice(0,12)}, 'Apply baseline to project', async () => {
@@ -169,10 +171,12 @@
   async function openFile(path, offset = 0) {
     if (fileDirty && !confirm('Discard unsaved file changes?')) return;
     const value = await call('file?path=' + encodeURIComponent(path) + '&offset=' + offset);
+    const saved=(await api('/api/ui/drafts')).files[path];
+    if(saved && !offset && value.editable){value.content=saved.content;value.revision=saved.revision;value.sha256=saved.before;}
     currentFile = value; fileDirty = false;
     $('library-path').textContent = path;
     $('library-file-status').textContent = value.editable ? 'Private draft' : 'View only';
-    $('library-file-note').textContent = value.editable ? 'Saving validates and rebuilds generated files. Following projects synchronize automatically; global client activation is separate.' : value.reason || 'Library image';
+    $('library-file-note').textContent = value.editable ? 'Save a private candidate first. Following projects receive changes only after reviewed publication. Global activation is separate.' : value.reason || 'Library image';
     $('library-editor').value = value.content || ''; $('library-editor').readOnly = !value.editable;
     $('library-editor').classList.toggle('prose-editor', /\.(md|mdc|txt)$/.test(path));
     $('library-editor-label').hidden = Boolean(value.image); $('library-image').hidden = !value.image;
@@ -181,7 +185,7 @@
     $('library-next').hidden = value.next === null || value.next === undefined;
     $('library-previous').hidden = !value.offset;
     $('library-result').textContent = value.next || value.offset ? `Characters ${value.offset + 1}–${value.offset + value.content.length} of ${value.characters}` : '';
-    renderFiles();
+    renderFiles();document.dispatchEvent(new CustomEvent('workspace-library-file',{detail:{path}}));
   }
   $('library-filter').oninput = renderFiles; $('library-modified').onchange = renderFiles;
   $('library-editor').oninput = () => { fileDirty = true; $('library-save').disabled = false; $('library-file-status').textContent = 'Unsaved changes'; };
@@ -189,13 +193,13 @@
   $('library-next').onclick = safely(() => openFile(currentFile.path, currentFile.next));
   $('library-previous').onclick = safely(() => openFile(currentFile.path, Math.max(0, currentFile.offset - 64000)));
   $('library-save').onclick = safely(async () => {
-    const body = {path:currentFile.path, sha256:currentFile.sha256, content:$('library-editor').value};
+    const body = {path:currentFile.path, sha256:currentFile.sha256, revision:currentFile.revision, content:$('library-editor').value};
     const plan = await call('file-preview', body);
     preview('Review your instruction changes', plan, 'Save private draft', async () => {
-      const result = await call('file-save', {...body,plan:plan.plan});
+      const result = await api('/api/ui/draft-save', body);
       fileDirty = false; await loadFiles(); await openFile(body.path); templatesLoaded = false;
-      $('library-result').textContent = 'Draft saved. ' + (result.snapshot ? 'Rollback snapshot: ' + result.snapshot : 'No changes.');
-      notice('Saved and validated. Following projects synchronize automatically while Local Control runs. Check Project sync for conflicts; global client activation remains separate.');
+      $('library-result').textContent = 'Private draft saved. Open Instructions → Saved drafts to review publication.';
+      notice(result.note);
     });
   });
   $('library-activate').onclick = safely(async () => {
@@ -228,9 +232,18 @@
       $('studio-preview').close(); notice('Draft save rolled back. Following projects receive the restored library on the next synchronization.');
     }));
   });
-  window.studioPage = safely(async name => {
+  const studioPage = safely(async name => {
     if (name === 'architectures' && !templatesLoaded) await loadTemplates();
     if (name === 'constitution' && !filesLoaded) { await loadFiles(); if (!currentFile) await openFile('constitution.md'); }
   });
+  registerView('architectures',()=>studioPage('architectures'));
+  registerView('constitution',()=>studioPage('constitution'));
+  window.invalidateStudioViews=()=>{templatesLoaded=false;filesLoaded=false;};
+  window.studioUnsaved=()=>fileDirty||templateDirty;
+  window.discardStudioEdits=()=>{fileDirty=false;templateDirty=false;filesLoaded=false;templatesLoaded=false;};
+  window.saveStudioDraft=async()=>{
+    if(fileDirty){const saved=await api('/api/ui/draft-save',{path:currentFile.path,sha256:currentFile.sha256,revision:currentFile.revision,content:$('library-editor').value});currentFile.revision=saved.revision;fileDirty=false;}
+    if(templateDirty)await saveTemplateDraft();
+  };
   window.addEventListener('beforeunload', event => { if (templateDirty || fileDirty) { event.preventDefault(); event.returnValue = ''; } });
 })();

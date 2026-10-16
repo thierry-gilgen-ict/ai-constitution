@@ -32,7 +32,7 @@ def validate(recipe):
         raise ValueError('Choose one to twenty preparation steps')
     seen = set()
     for step in steps:
-        if not isinstance(step,dict) or set(step) - {'id','kind','argv','url','timeout'} or step.get('kind') not in KINDS:
+        if not isinstance(step,dict) or set(step) - {'id','kind','argv','url','timeout','cwd'} or step.get('kind') not in KINDS:
             raise ValueError('Unsupported preparation step')
         identity = architecture.identifier(step.get('id'))
         if identity in seen: raise ValueError('Preparation step identifiers must be unique')
@@ -45,6 +45,13 @@ def validate(recipe):
                     or any(not isinstance(v,str) or not 1 <= len(v) <= 2000 or any(ord(c)<32 for c in v) for v in argv)):
                 raise ValueError('Use a bounded runtime argument list, not a shell command')
         elif 'argv' in step: raise ValueError('Only command steps accept arguments')
+        if 'cwd' in step:
+            if step['kind'] != 'command' or not isinstance(step['cwd'],str) or len(step['cwd'])>500:
+                raise ValueError('A relative working directory is supported for command steps only')
+            from pathlib import PurePosixPath, PureWindowsPath
+            value=step['cwd']
+            if value != '.' and (not value or '\\' in value or ':' in value or PureWindowsPath(value).is_absolute() or PurePosixPath(value).is_absolute() or '..' in PurePosixPath(value).parts):
+                raise ValueError('Working directory must stay inside the enrolled project')
         if step['kind'] == 'http':
             parsed = urlsplit(step.get('url',''))
             if (parsed.scheme != 'http' or parsed.hostname not in ('127.0.0.1','localhost','::1')
@@ -150,6 +157,11 @@ def preview(root, body):
     steps,blockers=commands(project,recipe)
     values,references=environment(root,project,recipe.get('environment',[]))
     inputs={n:plans.fingerprint(project/n) for n in INPUTS}
+    for step in steps:
+        cwd=working_directory(project, step)
+        if cwd != project:
+            for name in INPUTS:
+                inputs[(cwd/name).relative_to(project).as_posix()]=plans.fingerprint(cwd/name)
     for n in INPUTS:
         if inputs[n] is not None:
             # Reject obvious embedded credentials without returning manifest contents.
@@ -161,6 +173,14 @@ def preview(root, body):
     return plans.seal({'schema':1,'project':str(project),'recipe':recipe,'steps':steps,'inputs':inputs,
                        'environment_files':references,'environment_fingerprints':env_hash,'blockers':blockers,
                        'note':'Reviewed commands run in this project under your OS account. Dependencies may use the network. Health checks only contact loopback; logs omit child output.'})
+
+
+def working_directory(project, step):
+    relative=step.get('cwd','.')
+    target=project if relative=='.' else kit.safe_path(project, relative)
+    kit.no_links(target)
+    if not target.is_dir(): raise ValueError('Preparation working directory is unavailable')
+    return target
 
 
 def run_command(argv, project, root, variables, timeout):
@@ -208,7 +228,7 @@ def apply(control, body, progress=lambda _: None):
                 if (project/'.venv').exists() and not owned:
                     raise ValueError('A project environment already exists. Remove the create-environment step or inspect it before adoption.')
             perform=(lambda s=step:health(s['url'],s.get('timeout',300))) if step['kind']=='http' else (
-                lambda s=step:run_command(s['command'],project,control.root,variables,s.get('timeout',300)))
+                lambda s=step:run_command(s['command'],working_directory(project,s),control.root,variables,s.get('timeout',300)))
             def verified(previous, s=step):
                 if s['kind']=='http': return health(s['url'],s.get('timeout',300)) == previous
                 if s['kind']=='venv':

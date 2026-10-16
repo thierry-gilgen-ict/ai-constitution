@@ -1,10 +1,12 @@
 # Documentation
 
+Start with the [projects-first workspace guide](projects-first-usability.md) for navigation, onboarding, drafts and recovery.
+
 Choose the workflow you want to complete. The shared instruction toolkit works on its own; Local Control is an optional preview for your models, machines and private workspace.
 
 <!-- screenshots:manual-summary:begin -->
 
-**[Illustrated manual](manual/README.md)** · 122 images of the actual UI, with fictional data and step-by-step captions.
+**[Illustrated manual](manual/README.md)** · 135 images of the actual UI, with fictional data and step-by-step captions.
 
 <!-- screenshots:manual-summary:end -->
 

@@ -11,7 +11,7 @@ if __package__:
 else:
     from catalog import digest, json_bytes
 
-ROLES = ('framework', 'authentication', 'charts', 'database', 'email', 'deployment', 'testing', 'custom')
+ROLES = ('framework', 'frontend', 'authentication', 'charts', 'database', 'data', 'email', 'deployment', 'observability', 'testing', 'custom')
 MAX_TEMPLATE = 256 * 1024
 
 

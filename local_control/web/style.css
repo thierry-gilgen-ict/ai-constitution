@@ -15,7 +15,7 @@
     sans-serif;
   color: var(--ink);
   background: var(--paper);
-  font-size: 14px;
+  font-size: 16px;
 }
 * {
   box-sizing: border-box;
@@ -982,3 +982,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 #audit td { vertical-align:top; }
 #audit .section-title { flex-wrap:wrap; gap:16px; }
 #audit pre, #center-dialog pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+
+/* Projects-first shell: six destinations, contextual tabs and a labelled drawer. */
+:root { --muted: #53604e; }
+p, label, input, select, textarea { line-height: 1.6; }
+.caption, .center-metadata, .center-table, .project-facts, .center-code, .code-editor { font-size: .875rem; }
+.nav, .topbar, .topbar .quiet { font-size: .9rem; }
+.file-entry small { font-size: .75rem; letter-spacing: .02em; }
+#environment-label { font-size: .85rem; color: var(--muted); overflow-wrap: anywhere; margin: 12px 0; }
+#section-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 28px; }
+#section-tabs .nav { width:auto; margin:0; white-space:normal; }
+#menu-toggle { display:none; }
+.project-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:20px; }
+.project-card, .page, .panel, .section-title > div { min-width:0; overflow-wrap:anywhere; }
+.section-title { flex-wrap:wrap; gap:16px; }
+.structured-fields fieldset { margin:16px 0; padding:16px; border:1px solid var(--line); }
+.structured-fields label { display:block; margin:10px 0; }
+.structured-fields textarea, .structured-fields input, .structured-fields select { width:100%; }
+.demo-banner { padding:20px; background:var(--soft); border-bottom:1px solid var(--green); }
+.demo-main { margin:0 auto; max-width:960px; padding:24px; }
+html[data-connection="disconnected"] .page::before { content:'Last-known information · connection unavailable'; display:block; padding:12px; border:1px solid var(--wood); margin-bottom:16px; }
+@media(max-width:760px) {
+  .sidebar { position:fixed; z-index:40; inset:0 auto 0 0; width:min(280px,85vw); height:100dvh; padding:24px 16px; display:none; box-shadow:0 0 0 100vmax #18201555; }
+  .menu-open .sidebar { display:flex; }
+  .sidebar nav { display:flex; flex-direction:column; overflow:auto; }
+  .sidebar .nav { text-align:left; font-size:1rem; padding:14px; white-space:normal; }
+  #menu-toggle { display:block; }
+  .topbar { height:auto; min-height:70px; padding:12px 0; }
+  .topbar > div { flex-wrap:wrap; }
+  main { padding:0 16px; }
+  #section-tabs { overflow:visible; }
+  h1 { font-size:2rem; }
+  dialog { max-width:calc(100vw - 24px); padding:18px; }
+  .button-row > *, .dialog-actions > * { max-width:100%; white-space:normal; }
+}
+
+/* Progress stays in document flow and never obscures recovery controls. */
+.operation-strip { position:static; width:auto; margin:24px; box-shadow:none; }
+.demo-workspace main { margin:0 auto; max-width:960px; padding:24px; }

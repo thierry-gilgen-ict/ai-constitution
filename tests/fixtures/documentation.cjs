@@ -63,10 +63,27 @@ function fixture(scenario = 'ready') {
   const encrypted = {enabled: true, installed: true, repository: HOME + '/backups/encrypted', password_file: HOME + '/private/restic-password', password_env: 'EXAMPLE_BACKUP_PASSWORD', tag: 'demonstration-only', keep_last: 10, docs: 'https://restic.readthedocs.io/en/stable/020_installation.html', note: 'Example encrypted backup configuration. No password is read or shown.'};
   const diagnostics = {schema: 1, version: VERSION, mode: state.mode, active_requests: state.active_requests, nodes: [{name: 'Demonstration worker', health: 'online'}], note: 'Synthetic allowlisted report. No credentials, prompts or personal paths.'};
   const paths = {models: HOME + '/models/ollama', studio: HOME + '/.config/ai-constitution/library', downloads: HOME + '/downloads/ai-constitution', configuration: HOME + '/.config/ai-constitution/local-control', constitution_state: HOME + '/.config/ai-constitution/state'};
+  let preferences={favorites:[],recent:[],onboarding:{},environment:'development'}, candidates={};
+  if(scenario==='drafts')candidates={'constitution.md':{content:'Preserve existing work. Verify behavior before publication.',before:'fixture',revision:'fixture',saved_at:TIME}};
+  const uiProjects=workspace.projects.map((p,i)=>({...p,id:'demo-project-'+i,name:p.project.split('/').pop()}));
   function response(url, method, body = {}) {
     const parsed = new URL(url, 'http://127.0.0.1'); const p = parsed.pathname;
     if (p === '/api/login') { authorized = true; return {}; }
     if (!authorized) return {__status: 401, error: 'Open the authenticated dashboard from your terminal.'};
+    if(p.startsWith('/api/ui/')){
+      const op=p.slice('/api/ui/'.length);
+      if(op==='bootstrap')return {schema:1,version:VERSION,ui_protocol:1,controller:'Demo controller',launch_kind:'packaged',preferences,clients:[{id:'codex',name:'Codex',detected:true},{id:'cursor',name:'Cursor',detected:true},{id:'claude-code',name:'Claude Code',detected:false}]};
+      if(op==='home')return {schema:1,projects:uiProjects,preferences,issues:[],operations:state.jobs,sessions:[],observed_at:TIME};
+      if(op==='projects')return {schema:1,projects:uiProjects};
+      if(op==='preferences'){preferences={...preferences,...body};return preferences;}
+      if(op==='project')return {schema:1,project:uiProjects.find(p=>p.id===body.id)||uiProjects[0],inspection:{evidence:{},findings:[]}};
+      if(op==='operations')return {schema:1,jobs:state.jobs.map(j=>({...j,actions:[],recovery:'Inspect affected target before retrying.'})),retention:'50 completed operations plus unresolved work'};
+      if(op==='drafts')return {schema:1,files:candidates};
+      if(op==='draft-save'){candidates[body.path]={content:body.content,before:body.sha256,revision:'fixture-revision',saved_at:TIME};return {schema:1,revision:'fixture-revision',note:'Private candidate saved; not published.'};}
+      if(op==='draft-preview')return {...plan,scope:'Shared library and eligible following projects; global activation is separate',effect:'After publication; following projects synchronize under existing policies',verification:'Rebuild and validate generated files; verify loading in a fresh session',rollback:'Private transaction snapshot; later edits are protected',targets:[{project:PROJECT,pinned:false,paused:false}],changes:[{path:'constitution.md',diff:'+ Preserve existing work. Verify behavior before publication.'}],note:'Publish reviewed candidates; following policies remain authoritative.'};
+      if(op==='draft-publish'){candidates={};return {schema:1,status:'published',note:'Simulated publication only'};}
+      if(op==='draft-discard'){delete candidates[body.path];return {status:'discarded'};}
+    }
     if (p.startsWith('/api/workflows/')) return require('./workflows.cjs')(workspace,TIME)(p.replace('/api/workflows/',''),body);
     if (p.startsWith('/api/audit/')) return require('./audit.cjs')(PROJECT,TIME,VERSION)(p.replace('/api/audit/',''),body);
     if(p.startsWith('/api/claude/')) {
