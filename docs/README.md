@@ -6,7 +6,7 @@ Choose the workflow you want to complete. The shared instruction toolkit works o
 
 <!-- screenshots:manual-summary:begin -->
 
-**[Illustrated manual](manual/README.md)** · 135 images of the actual UI, with fictional data and step-by-step captions.
+**[Illustrated manual](manual/README.md)** · 140 images of the actual UI, with fictional data and step-by-step captions.
 
 <!-- screenshots:manual-summary:end -->
 

@@ -606,6 +606,9 @@ class Control:
             job = {"id": identity, "label": label, "status": "queued", "detail": "Waiting", "created_at": time.time()}
             self.jobs[identity] = job
             job['operation'] = function.__name__
+            candidate=next((a.get('project') for a in args if isinstance(a,dict) and isinstance(a.get('project'),str)),None)
+            if candidate: job['target']=candidate[:1000]
+            job['updated_at']=job['created_at']
             job['maintenance'] = quiet
             operations.save(self.root, self.jobs, self.events)
         def progress(detail):
@@ -613,6 +616,7 @@ class Control:
                 if identity in self.cancelled and function.__name__ in ('pull','run_lab','audit_scan_job'):
                     raise operations.Cancelled('Operation cancelled at a safe progress boundary')
                 job["detail"] = str(detail)[:200]
+                job["updated_at"] = time.time()
                 operations.save(self.root, self.jobs, self.events)
         def run():
             try:
@@ -620,6 +624,7 @@ class Control:
                     if identity in self.cancelled:
                         raise operations.Cancelled('Cancelled before starting')
                     job["status"] = "running"
+                    job["started_at"] = job["updated_at"] = time.time()
                     operations.save(self.root, self.jobs, self.events)
                 result = function(*args, progress=progress)
                 with self.lock:
@@ -644,6 +649,8 @@ class Control:
                 self.event(label + " failed: " + message)
             finally:
                 with self.lock:
+                    job['finished_at']=job['updated_at']=time.time()
+                    operations.save(self.root,self.jobs,self.events)
                     self.cancelled.discard(identity)
         self.pool.submit(run)
         return {"job": identity}

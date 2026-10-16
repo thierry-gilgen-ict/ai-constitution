@@ -1,6 +1,6 @@
 # Illustrated manual
 
-Actual Local Control UI **0.7.0**, captured with fictional accounts, paths, models and usage. Performance numbers and update versions are examples, not benchmarks or release announcements. CLI images are rendered transcripts from real isolated commands. [How these images are made](../screenshot-maintenance.md).
+Actual Local Control UI **0.7.1**, captured with fictional accounts, paths, models and usage. Performance numbers and update versions are examples, not benchmarks or release announcements. CLI images are rendered transcripts from real isolated commands. [How these images are made](../screenshot-maintenance.md).
 
 Choose a workflow. Each chapter shows the controls, the next step and the relevant limitation. Click an image to inspect its original size.
 
@@ -25,9 +25,9 @@ Choose a workflow. Each chapter shows the controls, the next step and the releva
 | [Workspace workflows](workflows.md) | 19 | [Instructions](../workspace-workflows.md) |
 | [Constitution health](audit.md) | 15 | [Instructions](../constitution-health.md) |
 | [Claude Code](claude.md) | 8 | [Instructions](../claude-code.md) |
-| [Projects-first workspace](usability.md) | 13 | [Instructions](../projects-first-usability.md) |
+| [Projects-first workspace](usability.md) | 18 | [Instructions](../projects-first-usability.md) |
 
-**135 images · project journeys and advanced views · desktop, tablet and small-screen layouts.**
+**140 images · project journeys and advanced views · desktop, tablet and small-screen layouts.**
 
 For copyable installation commands, use [Getting started](../getting-started.md). For failures, use [Progress and recovery](recovery.md). External application and native OS captures remain [explicitly pending](toolkit.md#external-application-captures).
 

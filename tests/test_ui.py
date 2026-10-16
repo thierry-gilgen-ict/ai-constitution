@@ -97,3 +97,50 @@ class Interface(Fixture):
         with patch('local_control.launcher.open_claude',return_value={'status':'fixture'}) as launch:
             launch_advice.launch(control,{'project':str(self.project),'plan':preview['plan'],'client':'claude-code','mode':'hosted','profile':'fixture'})
         launch.assert_called_once_with(self.root, str(self.project), 'fixture', 'hosted')
+
+
+    def test_editor_candidates_are_isolated_and_revision_checked(self):
+        from local_control import toolkits
+        document={'schema':1,'id':'fixture','name':'Fixture','version':'1.0.0','rules':[], 'skills':[], 'commands':[], 'mcp':[]}
+        body={'kind':'toolkit','context':'library','document':document}
+        saved=ui.editor_draft(self.root,body,save=True)
+        self.assertEqual(toolkits.overview(self.root)['kits'],{})
+        self.assertEqual(ui.editor_draft(self.root,body)['draft']['document'],document)
+        with self.assertRaisesRegex(ValueError,'another editor'): ui.editor_draft(self.root,body,save=True)
+        with self.assertRaisesRegex(ValueError,'another editor'): ui.editor_draft(self.root,body,discard=True)
+        ui.editor_draft(self.root,{**body,'revision':saved['revision']},discard=True)
+        self.assertIsNone(ui.editor_draft(self.root,body)['draft'])
+        self.assertEqual(toolkits.overview(self.root)['kits'],{})
+        with self.assertRaises(ValueError): ui.editor_draft(self.root,{**body,'document':{**document,'schema':9}},save=True)
+        with self.assertRaises(ValueError): ui.editor_draft(self.root,{'kind':'preparation','context':str(self.base/'unregistered')})
+
+    def test_project_inspection_is_explicit_and_retained(self):
+        control=self.control(); identity=ui.projects(control)[0]['id']
+        with patch('local_control.inspector.inspect',side_effect=AssertionError('Implicit scan')):
+            self.assertIsNone(ui.detail(control,identity)['inspected_at'])
+        inspected=ui.inspect_project(control,identity)
+        self.assertEqual(inspected['inspection']['installation'][0]['status'],'files-verified')
+        self.assertEqual(inspected['inspection']['evidence']['client_loading']['value'],'unverified')
+        with patch('local_control.inspector.inspect',side_effect=AssertionError('Implicit scan')):
+            self.assertEqual(ui.detail(control,identity),inspected)
+        with self.assertRaises(ValueError): ui.inspect_project(control,'unavailable')
+
+    def test_operation_history_keeps_unresolved_work_and_filters_target(self):
+        control=self.control()
+        control.jobs={str(i):{'id':str(i),'status':'failed','operation':'fixture','label':'Fixture','created_at':i+1,'target':str(self.project)} for i in range(105)}
+        first=ui.operations(control)
+        self.assertEqual(first['total'],105);self.assertEqual(first['next'],100)
+        self.assertEqual(len(ui.operations(control,{'offset':100})['jobs']),5)
+        self.assertEqual(ui.operation_detail(control,'0')['operation']['id'],'0')
+        self.assertNotIn('cancel',first['jobs'][0]['actions'])
+        self.assertIsNone(first['jobs'][0]['elapsed_seconds'])
+        control.jobs['104']['target']='another checkout'
+        self.assertEqual(ui.operations(control,{'project':str(self.project)})['total'],104)
+        with self.assertRaises(ValueError): ui.operations(control,{'offset':-1})
+        with self.assertRaises(ValueError): ui.operations(control,{'project':str(self.base/'unknown')})
+
+    def test_search_does_not_initialize_editable_library(self):
+        from local_control import workflows
+        control=self.control()
+        with patch.object(Studio,'initialize',side_effect=AssertionError('Search initialized library')):
+            self.assertTrue(workflows.search(control,'constitution')['items'])

@@ -239,6 +239,9 @@ class AdviceLabProfiles(Fixture):
         monitoring.record_usage(self.root,'a'*12,{'used':100,'limit':100,'unit':'requests'})
         value=launch_advice.advice(control,str(self.project));self.assertEqual(value['accounts'][0]['quota'],'exhausted')
         with self.assertRaisesRegex(ValueError,'exhausted'):launch_advice.launch(control,{'project':str(self.project),'plan':value['plan'],'mode':'hosted','client':'codex','account':'a'*12})
+        with patch('local_control.launcher.open_project',return_value={'status':'fixture'}) as launched:
+            launch_advice.launch(control,{'project':str(self.project),'plan':value['plan'],'mode':'local','client':'codex','account':'a'*12})
+        launched.assert_called_once()
 
     def test_lab_repeats_bounded_fixtures_and_reports_only_matching_baselines(self):
         control=self.control();control.config['primary']={'node':'local','model':'fixture:latest'}

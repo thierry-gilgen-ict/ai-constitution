@@ -8,7 +8,7 @@ export async function request(path, body, headers = {}) {
       signal: controller.signal, headers:{'Content-Type':'application/json', ...headers},
       ...(body === undefined ? {} : {body:JSON.stringify(body)})});
     let data;
-    try { data = await response.json(); } catch { throw new Error('The service returned an unreadable response. Reload the application or inspect Activity.'); }
+    try { data = await response.json(); } catch { const error=new Error('The service returned an unreadable response. Reload the application or inspect Activity.');error.kind='application';throw error; }
     if (!response.ok) { const error = new Error(data.error || 'Request failed'); error.status = response.status; error.problem=data.problem; throw error; }
     return data;
   } catch (error) {
@@ -53,7 +53,7 @@ export async function start() {
       if (error.status === 401) {
         authorized = false; connection('signin','Use the AI Constitution desktop shortcut to open authenticated access.');
         if (!$('login').open) $('login').showModal();
-      } else connection('disconnected',error.message+' Use the desktop launcher if the service has stopped.');
+      } else connection(error.kind==='application'?'error':'disconnected',error.message+' Use the desktop launcher if the service has stopped.');
     } finally {
       inFlight=false;clearTimeout(timerHandle);
       timerHandle=setTimeout(tick, Math.min(30000, failures ? 2000 * 2 ** Math.min(failures,4) : document.hidden ? 15000 : 3000));

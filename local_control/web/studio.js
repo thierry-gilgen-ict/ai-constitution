@@ -25,7 +25,7 @@
   function preview(title, value, label, apply) {
     $('studio-preview').querySelector('[data-studio-error]')?.remove();
     $('studio-preview-title').textContent = title;
-    $('studio-preview-body').innerHTML = `<p>${escapeHTML(value.note || '')}</p>${reviewHTML(value.review)}${value.conflicts?.length ? `<p class="review-error">Resolve upstream conflicts first: ${escapeHTML(value.conflicts.join(', '))}</p>` : ''}${value.retained_files?.length ? `<p>Kept from the previous baseline: ${escapeHTML(value.retained_files.join(', '))}</p>` : ''}${changesHTML(value)}`;
+    $('studio-preview-body').innerHTML = `<p>${escapeHTML(value.note || '')}</p>${apply&&window.reviewSummary?window.reviewSummary(value):''}${reviewHTML(value.review)}${value.conflicts?.length ? `<p class="review-error">Resolve upstream conflicts first: ${escapeHTML(value.conflicts.join(', '))}</p>` : ''}${value.retained_files?.length ? `<p>Kept from the previous baseline: ${escapeHTML(value.retained_files.join(', '))}</p>` : ''}${changesHTML(value)}`;
     $('studio-preview-confirm').textContent = label;
     $('studio-preview-confirm').hidden = !apply;
     $('studio-preview-confirm').disabled = Boolean(value.conflicts?.length || value.review?.errors?.length);
@@ -49,8 +49,8 @@
     $('component-role').innerHTML = roles.map(v => `<option>${escapeHTML(v)}</option>`).join('');
     templatesLoaded = true;
   }
-  function selectTemplate(value, hash = null) {
-    if (templateDirty && !confirm('Discard unsaved baseline changes?')) return;
+  async function selectTemplate(value, hash = null) {
+    if (templateDirty && !(await window.confirmWorkspaceNavigation())) return false;
     baseline = clone(value); baselineHash = hash; templateRevision = null; templateCandidate = false; templateDirty = false;
     $('template-workbench').hidden = false;
     for (const key of ['name', 'id', 'version', 'description']) $('template-' + key).value = baseline[key];
@@ -78,11 +78,11 @@
   }
   ['name','id','version','description','decisions','files'].forEach(key => $('template-' + key).oninput = changed);
   $('template-new').onclick = () => selectTemplate({schema_version:1, id:'my-baseline', name:'My project baseline', version:'1.0.0', description:'The starting point for my projects.', components:[], decisions:[], files:{}});
-  window.useCapturedTemplate = value => { selectTemplate(value); changed(); };
+  window.useCapturedTemplate = async value => { if(await selectTemplate(value)!==false)changed(); };
   window.templateRevision = () => readTemplate();
-  $('template-clone').onclick = safely(() => {
+  $('template-clone').onclick = safely(async () => {
     const value = readTemplate(); value.id += '-copy'; value.name += ' · copy';
-    templateDirty = false; selectTemplate(value); changed();
+    templateDirty = false; await selectTemplate(value); changed();
   });
   $('component-add').onclick = safely(() => {
     if (!baseline) return;
@@ -147,7 +147,7 @@
       const value = JSON.parse(await file.text());
       // Validate against the server before displaying any imported fields.
       await call('template-validate', {template:value});
-      selectTemplate(value, templates.find(v => v.template.id === value.id)?.sha256 || null); changed();
+      if(await selectTemplate(value, templates.find(v => v.template.id === value.id)?.sha256 || null)!==false)changed();
     } finally { event.target.value = ''; }
   });
   $('template-export').onclick = safely(async () => {
@@ -169,7 +169,7 @@
     $('library-files').querySelectorAll('[data-file]').forEach(b => b.onclick = safely(() => openFile(b.dataset.file)));
   }
   async function openFile(path, offset = 0) {
-    if (fileDirty && !confirm('Discard unsaved file changes?')) return;
+    if(fileDirty&&!(await window.confirmWorkspaceNavigation()))return;
     const value = await call('file?path=' + encodeURIComponent(path) + '&offset=' + offset);
     const saved=(await api('/api/ui/drafts')).files[path];
     if(saved && !offset && value.editable){value.content=saved.content;value.revision=saved.revision;value.sha256=saved.before;}
@@ -238,6 +238,7 @@
   });
   registerView('architectures',()=>studioPage('architectures'));
   registerView('constitution',()=>studioPage('constitution'));
+  window.selectArchitectureForProject=async(id,project,name)=>{if(!templatesLoaded)await loadTemplates();const found=templates.find(t=>t.template.id===id);if(!found)throw new Error('Selected template is no longer available');if(await selectTemplate(found.template,found.sha256)===false)return;$('template-project').value=project;$('template-project-name').value=name;};
   window.invalidateStudioViews=()=>{templatesLoaded=false;filesLoaded=false;};
   window.studioUnsaved=()=>fileDirty||templateDirty;
   window.discardStudioEdits=()=>{fileDirty=false;templateDirty=false;filesLoaded=false;templatesLoaded=false;};

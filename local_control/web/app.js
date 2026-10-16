@@ -30,7 +30,7 @@ function notice(message, error = false) {
 }
 async function api(path, body, headers = {}) {
   if (window.uiRequest) {
-    try { return await window.uiRequest(path,body,headers); } catch(error) {
+    try { const editScope=[...document.querySelectorAll('dialog[open]')].at(-1)||document.querySelector('.page.active');const result=await window.uiRequest(path,body,headers);if(editScope&&body&&/(?:[-/](?:save|settings|configure|apply|publish|activate|preferences))$/.test(path))window.acceptEditorChanges?.(editScope);return result; } catch(error) {
       if(error.status===401){authorized=false;document.documentElement.dataset.connection="signin";$("connection").textContent="Sign-in required";if(!$("login").open)$("login").showModal();}
       throw error;
     }
@@ -86,11 +86,12 @@ function page(name) {
   if (name === "models") loadInventory();
   if (name === "setup") loadSetup();
   if (name === "overview") loadHardware();
-  if (authorized) window.renderView(name).catch(error=>notice(error.message,true));
+  const rendered=authorized?window.renderView(name).catch(error=>notice(error.message,true)):Promise.resolve();
   if (name === "machines" && !driversRequested) {
     driversRequested = true;
     // Driver collection is an explicit user action, not a navigation side effect.
   }
+  return rendered;
 }
 document
   .querySelectorAll(".nav")
@@ -327,7 +328,7 @@ $("suggest").onclick = async () => {
     );
     const target = $("recommendations");
     target.hidden = false;
-    target.innerHTML = `<div class="panel-head"><h2>Fits your hardware</h2><span class="tiny">${r.context.toLocaleString()} CONTEXT · 15% VRAM HEADROOM</span></div><p class="muted">${escapeHTML(r.note)}</p><div class="recommend-grid">${r.models.map((m) => `<article class="recommend-card"><span class="pill">${escapeHTML(m.purpose||"Candidate")}</span><h3>${escapeHTML(m.name)}</h3><p>${escapeHTML(m.best_quant)} · ${Number(m.memory_required_gb).toFixed(1)} GB estimated memory<br>${escapeHTML(m.estimated_tps)} tokens/s estimated · ${escapeHTML(m.fit_label)} fit<br>License: ${escapeHTML(m.license || "Check model card")}</p><p>${escapeHTML(m.reason||"")}</p><p>${escapeHTML(m.client_support||"Qualification not observed")} Download size: verify the selected GGUF file below.</p><button data-find="${escapeHTML(m.name.split("/").pop())}">Find GGUF downloads ↗</button></article>`).join("")}</div>${!r.models.length ? "<p>No coding candidates meet these constraints. Try a smaller context in a future custom profile; do not assume a larger model will fit.</p>" : ""}`;
+    target.innerHTML = `<div class="panel-head"><h2>Fits your hardware</h2><span class="tiny">${r.context.toLocaleString()} CONTEXT · 15% VRAM HEADROOM</span></div><p class="muted">${escapeHTML(r.note)}</p><div class="recommend-grid">${r.models.map((m) => `<article class="recommend-card"><span class="pill">${escapeHTML(m.purpose||"Candidate")}</span><h3>${escapeHTML(m.name)}</h3><p>${escapeHTML(m.best_quant)} · ${m.memory_required_gb!=null&&Number.isFinite(Number(m.memory_required_gb))?Number(m.memory_required_gb).toFixed(1):"Unknown"} GB estimated memory<br>${escapeHTML(m.estimated_tps??"Unknown")} tokens/s estimated · ${escapeHTML(m.fit_label)} fit<br>License: ${escapeHTML(m.license || "Check model card")}</p><p>${escapeHTML(m.reason||"")}</p><p>${escapeHTML(m.client_support||"Qualification not observed")} Download size: verify the selected GGUF file below.</p><button data-find="${escapeHTML(m.name.split("/").pop())}">Find GGUF downloads ↗</button></article>`).join("")}</div>${!r.models.length ? "<p>No coding candidates meet these constraints. Try a smaller context in a future custom profile; do not assume a larger model will fit.</p>" : ""}`;
     target.querySelectorAll("[data-find]").forEach(
       (b) =>
         (b.onclick = () => {
@@ -500,3 +501,5 @@ $("pair-form").onsubmit = async (e) => {
 // The module bootstrap owns bounded connection recovery and authentication.
 window.addEventListener('error', () => { $("connection").textContent='Application error'; notice('A dashboard component failed. Reload the application; use the desktop launcher if sign-in is required.',true); });
 setTimeout(()=>{if(!window.uiRequest){$("connection").textContent='Application error';notice('The dashboard modules did not load. Reload this page or check the installed application.',true);}},8000);
+
+window.reviewSummary=value=>`<section class="review-summary" aria-label="Change scope"><dl class="project-facts"><dt>Scope</dt><dd>${escapeHTML(value.scope||'The targets listed in this preview')}</dd><dt>Takes effect</dt><dd>${escapeHTML(value.effect||'Only after the explicit action below; review the workflow details for timing and any restart requirements')}</dd><dt>Preserved controls</dt><dd>The owning workflow applies its scope, ownership, permission and conflict checks. Review any listed exceptions.</dd><dt>Verification</dt><dd>${escapeHTML(value.verification||'Review differences and current target state; file updates alone do not prove client loading')}</dd><dt>Recovery</dt><dd>${escapeHTML(value.rollback||'Use the recovery offered by this workflow. Never replay uncertain operations without checking their durable status.')}</dd></dl></section>`;
