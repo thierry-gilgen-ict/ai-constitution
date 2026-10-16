@@ -8,7 +8,7 @@
   const safe = fn => async (...args) => { try { await fn(...args); } catch (err) { notice(err.message, true); if ($('center-dialog').open) $('center-dialog-error').textContent = err.message; } };
   let confirmAction = null;
   const modal = (title, html, label, action) => {
-    $('center-dialog-title').textContent = title; $('center-dialog-body').innerHTML = html;
+    $('center-dialog-title').textContent = title; $('center-dialog-body').innerHTML = (action&&/review|preview|publish|activate/i.test(title)&&!html.includes('project-facts')&&window.reviewSummary?window.reviewSummary({}):'')+html;
     $('center-dialog-error').textContent = ''; $('center-dialog-apply').textContent = label || 'Apply';
     $('center-dialog-apply').hidden = !action; confirmAction = action; $('center-dialog').showModal(); document.dispatchEvent(new CustomEvent('workspace-modal'));
   };
@@ -126,7 +126,7 @@
   Object.entries(pages).forEach(([name,fn])=>registerView(name,safe(fn)));
   let polling=false;
   setInterval(async()=>{
-    if(!authorized || polling || document.querySelector('dialog[open]') || document.activeElement?.matches('input,textarea,select'))return;
+    if(!authorized || polling || window.workspaceUnsaved?.() || document.querySelector('dialog[open]') || document.activeElement?.matches('input,textarea,select'))return;
     const current=document.querySelector('.page.active')?.id;
     if(!['projects','accounts','audit'].includes(current))return;
     polling=true;try{await window.centerPage(current);}finally{polling=false;}

@@ -20,7 +20,7 @@
         if ($('operation-dismiss')) $('operation-dismiss').onclick = () => { tracked = null; $('operation-strip').hidden = true; };
         if (job.status === 'done' && !completed.has(job.id) && !document.querySelector('dialog[open]')) {
           completed.add(job.id); const name = document.querySelector('.page.active')?.id;
-          if (name && !window.studioUnsaved?.() && !document.activeElement?.matches('input,textarea,select')) window.centerPage(name);
+          if (name && !window.workspaceUnsaved?.() && !document.activeElement?.matches('input,textarea,select')) window.centerPage(name);
         }
       }
     }

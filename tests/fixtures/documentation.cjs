@@ -76,8 +76,13 @@ function fixture(scenario = 'ready') {
       if(op==='home')return {schema:1,projects:uiProjects,preferences,issues:[],operations:state.jobs,sessions:[],observed_at:TIME};
       if(op==='projects')return {schema:1,projects:uiProjects};
       if(op==='preferences'){preferences={...preferences,...body};return preferences;}
+      if(op==='editor-draft')return {schema:1,revision:'fixture',draft:{document:{schema:1,id:'example',name:'Saved private example',version:'1.0.0',rules:[],skills:[],commands:[],mcp:[]}}};
+      if(op==='editor-save')return {schema:1,revision:'fixture-saved',note:'Private candidate saved; nothing applied.'};
+      if(op==='editor-discard')return {schema:1,revision:null,draft:null};
+      if(op==='inspect-project')return {schema:1,project:uiProjects.find(p=>p.id===body.id)||uiProjects[0],inspected_at:TIME,inspection:{modules:[{path:'constitution.md'}],evidence:{client_loading:{value:'unverified'},model_access:{value:'observed-ready'},performance:{value:'protocol-tested'}},findings:[]}};
       if(op==='project')return {schema:1,project:uiProjects.find(p=>p.id===body.id)||uiProjects[0],inspection:{evidence:{},findings:[]}};
-      if(op==='operations')return {schema:1,jobs:state.jobs.map(j=>({...j,actions:[],recovery:'Inspect affected target before retrying.'})),retention:'50 completed operations plus unresolved work'};
+      if(op==='operation')return {schema:1,operation:{...state.jobs[0],target:PROJECT,stage:'Check actual target before retry',created_at:TIME-120,updated_at:TIME-60,actions:[],recovery:'Inspect the owning workflow; nothing is replayed automatically.'}};
+      if(op==='operations'||op==='project-operations')return {schema:1,jobs:state.jobs.map(j=>({...j,actions:[],recovery:'Inspect affected target before retrying.'})),retention:'50 completed operations plus unresolved work'};
       if(op==='drafts')return {schema:1,files:candidates};
       if(op==='draft-save'){candidates[body.path]={content:body.content,before:body.sha256,revision:'fixture-revision',saved_at:TIME};return {schema:1,revision:'fixture-revision',note:'Private candidate saved; not published.'};}
       if(op==='draft-preview')return {...plan,scope:'Shared library and eligible following projects; global activation is separate',effect:'After publication; following projects synchronize under existing policies',verification:'Rebuild and validate generated files; verify loading in a fresh session',rollback:'Private transaction snapshot; later edits are protected',targets:[{project:PROJECT,pinned:false,paused:false}],changes:[{path:'constitution.md',diff:'+ Preserve existing work. Verify behavior before publication.'}],note:'Publish reviewed candidates; following policies remain authoritative.'};

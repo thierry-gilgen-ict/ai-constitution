@@ -58,8 +58,8 @@ CI build success is not physical inference certification. Signed Windows install
 
 **In the dashboard · Get a verified worker package.** Choose Windows x64, Apple Silicon or Linux x64. Source packages support other compatible environments.
 
-![Get a verified worker package — demonstration data, UI 0.7.0](assets/screenshots/worker-download.png)
+![Get a verified worker package — demonstration data, UI 0.7.1](assets/screenshots/worker-download.png)
 
-[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.7.0.
+[Illustrated walkthrough](manual/workers.md) · Fictional data; UI 0.7.1.
 
 <!-- screenshots:packages:end -->

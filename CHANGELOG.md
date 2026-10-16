@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.7.1 — Workspace completion preview
+
+- Completed project-local inspection, retained readiness evidence, preparation/toolkit actions, scoped synchronization and target-labelled activity.
+- Added private toolkit/preparation candidates with revision checks, restoration and deletion. Navigation offers Stay, Discard or Save draft; polling preserves unfinished forms.
+- Fixed initial navigation races, queued destination changes and malformed-response classification. Missing measurements and old operation timing remain unknown.
+- Expanded onboarding with optional configuration/template selection, resumable/dismissible setup and worker-owner grant commands for fresh terminals.
+- Added application-specific launch evidence and account filtering. Hosted quota exhaustion does not block qualified local launches.
+- Added paginated durable history, operation details, contextual help and filename-only library search without initializing the editable library.
+- Refreshed the illustrated manual and completion map. Physical and unfamiliar-user acceptance follows repository delivery; this remains a preview.
+
 ## 0.7.0 — Projects-first usability preview
 
 - Replaced the sixteen-destination sidebar with six primary destinations, contextual pages, project URLs, browser history and a narrow-screen menu.

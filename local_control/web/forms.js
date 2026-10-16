@@ -17,7 +17,7 @@ function enhance(editor,layout) {
   const label=editor.closest('label'),details=document.createElement('details'),host=document.createElement('section');
   details.innerHTML='<summary>Advanced JSON · all fields preserved</summary>';label.before(host,details);details.append(label);
   const get=()=>JSON.parse(editor.value);
-  const put=value=>{editor.value=JSON.stringify(value,null,2);editor.dispatchEvent(new Event('input',{bubbles:true}));};
+  const put=value=>{window.trackEditorBaseline?.(editor);editor.value=JSON.stringify(value,null,2);editor.dispatchEvent(new Event('input',{bubbles:true}));};
   const draw=()=>{
     let data;try{data=get();}catch{host.textContent='Correct the advanced JSON to use the form editor.';details.open=true;return;}
     host.className='structured-fields';
@@ -44,4 +44,62 @@ export function installForms() {
   document.addEventListener('workspace-modal',()=>{
     for(const [id,layout] of Object.entries(layouts)){const editor=document.getElementById(id);if(editor)enhance(editor,layout);}
   });
+}
+
+
+// Only validated toolkit/recipe documents can be persisted; other form values stay in memory.
+export function installEditGuards() {
+  const originals=new Map(); let approvedClose=false;
+  const value=el=>el.type==='checkbox'||el.type==='radio'?String(el.checked):el.value;
+  const eligible=el=>el?.matches?.('input:not([type=search]),textarea,select') && !el.readOnly && !el.disabled && !el.closest('#workspace-palette,#editor-leave-dialog') && el.id!=='library-editor' && !el.closest('#template-workbench');
+  const track=event=>{const el=event.target;if(eligible(el)&&!originals.has(el))originals.set(el,value(el));};
+  document.addEventListener('focusin',track,true);
+  window.trackEditorBaseline=el=>track({target:el});
+  const dirty=()=>[...originals].filter(([el,v])=>el.isConnected&&el.closest('.page.active,dialog[open]')&&value(el)!==v);
+  window.workspaceUnsaved=()=>Boolean(window.studioUnsaved?.()||dirty().length);
+  window.acceptEditorChanges=(root=document)=>{for(const [el] of originals)if(!el.isConnected||root.contains(el))originals.delete(el);};
+  window.saveDocumentDraft=async editor=>{
+    const info=editor.dataset.editorKind,context=editor.dataset.editorContext||'library';
+    if(!info)throw new Error('This form cannot store private drafts. Save through its owning workflow.');
+    const result=await api('/api/ui/editor-save',{kind:info,context,document:JSON.parse(editor.value),revision:editor.dataset.draftRevision||undefined});
+    editor.dataset.draftRevision=result.revision;window.acceptEditorChanges(editor.closest('dialog')||editor.parentElement);notice(result.note);
+  };
+  window.confirmWorkspaceNavigation=async(scope=document)=>{
+    const scopedDirty=()=>dirty().filter(([el])=>scope.contains(el));const studio=scope===document;
+    if(!(studio&&window.studioUnsaved?.())&&!scopedDirty().length)return true;
+    let dialog=document.getElementById('editor-leave-dialog');
+    if(!dialog){dialog=document.createElement('dialog');dialog.id='editor-leave-dialog';document.body.append(dialog);}
+    const editor=document.querySelector('#center-dialog[open] textarea[data-editor-kind]');
+    const canSave=Boolean(editor||studio&&window.studioUnsaved?.());
+    dialog.innerHTML='<h2>Keep your edits?</h2><p>Leaving this view would discard unsaved form changes.</p>'+(editor?'<p>Save draft keeps the validated document only. Operational choices such as retry approval are never saved as authorization.</p>':'')+'<p id="editor-leave-error" role="alert"></p><div class="button-row">'+(canSave?'<button id="editor-leave-save">Save draft and continue</button>':'')+'<button id="editor-leave-discard">Discard edits</button><button id="editor-leave-stay" autofocus>Stay here</button></div>';
+    dialog.showModal();
+    return new Promise(resolve=>{
+      let answered=false;
+      const finish=ok=>{answered=true;dialog.close();if(ok){window.acceptEditorChanges(scope);approvedClose=true;$('center-dialog').close();approvedClose=false;}resolve(ok);};
+      $('editor-leave-stay').onclick=()=>finish(false);
+      $('editor-leave-discard').onclick=()=>{for(const [el,v] of scopedDirty()){if(el.type==='checkbox'||el.type==='radio')el.checked=v==='true';else el.value=v;}if(studio)window.discardStudioEdits?.();finish(true);};
+      if(canSave)$('editor-leave-save').onclick=async()=>{try{if(editor)await window.saveDocumentDraft(editor);if(studio&&window.studioUnsaved?.())await window.saveStudioDraft();finish(true);}catch(error){$('editor-leave-error').textContent=error.message;}};
+      dialog.oncancel=event=>{event.preventDefault();finish(false);};
+      dialog.onclose=()=>{if(!answered)resolve(false);};
+    });
+  };
+  const close=async event=>{if(approvedClose)return;event.preventDefault();if(await window.confirmWorkspaceNavigation($('center-dialog')))$('center-dialog').close();};
+  $('center-dialog-close').onclick=close;$('center-dialog').addEventListener('cancel',close);
+  document.addEventListener('workspace-modal',async()=>{
+    window.acceptEditorChanges($('center-dialog'));
+    const editor=$('toolkit-editor')||$('prepare-recipe');if(!editor)return;
+    editor.dataset.editorKind=editor.id==='toolkit-editor'?'toolkit':'preparation';
+    editor.dataset.editorContext=editor.id==='prepare-recipe'?window.preparationContext:'library';
+    const bar=document.createElement('div');bar.className='button-row';
+    bar.innerHTML='<button type="button" data-save-editor>Save private draft</button><button type="button" data-restore-editor hidden>Restore saved draft</button><button type="button" data-discard-editor hidden>Delete saved draft</button><span role="status"></span>';
+    $('center-dialog-body').prepend(bar);
+    bar.querySelector('[data-save-editor]').onclick=window.centerUI.safe(()=>window.saveDocumentDraft(editor));
+    try{
+      const saved=await api('/api/ui/editor-draft',{kind:editor.dataset.editorKind,context:editor.dataset.editorContext});
+      if(!editor.isConnected)return;
+      editor.dataset.draftRevision=saved.revision||'';
+      if(saved.draft){const restore=bar.querySelector('[data-restore-editor]');restore.hidden=false;restore.onclick=()=>{window.trackEditorBaseline(editor);editor.value=JSON.stringify(saved.draft.document,null,2);editor.dispatchEvent(new Event('change'));bar.querySelector('span').textContent='Private draft restored for review. Nothing was applied.';};const discard=bar.querySelector('[data-discard-editor]');discard.hidden=false;discard.onclick=window.centerUI.safe(async()=>{await api('/api/ui/editor-discard',{kind:editor.dataset.editorKind,context:editor.dataset.editorContext,revision:editor.dataset.draftRevision});editor.dataset.draftRevision='';restore.hidden=discard.hidden=true;bar.querySelector('span').textContent='Saved candidate deleted. Current form contents are unchanged.';});}
+    }catch(error){bar.querySelector('span').textContent=error.message;}
+  });
+  window.addEventListener('beforeunload',event=>{if(window.workspaceUnsaved()){event.preventDefault();event.returnValue='';}});
 }

@@ -13,11 +13,18 @@ def search(control,query):
     items.extend({'label':Path(p['project']).name,'detail':p['project'],'kind':'project','id':project_id(p['project']),'project':p['project'],'page':'project-detail'} for p in overview(control)['projects'])
     items.extend({'label':v['name'],'detail':v['id']+' · '+v['version'],'kind':'toolkit','page':'workflows'} for v in toolkits.overview(control.root)['kits'].values())
     from .studio import Studio
-    studio=Studio(control.root);studio.initialize();items.extend({'label':n,'kind':'file','page':'constitution'} for n in studio.payload())
-    items.extend({'label':a.get('label') or a.get('login') or a['id'],'detail':a.get('application',''),'kind':'account','page':'accounts'} for a in monitoring.load(control.root)['accounts'].values())
+    studio=Studio(control.root)
+    library=studio.draft if (studio.base/'origin.json').exists() else studio.source
+    from scripts import releases
     from scripts import constitution as kit
-    catalog=studio.draft/'registry/catalog.json';kit.no_links(catalog)
-    signature=(catalog.stat().st_mtime_ns,catalog.stat().st_size)
+    manifest=kit.safe_path(library,releases.INVENTORY)
+    if manifest.stat().st_size>1024*1024: raise ValueError('Instruction filename index exceeds its limit')
+    filenames=kit.read_json(manifest).get('files',[])
+    if len(filenames)>10000: raise ValueError('Instruction filename index exceeds its limit')
+    items.extend({'label':n,'kind':'file','page':'constitution'} for n in filenames if releases.allowed(n) and Path(n).suffix in ('.md','.mdc','.json','.txt'))
+    items.extend({'label':a.get('label') or a.get('login') or a['id'],'detail':a.get('application',''),'kind':'account','page':'accounts'} for a in monitoring.load(control.root)['accounts'].values())
+    catalog=library/'registry/catalog.json';kit.no_links(catalog)
+    signature=(catalog.stat().st_mtime_ns,catalog.stat().st_size,str(catalog))
     if signature[1]>16*1024*1024:raise ValueError('Search catalog exceeds its metadata limit')
     cached=getattr(control,'search_catalog',None)
     if not cached or cached[0]!=signature:
@@ -26,8 +33,8 @@ def search(control,query):
         control.search_catalog=(signature,models)
     items.extend(control.search_catalog[1])
     items.extend({'label':m,'detail':control.config['nodes'].get(node,{}).get('name',node),'kind':'managed local model','page':'models'} for node,models in control.config['managed'].items() for m in models)
-    for path in list((studio.draft/'templates/architectures').glob('*.json'))[:200]:
-        value=kit.read_json(kit.safe_path(studio.draft,path.relative_to(studio.draft).as_posix()))
+    for path in list((library/'templates/architectures').glob('*.json'))[:200]:
+        value=kit.read_json(kit.safe_path(library,path.relative_to(library).as_posix()))
         items.append({'label':value.get('name',path.stem),'detail':path.stem,'kind':'architecture','page':'architectures'})
     items.extend({'label':n['name'],'kind':'machine','page':'machines'} for n in control.config['nodes'].values())
     items.extend({'label':j.get('label','Operation'),'detail':j['status'],'kind':'operation','page':'activity-page'} for j in control.status()['jobs'])

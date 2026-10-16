@@ -1,5 +1,6 @@
 """Account-wide quota evidence assists launch; it never signs in or moves a session."""
 import time
+import shutil
 from . import plans, monitoring, launcher
 
 
@@ -23,7 +24,7 @@ def advice(control,project):
                      'identity_verified':bool(obs.get('login') and current and obs.get('login','').casefold()==a.get('login','').casefold()),'source':source})
     from . import auditing
     profiles = [{'id':p['id'], 'home':p['home']} for p in auditing.current_scope(control.root)['profiles'] if p['client']=='claude-code']
-    return plans.seal({'schema':1,'project':str(project),'accounts':rows,'claude_profiles':profiles,'local':{'mode':control.mode,'route':control.config.get('fallback' if control.mode in ('gaming','draining') else 'primary')},
+    return plans.seal({'schema':1,'project':str(project),'accounts':rows,'claude_profiles':profiles,'capabilities':[{'client':c,'detected':bool(shutil.which('claude' if c=='claude-code' else c)),'supported_modes':['hosted','local'],'qualification':'Validated separately by the launcher','hosted_kind':'native application' if c=='cursor' else 'CLI terminal'} for c in ('codex','cursor','claude-code')],'local':{'mode':control.mode,'route':control.config.get('fallback' if control.mode in ('gaming','draining') else 'primary')},
         'note':'Quota is shared across machines. Unknown is not free capacity. Launch uses the client’s existing login; verify its account there. Existing tasks keep their session and route.'})
 
 
@@ -34,7 +35,7 @@ def launch(control,body):
     selected=next((a for a in value['accounts'] if a['id']==body.get('account')),None)
     if body.get('account') and selected is None: raise ValueError('Account mapping is unavailable; review the current project assignments')
     if selected and selected['application'].lower().replace(' ', '-')!=client:raise ValueError('Account mapping belongs to another application')
-    if selected and selected['quota']=='exhausted':raise ValueError('Selected account’s latest observed window is exhausted; review usage before launching')
+    if mode=='hosted' and selected and selected['quota']=='exhausted':raise ValueError('Selected account’s latest observed window is exhausted; review usage before launching')
     if client=='claude-code':return launcher.open_claude(control.root,value['project'],body.get('profile'),mode)
     if mode=='local':return launcher.open_project(control.root,value['project'],client)
     return launcher.open_hosted(control.root,value['project'],client)

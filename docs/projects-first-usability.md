@@ -21,7 +21,9 @@ Views use browser history and shareable local URLs. Project addresses contain op
 2. Select the coding applications. PATH detection is advisory, not proof of sign-in or instruction loading. Existing portable bundles need explicit adoption.
 3. Review the target and file differences, then enroll. A conflict preserves existing instructions and explains the next action.
 4. Open project detail. Review installation, loading evidence, model access and configuration separately. **Open project** chooses the application, execution mode, Claude profile when applicable, and an optional account mapping.
-5. Save incomplete onboarding to resume later. Architecture templates, local inference, collection and schedules are optional follow-up choices.
+5. Select an optional configuration mapping and architecture follow-up. Enrollment previews the mapping; the architecture opens in a separate review after enrollment. Save incomplete onboarding to resume later, or dismiss its Home reminder. Local inference, collection and schedules remain optional.
+
+**Inspect current setup** performs a deliberate read-only inspection and retains its timestamp. Reopening project detail uses that retained observation; it does not silently rescan. Prepare the checkout, select toolkits and preview scoped synchronization from its Overview tab. Activity shows target-labelled operations for that checkout; older unknown targets remain in the central history.
 
 The native Codex launch uses its CLI terminal; Cursor hosted launch opens its application. Cursor local integration remains a terminal workflow. Claude uses its selected, enrolled profile. No launch migrates an existing conversation or switches native account credentials. Remote controller inventories are cached observations: open the checkout on its owning computer. Sharing metadata never authorizes arbitrary remote commands.
 
@@ -33,11 +35,13 @@ Following projects receive published changes according to existing policies. Pin
 
 Existing Studio contents retain their previous meaning and synchronization behavior; upgrading does not retroactively approve or unpublish them. Legacy CLI/Studio APIs retain their existing reviewed-write contracts. Only the new candidate endpoints have isolated-draft semantics.
 
+Toolkit and preparation forms have **Save private draft**, **Restore saved draft** and **Delete saved draft** controls. Validated documents live in private `workspace/editor-drafts.json`; only the owning workflow can explicitly save active configuration or review application. A stale candidate revision prevents overwriting another editor. Leaving an unfinished form offers Stay, Discard and, for supported documents, Save draft. Operational approvals and passwords are not saved as draft authorization.
+
 The visual toolkit, preparation and routing editors preserve fields they do not display. Advanced JSON remains available. Preparation command steps may use a relative working directory inside the enrolled checkout; other step types run at its root. Escapes and filesystem links are refused. Environment controls accept names, not secret values. Editing or capturing a template never executes project code.
 
 ## Add a worker or a model
 
-The worker guide saves progress through platform, package, start, pairing, access and verification. Package metadata shows checksum and signing evidence; an unknown older package version stays unknown. Complete commands run from a fresh terminal in the extracted package folder. Check model connectivity, protocol capability and audit access separately. Inference pairing grants no instruction-file access; the worker owner approves that locally.
+The worker guide saves progress through platform, package, start, pairing, access and verification. Package metadata shows checksum and signing evidence; an unknown older package version stays unknown. Complete commands run from a fresh terminal in the extracted package folder. Check model connectivity, protocol capability and audit access separately. Inference pairing grants no instruction-file access; the worker owner approves that locally. The access step composes commands for listing paired controllers and granting selected permissions to a selected existing root. Apply and source sharing start unselected. Copying a command grants nothing; run it deliberately on the worker. Keep that owner-local command available for revocation.
 
 Model suggestions show up to three relative memory choices. Fast, Balanced and Larger tasks are estimated candidates, not coding-performance rankings. Inspect the exact download, license and client qualification before adoption. New installations start with an 8K context; existing choices remain unchanged. Use **Suggest a starting context** for hardware-specific advice, then save explicitly.
 
@@ -47,7 +51,7 @@ Gaming mode reports fallback checks, response draining, unloading and residency 
 
 Read requests and authentication bootstrap time out after eight seconds. Failed polling backs off; sign-in failures pause authentication reads until the user retries through the launcher. Old values remain labelled stale. A browser cannot restart a stopped controller: use the installed shortcut or the source installation's `open` command.
 
-Activity reuses durable operation IDs. Cancel appears only for supported operations; interrupted or uncertain actions require inspection before a new attempt. Recent completed history is bounded to 50 entries alongside unresolved/active work. Acknowledgement is not resolution. Version changes offer a reload after saving instruction drafts.
+Activity reuses durable operation IDs. Cancel appears only for supported operations; interrupted or uncertain actions require inspection before a new attempt. Recent completed history is bounded to 50 entries alongside unresolved/active work. Acknowledgement is not resolution. New operations record target and stage timestamps. Activity supports retained-history paging and detail views; missing old timing stays unknown. Version changes offer a reload after saving supported drafts.
 
 The separate **demonstration** page uses fictional data and in-memory simulations. Its content-security policy denies network connections. Reset discards simulated changes; exit returns to the real dashboard. It cannot install software, launch a client or access a worker.
 
@@ -56,3 +60,5 @@ The separate **demonstration** page uses fictional data and in-memory simulation
 Test a candidate package with disposable state in a separate directory. Back up private controller and enrollment state, retain the previous executable and startup preferences, then use the guarded restart only after checking active sessions and operations. Never point development and production controllers at the same private state. Restore through reviewed recovery; do not silently reactivate schedules or permissions.
 
 Automated browser fixtures exercise the interface and permission boundaries. They do not prove native client loading, real inference, GPU release, second-computer installation or macOS/Linux native behavior. Three unfamiliar-user trials and the physical acceptance checklist remain release gates before a production-ready claim. See the [compatibility matrix](compatibility-matrix.md) and [illustrated workspace walkthrough](manual/usability.md).
+
+See the [recommendation-by-recommendation delivery map](projects-first-completion.md) for implementation scope and the next hands-on acceptance session.

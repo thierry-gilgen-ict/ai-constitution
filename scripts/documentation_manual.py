@@ -50,7 +50,7 @@ def build(root=ROOT):
     def tile(id):
         value = lookup[id]
         return f"**[{value['title']}](docs/manual/{value['chapter']}.md)**<br>[![{value['title']} — demonstration data](docs/assets/screenshots/{id}.png)](docs/assets/screenshots/{id}.png)"
-    cards = ['## See it before setting it up', '', f"Actual UI **{manifest['ui_version']}**, with fictional data. Open an image at full size, or follow the **[80-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.", '', '| Models and projects | Maintenance and visibility |', '| --- | --- |']
+    cards = ['## See it before setting it up', '', f"Actual UI **{manifest['ui_version']}**, with fictional data. Open an image at full size, or follow the **[{len(manifest['entries'])}-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.", '', '| Models and projects | Maintenance and visibility |', '| --- | --- |']
     for a, b in [('usability-home', 'usability-onboarding'), ('architectures', 'usability-draft-publication'), ('accounts', 'workers')]:
         cards.append('| ' + tile(a) + ' | ' + tile(b) + ' |')
     cards[2] = cards[2].replace('80-image', f"{len(manifest['entries'])}-image")

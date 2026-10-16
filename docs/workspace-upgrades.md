@@ -31,9 +31,9 @@ Workers supporting protocol 2 expose the same guarded staging and restart flow o
 
 **In the dashboard · Updates & model inbox.** Open Updates & model inbox through the primary destination and contextual tabs. The page below uses fictional documentation data.
 
-![Updates & model inbox — demonstration data, UI 0.7.0](assets/screenshots/updates.png)
+![Updates & model inbox — demonstration data, UI 0.7.1](assets/screenshots/updates.png)
 
-[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.7.0.
+[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.7.1.
 
 <!-- screenshots:updates:end -->
 
@@ -67,9 +67,9 @@ Background readiness checks use model inventory, bounded timeouts and offline co
 
 **In the dashboard · Measured performance.** Open Measured performance through the primary destination and contextual tabs. The page below uses fictional documentation data.
 
-![Measured performance — demonstration data, UI 0.7.0](assets/screenshots/insights.png)
+![Measured performance — demonstration data, UI 0.7.1](assets/screenshots/insights.png)
 
-[Illustrated walkthrough](manual/insights.md) · Fictional data; UI 0.7.0.
+[Illustrated walkthrough](manual/insights.md) · Fictional data; UI 0.7.1.
 
 <!-- screenshots:measurements:end -->
 
@@ -87,8 +87,8 @@ Cost connector schemas follow the official [OpenAI costs API](https://platform.o
 
 **In the dashboard · Review actionable failures.** Unacknowledged failures remain visible. Open the recovery page for a fresh preview and retry.
 
-![Review actionable failures — demonstration data, UI 0.7.0](assets/screenshots/notifications.png)
+![Review actionable failures — demonstration data, UI 0.7.1](assets/screenshots/notifications.png)
 
-[Illustrated walkthrough](manual/recovery.md) · Fictional data; UI 0.7.0.
+[Illustrated walkthrough](manual/recovery.md) · Fictional data; UI 0.7.1.
 
 <!-- screenshots:notifications:end -->

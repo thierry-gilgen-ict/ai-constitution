@@ -1,6 +1,6 @@
 import {request, connection, start} from './connection.js';
 import {installProjects} from './projects.js';
-import {installForms} from './forms.js';
+import {installForms, installEditGuards} from './forms.js';
 
 window.uiRequest = request;
 if (!window.centerUI || !window.trackOperation || !window.claudeReview || !viewRegistry.has('audit') || !viewRegistry.has('workflows')) {
@@ -16,19 +16,14 @@ const sections = {
 };
 const labels = Object.fromEntries(Object.values(sections).flatMap(v=>v.pages));
 const e = escapeHTML;
-let navigating = false, currentAddress=location.pathname+location.search;
+let navigating = false, currentAddress=location.pathname+location.search;const navigationQueue=[];
 const legacyPage = page;
 window.navigateWorkspace = async (name, {replace=false, project=null}={}) => {
-  if (navigating) return;
+  if (navigating) return new Promise((resolve,reject)=>navigationQueue.push(()=>window.navigateWorkspace(name,{replace,project}).then(resolve,reject)));
   if (!labels[name] && name !== 'project-detail') name='home';
-  if (document.querySelector('.page.active')?.id !== name && window.studioUnsaved?.()) {
-    const decision = await dirtyChoice();
-    if (decision === 'stay') {if(replace)history.pushState({},'',currentAddress);return;}
-    if (decision === 'save') { try { await window.saveStudioDraft(); } catch(error) { notice(error.message,true); return; } }
-    else window.discardStudioEdits?.();
-  }
   navigating = true;
   try {
+    if (!(await window.confirmWorkspaceNavigation())) {if(replace)history.pushState({},'',currentAddress);return;}
     const section = name === 'project-detail' ? 'projects' : Object.keys(sections).find(k=>sections[k].pages.some(p=>p[0]===name)) || 'projects';
     document.querySelectorAll('[data-section]').forEach(b=>{b.classList.toggle('active',b.dataset.section===section);b.setAttribute('aria-current',b.dataset.section===section?'page':'false');});
     $('section-tabs').innerHTML = sections[section].pages.map(([id,label])=>`<button class="nav ${id===name?'active':''}" data-page="${id}">${e(label)}</button>`).join('');
@@ -37,32 +32,19 @@ window.navigateWorkspace = async (name, {replace=false, project=null}={}) => {
     const url = new URL(location.href); url.searchParams.set('view',name);
     if(project) url.searchParams.set('project',project); else url.searchParams.delete('project');
     history[replace?'replaceState':'pushState']({},'',url.pathname+url.search);currentAddress=url.pathname+url.search;
-    legacyPage(name);
-    const help=$('context-help');if(help)help.href='https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/docs/manual/'+({home:'usability',projects:'usability',instructions:name==='audit'?'audit':'constitution',compute:'workers',activity:'recovery',settings:'accounts'}[section]||'README')+'.md';
+    await legacyPage(name);
+    const help=$('context-help');if(help)help.href='https://github.com/thierry-gilgen-ict/ai-constitution/blob/main/docs/manual/'+({home:'usability',onboarding:'usability','project-list':'usability','project-detail':'usability',workflows:'workflows',architectures:'architectures',constitution:'constitution',drafts:'usability',audit:'audit',models:'models',machines:'machines',workers:'workers','worker-setup':'workers',overview:'overview',setup:'setup',connect:'connect',insights:'insights','activity-page':'recovery',projects:'projects',accounts:'accounts',storage:'storage',vault:'vault',updates:'updates','settings-page':'usability'}[name]||'README')+'.md';
     $('breadcrumb').textContent = sections[section].label + ' / ' + (labels[name] || 'Project');
-  } finally { navigating=false; }
+  } finally { navigating=false;navigationQueue.shift()?.(); }
 };
 page = name => window.navigateWorkspace(name);
 const help=document.createElement('a');help.id='context-help';help.textContent='Help';help.target='_blank';help.rel='noreferrer';document.querySelector('.topbar > div').append(help);
 const nav = document.querySelector('.sidebar nav');
-nav.innerHTML = Object.entries(sections).map(([key,value])=>`<button class="nav" data-section="${key}">${e(value.label)}</button>`).join('');
+nav.innerHTML = Object.entries(sections).map(([key,value])=>`<button class="nav" data-section="${key}" disabled>${e(value.label)}</button>`).join('');
 nav.querySelectorAll('button').forEach(b=>b.onclick=()=>page(sections[b.dataset.section].pages[0][0]));
 $('menu-toggle').onclick=()=>{const open=document.body.classList.toggle('menu-open');$('menu-toggle').setAttribute('aria-expanded',String(open));if(open)nav.querySelector('button')?.focus();};
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.body.classList.contains('menu-open')){document.body.classList.remove('menu-open');$('menu-toggle').setAttribute('aria-expanded','false');$('menu-toggle').focus();}});
 window.addEventListener('popstate',()=>window.navigateWorkspace(new URL(location.href).searchParams.get('view')||'home',{replace:true,project:new URL(location.href).searchParams.get('project')}));
-
-window.chooseDraftNavigation=dirtyChoice;
-function dirtyChoice() {
-  return new Promise(resolve=>{
-    const {modal} = window.centerUI;
-    modal('Keep your edits?', '<p>Your editor contains unsaved changes.</p><div class="button-row"><button id="dirty-save">Save draft and continue</button><button id="dirty-discard">Discard edits</button><button id="dirty-stay">Stay here</button></div>',null,null);
-    const dialog=$('center-dialog'); let answered=false;
-    const answer=value=>{answered=true;dialog.close();resolve(value);};
-    $('dirty-stay').onclick=()=>answer('stay');
-    $('dirty-save').onclick=()=>answer('save');$('dirty-discard').onclick=()=>answer('discard');
-    dialog.addEventListener('close',()=>{if(!answered)resolve('stay');},{once:true});
-  });
-}
 
 export function review(title, value, apply) {
   const {modal,safe,done}=window.centerUI;
@@ -74,9 +56,19 @@ window.reviewWorkspace = review;
 
 registerView('activity-page', async()=>{
   const value=await api('/api/ui/operations');
-  $('activity-content').innerHTML=`<p>${e(value.retention)}</p>`+value.jobs.map(j=>`<article class="panel"><span class="pill">${e(j.status)}</span><h2>${e(j.label)}</h2><p>${e(j.detail || 'No additional detail')}</p><p class="caption">${e(j.created_at?new Date(j.created_at*1000).toLocaleString():'Time not recorded')}</p><p>${e(j.recovery)}</p>${j.actions.includes('cancel')?`<button data-job-cancel="${e(j.id)}">Cancel operation</button>`:''}<details><summary>Operation reference</summary><code>${e(j.id)}</code></details><button data-recovery="${e(j.operation||'')}">Inspect related workflow</button></article>`).join('')||'<p>No retained operations yet. Downloads, scans and updates will appear here.</p>';
-  $('activity-content').querySelectorAll('[data-job-cancel]').forEach(b=>b.onclick=()=>action({action:'cancel',job:b.dataset.jobCancel}));
-  $('activity-content').querySelectorAll('[data-recovery]').forEach(b=>b.onclick=()=>page(/audit|constitution/.test(b.dataset.recovery)?'audit':/backup|restore/.test(b.dataset.recovery)?'vault':/update|stage/.test(b.dataset.recovery)?'updates':/prepare|toolkit/.test(b.dataset.recovery)?'workflows':'overview'));
+  $('activity-content').innerHTML=`<p>${e(value.retention)}</p><p>${value.total??value.jobs.length} retained operations. Target is unknown for older records.</p>`;
+  const append=batch=>{
+    const host=document.createElement('div');$('activity-content').append(host);
+    host.innerHTML=batch.jobs.map(j=>`<article class="panel"><span class="pill">${e(j.status)}</span><h2>${e(j.label)}</h2><p>Target: ${e(j.target||'Not recorded')}</p><p>${e(j.stage||j.detail||'No stage recorded')}</p><p class="caption">${e(j.created_at?new Date(j.created_at*1000).toLocaleString():'Time not recorded')} · ${j.elapsed_seconds==null?'Elapsed time not recorded':Math.round(j.elapsed_seconds)+' seconds'}</p><p>${e(j.recovery)}</p><button data-operation="${e(j.id)}">Details and recovery</button>${j.actions.includes('cancel')?`<button data-job-cancel="${e(j.id)}">Cancel operation</button>`:''}${j.actions.includes('acknowledge')?`<button data-job-ack="${e(j.id)}">Acknowledge</button>`:''}</article>`).join('')||'<p>No retained operations.</p>';
+    host.querySelectorAll('[data-job-cancel]').forEach(b=>b.onclick=window.centerUI.safe(async()=>{await action({action:'cancel',job:b.dataset.jobCancel});await window.renderView('activity-page');}));
+    host.querySelectorAll('[data-job-ack]').forEach(b=>b.onclick=window.centerUI.safe(async()=>{await api('/api/operations/acknowledge',{id:b.dataset.jobAck});await window.renderView('activity-page');}));
+    host.querySelectorAll('[data-operation]').forEach(b=>b.onclick=window.centerUI.safe(async()=>{
+      const {operation:j}=await api('/api/ui/operation',{id:b.dataset.operation});
+      window.centerUI.modal('Operation details',`<p>${e(j.label)} · ${e(j.status)}</p><dl class="project-facts"><dt>Target</dt><dd>${e(j.target||'Not recorded')}</dd><dt>Stage</dt><dd>${e(j.stage)}</dd><dt>Started</dt><dd>${e(j.started_at?new Date(j.started_at*1000).toLocaleString():'Not recorded')}</dd><dt>Updated</dt><dd>${e(j.updated_at?new Date(j.updated_at*1000).toLocaleString():'Not recorded')}</dd></dl><p>${e(j.recovery)}</p><details><summary>Sanitized operation reference</summary><code>${e(j.id)} · ${e(j.operation)}</code></details><button id="operation-owner">Open recovery workflow</button>`,null,null);
+      $('operation-owner').onclick=()=>{$('center-dialog').close();page(/audit|constitution/.test(j.operation)?'audit':/backup|restore/.test(j.operation)?'vault':/update|stage/.test(j.operation)?'updates':/prepare|toolkit/.test(j.operation)?'workflows':'overview');};
+    }));
+    if(batch.next!==null&&batch.next!==undefined){const more=document.createElement('button');more.textContent='Load older retained operations';host.append(more);more.onclick=window.centerUI.safe(async()=>{more.remove();append(await api('/api/ui/project-operations',{offset:batch.next}));});}
+  };append(value);
 });
 registerView('drafts', async()=>{
   const value=await api('/api/ui/drafts');
@@ -89,14 +81,15 @@ registerView('settings-page',()=>{
   $('settings-startup-on').onclick=()=>action({action:'autostart',enabled:true});$('settings-startup-off').onclick=()=>action({action:'autostart',enabled:false});
   $('settings-content').querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>page(b.dataset.goto));
 });
-installProjects(); installForms();
+installProjects(); installForms(); installEditGuards();
 document.addEventListener('workspace-ready',()=>{
   const v=window.uiBootstrap;
   $('environment-label').textContent=`${v.preferences.environment} · ${v.version} · ${v.controller}`;
   $('login-guidance').textContent=v.launch_kind==='packaged'?'Open the AI Constitution desktop shortcut. It starts the app and signs you in locally.':'Run the Local Control open command from your source installation.';
+  nav.querySelectorAll('button').forEach(b=>b.disabled=false);
   const url=new URL(location.href);window.navigateWorkspace(url.searchParams.get('view')||'home',{replace:true,project:url.searchParams.get('project')});
 });
-document.addEventListener('workspace-version-changed',()=>{if($('version-reload'))return;const b=document.createElement('button');b.id='version-reload';b.textContent='Save drafts and reload';b.onclick=window.centerUI.safe(async()=>{if(window.studioUnsaved?.())await window.saveStudioDraft();location.reload();});$('environment-label').append(b);});
+document.addEventListener('workspace-version-changed',()=>{if($('version-reload'))return;const b=document.createElement('button');b.id='version-reload';b.textContent='Save drafts and reload';b.onclick=window.centerUI.safe(async()=>{if(await window.confirmWorkspaceNavigation())location.reload();});$('environment-label').append(b);});
 window.addEventListener('beforeunload',event=>{if(window.studioUnsaved?.()){event.preventDefault();event.returnValue='';}});
 window.addEventListener('error',()=>connection('error','A dashboard component could not start. Reload the page; if it repeats, inspect the local application version.'));
 await start();
