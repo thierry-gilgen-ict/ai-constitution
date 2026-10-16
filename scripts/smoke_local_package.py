@@ -49,6 +49,12 @@ def smoke(binary):
             assert request('/api/studio/templates')[0] == 401
             assert request('/studio.js')[0] == 200
             assert request('/experience.js')[0] == 200
+            assert json.loads(request('/healthz')[1]) == {'schema':1,'ready':True}
+            assert request('/api/ui/bootstrap')[0] == 401
+            for asset in ('shell.js','connection.js','projects.js','forms.js','demo.js','demo/'):
+                assert request('/'+asset)[0] == 200
+            status, data = request('/api/ui/bootstrap',token=token)
+            assert status==200 and json.loads(data)['ui_protocol']==1
             assert request('/api/version', token=token)[0] == 200
             templates = api('templates')['templates']
             assert len(templates) >= 3
@@ -56,6 +62,13 @@ def smoke(binary):
             body = {'path': 'constitution.md', 'sha256': opened['sha256'], 'content': opened['content'] + '\nKeep a short decision log.\n'}
             preview = api('file-preview', body)
             api('file-save', {**body, 'plan': preview['plan']})
+            opened=api('file?path=constitution.md')
+            candidate={'path':'constitution.md','sha256':opened['sha256'],'content':opened['content']+'\nA candidate requires reviewed publication.\n'}
+            assert request('/api/ui/draft-save',candidate,token)[0]==200
+            assert api('file?path=constitution.md')['content']==opened['content']
+            status, data=request('/api/ui/draft-preview',{},token); assert status==200
+            assert request('/api/ui/draft-publish',{'plan':json.loads(data)['plan']},token)[0]==200
+            assert api('file?path=constitution.md')['content']==candidate['content']
             project = root / 'project'; project.mkdir()
             body = {'project': str(project), 'name': 'package-demo', 'template': templates[0]['template']}
             preview = api('project-preview', body)
@@ -80,7 +93,8 @@ def smoke(binary):
             assert request('/api/stop', {'acknowledge_external': True}, token)[0] == 200
             assert child.wait(10) == 0
             return {'authenticated_studio': True, 'bundled_templates': True, 'draft_save': True,
-                    'project_apply': True, 'library_activation': True, 'isolated_state': True,'constitution_health':True}
+                    'project_apply': True, 'library_activation': True, 'isolated_state': True,'constitution_health':True,
+                    'ui_bootstrap':True,'candidate_publication':True,'modular_assets':True}
         finally:
             if child.poll() is None:
                 child.terminate()

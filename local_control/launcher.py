@@ -14,6 +14,30 @@ def command(*args):
     return [*prefix, *map(str, args)]
 
 
+def open_claude(root, project, profile, mode):
+    from . import claude
+    # Validate the owned project/profile here and again inside the managed CLI.
+    claude.launch_command(root, {'project': project, 'profile': profile, 'mode': mode})
+    selected = claude.profile(root, profile)
+    args = command('--state-dir', root, 'claude', '--project', project, '--profile', selected['id'], '--mode', mode)
+    if os.name == 'nt':
+        terminal = shutil.which('wt.exe')
+        subprocess.Popen([terminal, 'new-tab', '--startingDirectory', str(project), *args] if terminal else args,
+                         cwd=project, creationflags=0 if terminal else subprocess.CREATE_NEW_CONSOLE)
+    elif platform.system() == 'Darwin':
+        target = Path(root) / 'launch-claude.command'
+        from scripts.paths import no_links
+        no_links(target)
+        target.write_text('#!/bin/sh\ncd ' + shlex.quote(str(project)) + '\nexec ' + shlex.join(args) + '\n', encoding='utf-8')
+        target.chmod(0o700)
+        subprocess.Popen(['open', '-a', 'Terminal', str(target)])
+    else:
+        terminal = shutil.which('x-terminal-emulator')
+        if not terminal: raise ValueError('Open the displayed Claude command in your terminal')
+        subprocess.Popen([terminal, '-e', *args], cwd=project)
+    return {'status': 'launched', 'client': 'claude-code', 'note': 'A new managed Claude terminal was opened. Verify sign-in and instruction loading there.'}
+
+
 def open_project(root, project, client):
     project = Path(project).resolve(strict=True)
     if not project.is_dir() or client not in ('codex', 'cursor'):

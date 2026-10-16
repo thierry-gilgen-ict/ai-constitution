@@ -7,7 +7,11 @@ test.beforeEach(async({page,request})=>{
   await expect(page.locator('#login')).not.toBeVisible();
   await expect(page.locator('#connection')).toContainText('Connected');
 });
-const navigate=async(page,name)=>page.locator('.nav[data-page="'+name+'"]').click();
+const navigate=async(page,name)=>{
+  const group={workflows:'projects',projects:'activity',vault:'settings',workers:'compute',accounts:'settings',updates:'settings',architectures:'projects',constitution:'instructions',audit:'instructions'}[name]||'compute';
+  await page.locator('[data-section="'+group+'"]').click();
+  await page.locator('.nav[data-page="'+name+'"]').click();
+};
 
 test('workspace inspector, preparation and toolkit ownership through real APIs',async({page,request})=>{
   const headers={Authorization:'Bearer '+fixture.token};
@@ -106,6 +110,13 @@ test('demonstration: capture baseline and start a synthetic local session',async
   await expect(page.locator('#center-dialog-body')).toContainText('nextjs');
   await page.getByRole('button',{name:'Open in template editor',exact:true}).click();
   await expect(page.locator('#template-id')).toHaveValue('demo-captured');
+  await page.locator('#template-save').click();
+  await expect(page.locator('#template-status')).toContainText('publication required');
+  await navigate(page,'constitution');await page.locator('[data-page="drafts"]').click();
+  await page.locator('#publish-drafts').click();await page.locator('#center-dialog-apply').click();
+  await expect(page.locator('#center-dialog')).not.toBeVisible();
+  await navigate(page,'architectures');
+  await page.locator('[data-template-id="demo-captured"]').click();
   await page.locator('#template-project').fill(fixture.second);
   await page.locator('#template-project-name').fill('demo-api');
   await page.locator('#template-apply-preview').click();

@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from scripts import constitution as kit, releases
-from local_control import plans, inspector, rollouts, project_setup, project_vault, toolkits, fleet, recovery, launch_advice, model_lab, resource_profiles, workflows
+from local_control import plans, inspector, rollouts, project_setup, project_vault, toolkits, fleet, recovery, launch_advice, model_lab, resource_profiles, workflows, updates
 from local_control.core import Control
 from local_control.studio import Studio
 
@@ -29,6 +29,7 @@ class Fixture(unittest.TestCase):
         names=sorted(set(releases.files(self.library))|{releases.INVENTORY})
         (self.library/releases.INVENTORY).write_text(json.dumps({'schema_version':1,'files':names}))
         for p in (patch('local_control.studio.bundled_source',return_value=self.library),
+                  patch('local_control.updates.bundled_source',return_value=self.library),
                   patch('local_control.auditing.bundled_source',return_value=self.library),
                   patch.object(Path,'home',return_value=self.base/'home')):
             p.start();self.addCleanup(p.stop)

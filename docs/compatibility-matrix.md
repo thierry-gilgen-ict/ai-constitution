@@ -61,3 +61,9 @@ Acceptance requires reviewing gaps, failed operations, driver events and the exp
 ## External usability trial
 
 Ask three people unfamiliar with the project to: onboard a repository without losing its instructions; identify their subscription; configure a private backup and restore it; find the correct worker package; and explain what an update restart will interrupt. Record completion time, mistakes, unclear text and assistance required. Use test accounts and fixtures. Publish aggregated findings only with participant consent. This trial requires real participants and remains an external release-quality gate.
+
+## Projects-first 0.7 preview acceptance
+
+Automated coverage uses one isolated controller per browser engine. It covers Home/navigation/history, 320px layouts, authentication pause, stalled reads, hosted onboarding, draft isolation/publication, worker commands, recovery and demo connection restrictions. Python fixtures check stale candidates, reviewed publication and scoped preparation directories. Core CI retains Windows/macOS/Linux coverage.
+
+Physical checks remain separate: production shortcut/sign-in/restart, worker setup on the second Windows computer, native loading in all selected clients, real model qualification and GPU residency. macOS/Linux native package acceptance and three unfamiliar-user trials remain pending until recorded. Time hosted onboarding with an already installed/signed-in client; target five minutes excluding downloads and authentication. Participants must identify affected targets and publication scope before approving a change. Do not call the preview production-ready until blocking findings are addressed.

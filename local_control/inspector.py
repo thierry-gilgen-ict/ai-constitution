@@ -9,11 +9,13 @@ def inspect(control, name):
     project = plans.project(control.root, name)
     studio = Studio(control.root)
     with kit.state_lock(studio.guard):
-        studio.initialize()
+        # Inspect an untouched installation without creating an editable library.
+        kit.no_links(studio.base / 'origin.json')
+        library = studio.draft if (studio.base / 'origin.json').exists() else studio.source
         plans.fingerprint(project / '.ai/policy.json')
         plans.fingerprint(studio.state.parent / 'overrides/policy.json')
-        resolved = policy.resolve(studio.draft, studio.state, project)
-        installation = kit.doctor(studio.draft, studio.state, project)
+        resolved = policy.resolve(library, studio.state, project)
+        installation = kit.doctor(library, studio.state, project)
     overview = workspace.overview(control)
     item = next(p for p in overview['projects'] if p['project'] == str(project))
     findings = []
@@ -38,7 +40,7 @@ def inspect(control, name):
     health = control.health.get((selected or {}).get('node'), {})
     fresh = time.time() - health.get('checked_at', 0) < 180
     access = 'observed-ready' if selected and fresh and health.get('status') == 'online' and selected['model'] in health.get('ready_models',[]) else 'unverified'
-    return {'schema': 1, 'project': str(project), 'release': (studio.draft / 'VERSION').read_text().strip(),
+    return {'schema': 1, 'project': str(project), 'release': (library / 'VERSION').read_text().strip(),
             'effective_sha256': resolved['effective_sha256'], 'layers': resolved['layer_hashes'],
             'routes': resolved['routes']['routes'], 'route_sources': resolved['provenance'],
             'modules': modules, 'installation': installation, 'architecture': item['architecture'],

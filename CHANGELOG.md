@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.7.0 — Projects-first usability preview
+
+- Replaced the sixteen-destination sidebar with six primary destinations, contextual pages, project URLs, browser history and a narrow-screen menu.
+- Added recent/favorite projects, resumable hosted onboarding for Codex, Cursor and Claude Code, project detail and a shared client launcher. Native accounts are never switched by mappings.
+- Added eight-second read/bootstrap timeouts, authentication pause, stale-data labels, reload guidance and component-level recovery.
+- Added isolated instruction/template candidates, explicit publication, concurrent-editor fingerprints and reviewed transaction recovery. Existing Studio contents and synchronization policies retain their prior behavior.
+- Added structured toolkit, preparation and routing editors, in-project preparation directories, inline template checks, guided worker setup and bounded model choices. New context defaults are conservative; existing configurations are unchanged.
+- Added operation activity, contextual help, metadata search, cached remote-project views and a separate in-memory demo with header and document connection restrictions.
+- Added Firefox and WebKit coverage alongside Chromium, disposable usability/security fixtures and refreshed illustrated documentation.
+
+This is a preview. Native client loading, physical worker/GPU acceptance and three unfamiliar-user trials are tracked separately in the compatibility matrix. Browser fixtures are not evidence of those outcomes.
+
 ## 0.6.0 — Claude Code compatibility preview
 
 - Added opt-in Claude enrollment, independent custom profiles, schema-2 portable ownership, shared client capabilities and generated routing aliases. Legacy installation defaults remain compatible.

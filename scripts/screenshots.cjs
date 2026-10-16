@@ -12,7 +12,7 @@ const args = process.argv.slice(2);
 const option = name => args.includes(name) ? args[args.indexOf(name) + 1] : null;
 const output = path.resolve(ROOT, option('--output') || 'docs/assets/screenshots');
 const selected = option('--only')?.split(',');
-const assets = ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js', 'audit.js', 'claude.js'];
+const assets = ['index.html', 'style.css', 'app.js', 'center.js', 'studio.js', 'experience.js', 'workflows.js', 'audit.js', 'claude.js', 'shell.js', 'connection.js', 'projects.js', 'forms.js', 'demo.html', 'demo.js'];
 const inputs = [...assets.map(a => 'local_control/web/' + a), 'VERSION', 'tests/fixtures/documentation.cjs', 'scripts/documentation_scenarios.cjs', 'scripts/documentation_cli.py', 'scripts/screenshots.cjs', 'templates/architecture-components.json', ...['web-product', 'data-dashboard', 'python-api'].map(id => 'templates/architectures/' + id + '.json'), 'constitution.md', 'engineering.md', 'research.md', 'routing.md', 'registry/routes.json'];
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
 inputs.push('tests/fixtures/workflows.cjs');
@@ -23,6 +23,7 @@ const ready = {setup:'#setup-summary', overview:'#route .route-row', models:'#in
 const badge = `DEMONSTRATION DATA · UI ${VERSION}`;
 ready.workflows='#workflow-rollout';
 ready.audit='#audit-scan';
+Object.assign(ready,{home:'#home-content .panel','project-list':'#project-results','onboarding':'#onboard-project','worker-setup':'#worker-setup-content .panel',drafts:'#drafts-content','activity-page':'#activity-content','settings-page':'#settings-content'});
 
 function externalCaptures() {
   return [
@@ -53,7 +54,7 @@ async function main() {
   const transcripts = JSON.parse(execFileSync(process.env.PYTHON || 'python', ['-X','utf8',path.join(ROOT,'scripts/documentation_cli.py')], {cwd:ROOT,encoding:'utf8'}));
   // Serve only six checked-in web assets. No Python controller, state directory or real API starts.
   const server = http.createServer((req,res) => {
-    const name = new URL(req.url, 'http://127.0.0.1').pathname.slice(1) || 'index.html';
+    const raw = new URL(req.url, 'http://127.0.0.1').pathname.slice(1) || 'index.html';const name=raw==='demo/'?'demo.html':raw;
     if (!assets.includes(name)) { res.writeHead(404); return res.end(); }
     res.writeHead(200, {'Content-Type':name.endsWith('.html')?'text/html':name.endsWith('.css')?'text/css':'text/javascript'});
     res.end(fs.readFileSync(path.join(ROOT,'local_control/web',name)));
@@ -97,11 +98,12 @@ async function main() {
         const t = transcripts[entry.transcript];
         await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#f4f3ed;color:#263b31;font:20px/1.6 system-ui;padding:52px}article{background:#fffefa;border:1px solid #d8ddd0;border-radius:16px;padding:36px;max-width:1180px}h1{font:38px Georgia;margin:0 0 20px}pre{font:19px/1.6 monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#edf0e6;padding:24px;border-radius:10px}.caption{font-size:16px;color:#687460}</style></head><body><article><p class="caption">REAL CLI TRANSCRIPT · ISOLATED TEMPORARY HOME</p><h1>${e(entry.title)}</h1><pre>$ ${e(t.command)}\n\n${e(t.output)}</pre><p class="caption">${e(t.note || 'Actual command output. No client files changed.')}</p><p class="caption">${e(badge)}</p></article></body></html>`);
       } else {
-        await page.goto(origin,{waitUntil:'networkidle'});
+        await page.goto(origin+(entry.page==='demo'?'/demo/':''),{waitUntil:'networkidle'});
         await page.addStyleTag({content:'*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}'});
         if (entry.scenario === 'login') await page.locator('#login').waitFor({state:'visible'});
-        else {
-          await page.locator('.nav[data-page="'+entry.page+'"]').click();
+        else if(entry.page!=='demo') {
+          await page.waitForFunction(()=>Boolean(window.uiBootstrap));
+          await page.evaluate(name=>window.navigateWorkspace(name,{replace:true}),entry.page);
           await page.locator(ready[entry.page]).first().waitFor({state:'visible'});
         }
         for (const [action,selector,value] of entry.steps) {

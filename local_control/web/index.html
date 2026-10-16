@@ -12,6 +12,7 @@
     <script defer src="/workflows.js"></script>
     <script defer src="/audit.js"></script>
     <script defer src="/claude.js"></script>
+    <script type="module" src="/shell.js"></script>
   </head>
   <body>
     <aside class="sidebar">
@@ -50,14 +51,23 @@
     </aside>
     <main>
       <header class="topbar">
-        <span id="breadcrumb">Workspace / Overview</span>
+        <button id="menu-toggle" class="quiet" aria-label="Open navigation" aria-expanded="false">Menu</button><span id="breadcrumb">Workspace / Overview</span>
         <div>
           <button id="release-badge" class="update-badge" hidden>Update available</button><button id="notifications-button" class="quiet">Notifications <span id="notifications-count">0</span></button>
-          <span id="connection" class="pill">Connecting</span
+          <span id="connection" class="pill">Starting</span
           ><button class="quiet" id="refresh">↻ Refresh</button>
         </div>
       </header>
+      <p id="environment-label" class="caption"></p><nav id="section-tabs" class="button-row section-tabs" aria-label="Section navigation"></nav>
       <div id="notice" role="status" aria-live="polite" hidden></div>
+<section id="home" class="page"><div id="home-content"></div></section>
+<section id="project-list" class="page"><div id="project-list-content"></div></section>
+<section id="project-detail" class="page"><div id="project-detail-content"></div></section>
+<section id="onboarding" class="page"><div id="onboarding-content"></div></section>
+<section id="worker-setup" class="page"><div id="worker-setup-content"></div></section>
+<section id="drafts" class="page"><div id="drafts-content"></div></section>
+<section id="activity-page" class="page"><div id="activity-content"></div></section>
+<section id="settings-page" class="page"><div id="settings-content"></div></section>
       <section id="workflows" class="page"><div class="page-heading"><span class="eyebrow">PREPARE · UNDERSTAND · REPEAT</span><h1>A workspace that works for you.</h1><p>Inspect effective setup, prepare projects and review changes before applying them.</p></div><div class="button-row workflow-tabs" role="group" aria-label="Workspace sections"><button data-workflow-tab="projects">Projects</button><button data-workflow-tab="toolkits">Agent toolkits</button><button data-workflow-tab="controllers">Controllers</button><button data-workflow-tab="recovery">Recovery</button><button data-workflow-tab="lab">Model lab</button><button data-workflow-tab="profiles">Resource profiles</button></div><div id="workflows-content"></div></section>
       <section id="audit" class="page"><div class="page-heading"><span class="eyebrow">UNDERSTAND · REVIEW · RECONCILE</span><h1>Instructions you can trust.</h1><p>Understand what applies, inspect findings and choose how your constitutions stay healthy.</p></div><div id="audit-content"></div></section>
       <section id="updates" class="page"><div class="page-heading"><span class="eyebrow">KEEP YOUR WORKSPACE CURRENT</span><h1>Updates, under your control.</h1><p>Review application releases and new model definitions in one place.</p></div><div id="updates-content"></div></section>
@@ -68,7 +78,7 @@
         <div id="setup-summary" class="panel" role="status">Checking this computer…</div>
         <div class="setup-grid">
           <article class="panel"><span class="step">01 / PREPARE</span><h2>Meet your hardware.</h2><p>Ollama runs the models. The hardware helper estimates which ones fit. Installation may show an operating-system prompt.</p><div class="button-row"><button id="setup-ollama">Install Ollama</button><button id="setup-fit">Install hardware helper</button></div><p class="caption">After installing Ollama, start its application and refresh this page.</p></article>
-          <article class="panel"><span class="step">02 / CHOOSE</span><h2>A model that fits.</h2><p>Choose the session context before configuring models. Larger contexts need more memory.</p><label>Context budget<select id="setup-context"><option value="4096">4K · small tasks</option><option value="8192">8K</option><option value="16384">16K</option><option value="32768">32K</option><option value="65536" selected>64K · larger projects</option><option value="131072">128K</option></select></label><div class="button-row"><button id="suggest-context">Suggest a starting context</button><button id="save-context">Save context</button><button id="setup-find">Find models for me ↗</button></div><p class="caption">Review download size, model card and license in the model library. Estimates are separate from measured results.</p></article>
+          <article class="panel"><span class="step">02 / CHOOSE</span><h2>A model that fits.</h2><p>Choose the session context before configuring models. Larger contexts need more memory.</p><label>Context budget<select id="setup-context"><option value="4096">4K · small tasks</option><option value="8192" selected>8K · conservative starting point</option><option value="16384">16K</option><option value="32768">32K</option><option value="65536">64K · larger projects</option><option value="131072">128K</option></select></label><div class="button-row"><button id="suggest-context">Suggest a starting context</button><button id="save-context">Save context</button><button id="setup-find">Find models for me ↗</button></div><p class="caption">Review download size, model card and license in the model library. Estimates are separate from measured results.</p></article>
           <article class="panel"><span class="step">03 / VERIFY</span><h2>Prepare both routes.</h2><label>Installed model<select id="setup-model"></select></label><div class="button-row"><button id="setup-primary">Test as primary</button><button id="setup-fallback">Test as CPU fallback</button></div><p class="caption">Tests a real function call and its result, context capacity and CPU placement. This can take longer on CPU.</p><button id="setup-machines">Use another computer instead ↗</button></article>
           <article class="panel"><span class="step">04 / WORK</span><h2>Bring a project.</h2><p>Open a supported local session with your project instructions and normal approval settings.</p><button id="setup-project" class="primary">Connect a project ↗</button><p class="caption">Your GPU can be released once a compatible fallback is ready. Existing direct-provider sessions keep their original connection.</p></article>
         </div>
@@ -378,7 +388,7 @@ python scripts/local_control.py cursor --project /path/to/project</pre
           <label>Description<textarea id="template-description" rows="2" maxlength="2000"></textarea></label>
           <div class="section-title"><h3>The building blocks</h3><button id="component-new">+ Custom component</button></div>
           <div class="search-row"><label class="grow">Add from the library<select id="component-catalog"></select></label><button id="component-add">Add component</button></div>
-          <div id="template-components" class="component-list"></div>
+          <div id="template-inline-review" role="status" aria-live="polite"></div><div id="template-components" class="component-list"></div>
           <label>Architecture decisions · one per line<textarea id="template-decisions" rows="3" placeholder="Use Docker for local services. Keep email calls on the server."></textarea></label>
           <details class="studio-details"><summary>Scaffold files &amp; portable JSON</summary><p class="caption">Optional text files. Use {{project_name}} for the project slug. Existing files are preserved unless this template owns their unmodified contents.</p><label>Scaffold files · JSON object of paths and text<textarea id="template-files" rows="8" class="code-editor" spellcheck="false"></textarea></label><button id="template-export">Export this baseline ↓</button><p class="caption">Export includes your component guidance. Review it for private information before sharing.</p></details>
           <div class="button-row"><button id="template-save" class="primary">Review &amp; save baseline</button><button id="template-clone">Duplicate</button></div>
@@ -387,10 +397,10 @@ python scripts/local_control.py cursor --project /path/to/project</pre
       </section>
       <section id="constitution" class="page">
         <div class="page-heading"><span class="eyebrow">GOOD DEFAULTS. YOUR OWN VOICE.</span><h1>Make the constitution yours.</h1><p>Read the library, refine its instructions, and decide when your projects receive the changes.</p></div>
-        <div class="studio-intro"><div><strong>Private draft</strong><p class="caption">Saves stay on this computer. Your public checkout stays separate.</p></div><div class="button-row"><button id="library-refresh">Review library update</button><button id="library-history">Draft history</button><button id="library-activate" class="primary">Preview activation →</button></div></div>
+        <div class="studio-intro"><div><strong>Shared library and private drafts</strong><p class="caption">Saves stay on this computer. Your public checkout stays separate.</p></div><div class="button-row"><button id="library-refresh">Review library update</button><button id="library-history">Draft history</button><button id="library-activate" class="primary">Preview activation →</button></div></div>
         <div class="file-workspace">
           <aside class="file-browser"><label>Find a library file<input id="library-filter" type="search" placeholder="routing, engineering, templates…"></label><label class="check"><input id="library-modified" type="checkbox"> Customized files only</label><p id="library-count" class="caption"></p><div id="library-files" role="navigation" aria-label="Constitution library files"></div></aside>
-          <article class="panel file-panel"><div class="section-title"><h2 id="library-path">Choose a file</h2><span id="library-file-status" class="pill">Library</span></div><p id="library-file-note" class="caption">Start with constitution.md for working defaults, or registry/routes.json for model routing.</p><img id="library-image" alt="Selected library image" hidden><label id="library-editor-label">File contents<textarea id="library-editor" class="code-editor library-editor" spellcheck="false" readonly></textarea></label><div class="button-row"><button id="library-save" class="primary" disabled>Review &amp; save draft</button><button id="library-reload" disabled>Reload file</button><button id="library-previous" hidden>Previous page</button><button id="library-next" hidden>Next page</button></div><p id="library-result" role="status" class="caption"></p></article>
+          <article class="panel file-panel"><div class="section-title"><h2 id="library-path">Choose a file</h2><span id="library-file-status" class="pill">Library</span></div><p id="library-file-note" class="caption">Start with constitution.md for working defaults, or registry/routes.json for model routing.</p><img id="library-image" alt="Selected library image" hidden><label id="library-editor-label">File contents<textarea id="library-editor" class="code-editor library-editor" spellcheck="false" readonly></textarea></label><div class="button-row"><button id="library-save" class="primary" disabled>Review &amp; save private draft</button><button id="library-reload" disabled>Reload file</button><button id="library-previous" hidden>Previous page</button><button id="library-next" hidden>Next page</button></div><p id="library-result" role="status" class="caption"></p></article>
         </div>
       </section>
       <section id="projects" class="page"><div class="page-heading"><span class="eyebrow">GOOD CHANGES, EVERYWHERE THEY BELONG</span><h1>Projects that keep up.</h1><p>Shared instructions and matching templates flow to enrolled projects. Your local edits stay protected.</p></div><div id="sync-content" aria-live="polite"></div></section>
@@ -406,8 +416,7 @@ python scripts/local_control.py cursor --project /path/to/project</pre
     <dialog id="login">
       <div class="eyebrow">YOUR PRIVATE WORKSPACE</div>
       <h2>Welcome to Local Control.</h2>
-      <p>Open the authenticated dashboard from your terminal:</p>
-      <pre>python scripts/local_control.py open</pre>
+      <p id="login-guidance">Open the AI Constitution desktop shortcut to start the app and sign in locally. For a source installation, use the Local Control open command.</p>
       <p class="muted">
         The launch link signs you in locally. No cloud account is needed.
       </p>

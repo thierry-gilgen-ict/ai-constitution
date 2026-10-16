@@ -1,14 +1,16 @@
 # Try the workspace without touching your setup
 
+For a quick tour, open **Settings → Startup & help → Explore demonstration** in Local Control. This separate surface uses only fictional in-memory state and blocks network connections. No test tools are required.
+
 The repository includes a synthetic dashboard and a repeatable browser demonstration. It uses temporary project/configuration folders, `demo@example.com`, a simulated model and a clearly labelled fake release. It does not access real subscriptions or send inference.
 
 ```sh
 npm ci --ignore-scripts
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run test:browser
 ```
 
-The six journeys exercise the update notification, project discovery/enrollment, backup and restore previews, worker installation steps, architecture capture and a synthetic local-session launch, plus keyboard/contrast checks. Videos and an HTML report are written under ignored `.local/browser-results` and `.local/browser-report`. Open the report with:
+The automated journeys exercise the update notification, project discovery/enrollment, backup and restore previews, worker installation steps, architecture capture and a synthetic local-session launch, plus keyboard/contrast checks. Videos and an HTML report are written under ignored `.local/browser-results` and `.local/browser-report`. Open the report with:
 
 ```sh
 npx playwright show-report .local/browser-report

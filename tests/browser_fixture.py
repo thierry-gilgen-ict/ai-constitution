@@ -17,6 +17,7 @@ def main():
         base = Path(directory).resolve(); root = base / 'control'
         project = base / 'projects/demo-web'; project.mkdir(parents=True); (project / '.git').mkdir()
         (project / 'package.json').write_text('{"dependencies":{"next":"15.0.0","better-auth":"1.0.0","resend":"4.0.0","pg":"8.0.0"}}')
+        (project / 'AGENTS.md').write_text('Use the documented checks. Preserve existing edits.\n')
         (project / '.env.example').write_text('RESEND_API_KEY=\n')
         second = base / 'projects/demo-api'; second.mkdir(); (second / '.git').mkdir()
         config = base / 'configs/demo'; config.mkdir(parents=True); (config / '.env').write_text('EXAMPLE=synthetic-fixture')
@@ -46,7 +47,7 @@ def main():
                 return super().dispatch(post)
         control.driver_check_all=lambda progress=lambda _:None: {'status':'fixture'}
         control.setup_status=lambda: {'runtime':{'ollama':True},'note':'Synthetic fixture'}
-        server=Server(('127.0.0.1',18766),control);server.RequestHandlerClass=FixtureHandler
+        server=Server(('127.0.0.1',int(sys.argv[1]) if len(sys.argv)>1 else 18766),control);server.RequestHandlerClass=FixtureHandler
         with patch('local_control.hardware.run_fit',return_value={'system':{'gpu_name':'Fixture GPU','gpu_vram_gb':16,'total_ram_gb':32},'models':[]}), \
              patch('local_control.launcher.open_project',return_value={'status':'fixture-launched','note':'Synthetic local session; no inference was sent'}):
             try: server.serve_forever()

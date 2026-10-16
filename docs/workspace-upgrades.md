@@ -1,5 +1,7 @@
 # A workspace you can maintain
 
+In the projects-first preview, updates live under **Settings → Updates**, recovery under **Activity**, and worker packages under **Models & machines**. New instruction candidates must be published before synchronization; see the [migration guide](projects-first-usability.md). Production cutover still uses the guarded restart after a separate candidate test and verified backup.
+
 Local Control 0.3 adds project onboarding, application updates, encrypted backup integration and recovery controls. The core instruction toolkit still needs only Python 3.11+; the dashboard remains a private, optional companion.
 
 ## Bring existing projects
@@ -27,11 +29,11 @@ Workers supporting protocol 2 expose the same guarded staging and restart flow o
 
 <!-- screenshots:updates:begin -->
 
-**In the dashboard · Updates & model inbox.** Open Updates & model inbox from the sidebar. The page below uses fictional documentation data.
+**In the dashboard · Updates & model inbox.** Open Updates & model inbox through the primary destination and contextual tabs. The page below uses fictional documentation data.
 
-![Updates & model inbox — demonstration data, UI 0.6.0](assets/screenshots/updates.png)
+![Updates & model inbox — demonstration data, UI 0.7.0](assets/screenshots/updates.png)
 
-[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/updates.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:updates:end -->
 
@@ -63,11 +65,11 @@ Background readiness checks use model inventory, bounded timeouts and offline co
 
 <!-- screenshots:measurements:begin -->
 
-**In the dashboard · Measured performance.** Open Measured performance from the sidebar. The page below uses fictional documentation data.
+**In the dashboard · Measured performance.** Open Measured performance through the primary destination and contextual tabs. The page below uses fictional documentation data.
 
-![Measured performance — demonstration data, UI 0.6.0](assets/screenshots/insights.png)
+![Measured performance — demonstration data, UI 0.7.0](assets/screenshots/insights.png)
 
-[Illustrated walkthrough](manual/insights.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/insights.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:measurements:end -->
 
@@ -85,8 +87,8 @@ Cost connector schemas follow the official [OpenAI costs API](https://platform.o
 
 **In the dashboard · Review actionable failures.** Unacknowledged failures remain visible. Open the recovery page for a fresh preview and retry.
 
-![Review actionable failures — demonstration data, UI 0.6.0](assets/screenshots/notifications.png)
+![Review actionable failures — demonstration data, UI 0.7.0](assets/screenshots/notifications.png)
 
-[Illustrated walkthrough](manual/recovery.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/recovery.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:notifications:end -->

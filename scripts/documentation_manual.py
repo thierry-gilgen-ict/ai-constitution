@@ -42,7 +42,7 @@ def build(root=ROOT):
             lines.extend(['', 'Use the linked guides now. See the [capture checklist](../screenshot-maintenance.md#external-applications) to contribute a reviewed screenshot.', ''])
         lines.extend(['---', '', '[Back to all workflows](README.md)', ''])
         (directory / (chapter + '.md')).write_text('\n'.join(lines), encoding='utf-8')
-    index.extend(['', f"**{len(manifest['entries'])} images · {len(manifest['pages'])} dashboard pages · desktop, tablet and small-screen layouts.**", '', 'For copyable installation commands, use [Getting started](../getting-started.md). For failures, use [Progress and recovery](recovery.md). External application and native OS captures remain [explicitly pending](toolkit.md#external-application-captures).', '', 'These images explain workflows. They do not verify real hardware, subscriptions, installers or a running agent’s instruction loading. See the [acceptance matrix](../compatibility-matrix.md) for that evidence.', ''])
+    index.extend(['', f"**{len(manifest['entries'])} images · project journeys and advanced views · desktop, tablet and small-screen layouts.**", '', 'For copyable installation commands, use [Getting started](../getting-started.md). For failures, use [Progress and recovery](recovery.md). External application and native OS captures remain [explicitly pending](toolkit.md#external-application-captures).', '', 'These images explain workflows. They do not verify real hardware, subscriptions, installers or a running agent’s instruction loading. See the [acceptance matrix](../compatibility-matrix.md) for that evidence.', ''])
     (directory / 'README.md').write_text('\n'.join(index), encoding='utf-8')
     managed(root / 'docs/README.md', 'manual-summary', f"**[Illustrated manual](manual/README.md)** · {len(manifest['entries'])} images of the actual UI, with fictional data and step-by-step captions.", before='| I want to… | Guide |')
     managed(root / 'docs/provenance.md', 'capture-summary', f"The current [illustrated manual](manual/README.md) contains **{len(manifest['entries'])} captures of UI {manifest['ui_version']}**. Dashboard images use synthetic data; CLI images render real isolated commands.", before='## Dashboard screenshots and CLI transcripts')
@@ -51,10 +51,10 @@ def build(root=ROOT):
         value = lookup[id]
         return f"**[{value['title']}](docs/manual/{value['chapter']}.md)**<br>[![{value['title']} — demonstration data](docs/assets/screenshots/{id}.png)](docs/assets/screenshots/{id}.png)"
     cards = ['## See it before setting it up', '', f"Actual UI **{manifest['ui_version']}**, with fictional data. Open an image at full size, or follow the **[80-image illustrated manual](docs/manual/README.md)**. Example releases and performance figures are simulated.", '', '| Models and projects | Maintenance and visibility |', '| --- | --- |']
-    for a, b in [('overview', 'architectures'), ('accounts', 'workers'), ('updates', 'vault')]:
+    for a, b in [('usability-home', 'usability-onboarding'), ('architectures', 'usability-draft-publication'), ('accounts', 'workers')]:
         cards.append('| ' + tile(a) + ' | ' + tile(b) + ' |')
     cards[2] = cards[2].replace('80-image', f"{len(manifest['entries'])}-image")
-    cards.extend(['', '<details>', f"<summary>Explore all {len(manifest['pages'])} dashboard pages</summary>", ''])
+    cards.extend(['', '<details>', f"<summary>Explore advanced workspace views</summary>", ''])
     for id, title in manifest['pages'].items():
         cards.extend([f"### [{title}](docs/manual/{id}.md)", '', f"![{title} — fictional documentation data, UI {manifest['ui_version']}](docs/assets/screenshots/{id}.png)", ''])
     cards.extend(['</details>', '', '[Capture provenance](docs/provenance.md) · [Refresh screenshots](docs/screenshot-maintenance.md) · [External application checklist](docs/manual/toolkit.md#external-application-captures)'])

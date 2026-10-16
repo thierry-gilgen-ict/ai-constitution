@@ -20,7 +20,7 @@
         if ($('operation-dismiss')) $('operation-dismiss').onclick = () => { tracked = null; $('operation-strip').hidden = true; };
         if (job.status === 'done' && !completed.has(job.id) && !document.querySelector('dialog[open]')) {
           completed.add(job.id); const name = document.querySelector('.page.active')?.id;
-          if (name) window.centerPage(name);
+          if (name && !window.studioUnsaved?.() && !document.activeElement?.matches('input,textarea,select')) window.centerPage(name);
         }
       }
     }
@@ -137,16 +137,7 @@
     document.querySelectorAll('[data-connector-refresh]').forEach(b=>b.onclick=safe(async()=>done(await api('/api/connectors/refresh',{account:b.dataset.connectorRefresh}))));
   }
 
-  const parentPage=window.centerPage;
-  window.centerPage=safe(async name=>{
-    await parentPage(name);
-    if(name==='projects')await projectTools();
-    if(name==='updates')await updatesPage();
-    if(name==='insights')await performance();
-    if(name==='vault')await vaultTools();
-    if(name==='workers')await workerTools();
-    if(name==='accounts')await accountTools();
-  });
+  Object.entries({projects:projectTools,updates:updatesPage,insights:performance,vault:vaultTools,workers:workerTools,accounts:accountTools}).forEach(([name,fn])=>registerView(name,safe(fn)));
   const policy=document.createElement('label');policy.innerHTML='Architecture update policy<select id="template-follow-policy"><option value="">Follow saved template; pin unsaved edits</option><option value="latest">Follow latest saved template</option><option value="pinned">Pin this exact revision</option></select>';
   $('template-apply-preview').before(policy);
   const history=document.createElement('button');history.textContent='Versions & inheritance';history.type='button';$('template-clone').after(history);

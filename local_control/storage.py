@@ -101,7 +101,7 @@ def _load(root, *, migrate=False):
         return value
     value = {"schema": 2, "token": secrets.token_urlsafe(32), "gateway_token": secrets.token_urlsafe(32), "nodes": {
         "local": {"name": "This computer", "url": "http://127.0.0.1:11434", "kind": "ollama"}},
-        "primary": None, "fallback": None, "mode": "work", "managed": {}, "context": 65536,
+        "primary": None, "fallback": None, "mode": "work", "managed": {}, "context": 8192,
         "controllers": {}, "pairing": None, "legacy_worker_token": False, "fallbacks": [], "maintenance": [],
         "limits": {"concurrent_per_node": 1, "queue": 16, "wait_seconds": 60}}
     atomic(path, value)

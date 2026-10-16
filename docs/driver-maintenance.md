@@ -18,9 +18,9 @@ Updating the main computer pauses **both** its GPU and CPU runtimes. Its CPU fal
 
 **In the dashboard · Prepare driver maintenance.** Review the target computer and update method. Confirm other clients are idle before opening that machine’s native updater.
 
-![Prepare driver maintenance — demonstration data, UI 0.6.0](assets/screenshots/driver-update.png)
+![Prepare driver maintenance — demonstration data, UI 0.7.0](assets/screenshots/driver-update.png)
 
-[Illustrated walkthrough](manual/machines.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/machines.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:update:end -->
 

@@ -1,5 +1,7 @@
 # Getting started
 
+For the dashboard, start with **Home → Add a project**. Select Codex, Cursor and/or Claude Code and review enrollment. Local models are optional. [Projects-first guide](projects-first-usability.md).
+
 ## Install once
 
 Clone the repository wherever you keep development projects. Python 3.11+ and Git are the only prerequisites. The Python entry point works on Windows, macOS, and Linux; the PowerShell wrapper forwards identical arguments.
@@ -34,9 +36,9 @@ If your `.cursor` directory is a junction or symlink to a relocated profile, fir
 
 **In the dashboard · Verify the instruction toolkit.** A rendered transcript of a real isolated CLI check. This image is not a screenshot of a terminal application.
 
-![Verify the instruction toolkit — demonstration data, UI 0.6.0](assets/screenshots/toolkit-check.png)
+![Verify the instruction toolkit — demonstration data, UI 0.7.0](assets/screenshots/toolkit-check.png)
 
-[Illustrated walkthrough](manual/toolkit.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/toolkit.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:check:end -->
 
@@ -68,9 +70,9 @@ Commit the portable project files only if appropriate for that repository. They 
 
 **In the dashboard · Review enrollment.** The enrollment preview lists proposed managed-file changes. Only ready repositories are enrolled when you apply.
 
-![Review enrollment — demonstration data, UI 0.6.0](assets/screenshots/project-preview.png)
+![Review enrollment — demonstration data, UI 0.7.0](assets/screenshots/project-preview.png)
 
-[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.6.0.
+[Illustrated walkthrough](manual/projects.md) · Fictional data; UI 0.7.0.
 
 <!-- screenshots:onboard:end -->
 
