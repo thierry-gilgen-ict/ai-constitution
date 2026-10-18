@@ -14,7 +14,7 @@ Shared instructions, reusable project architectures, and a private workspace das
 [![Core: no runtime packages](https://img.shields.io/badge/core_runtime_packages-zero-b7ab95)](scripts/constitution.py)
 [![Release](https://img.shields.io/github/v/release/thierry-gilgen-ict/ai-constitution)](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest)
 
-**[Start here](docs/getting-started.md) · [Download](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest) · [Illustrated manual](docs/manual/README.md) · [Documentation](docs/README.md) · [Control center](docs/control-center.md) · [Upgrade](docs/updates.md)**
+**[Start here](docs/getting-started.md) · [Stable download](https://github.com/thierry-gilgen-ict/ai-constitution/releases/latest) · [Preview download](https://github.com/thierry-gilgen-ict/ai-constitution/releases/tag/v0.7.1) · [Illustrated manual](docs/manual/README.md) · [Documentation](docs/README.md) · [Control center](docs/control-center.md) · [Upgrade](docs/updates.md)**
 
 Switching agents should not mean explaining your working style again. A new model release should not mean finding every stale model name in every project. And a shared configuration should never turn your home directory into a public repository.
 
