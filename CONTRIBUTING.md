@@ -22,7 +22,7 @@ Use the issue forms for reproducible bugs and workflow proposals. Include the ap
 
 ## Model updates
 
-Use `update` for imported metadata. Use a source-linked record in `registry/overrides.json` for a verified release missing upstream. Do not imply that catalog availability means availability inside Codex, Cursor, or Grok Bot. Include the source and verification date for curated route changes. State whether a recommendation has been evaluated.
+Use `update` for imported metadata. Use a source-linked record in `registry/overrides.json` for a verified release missing upstream. Do not imply that catalog availability means availability inside Codex, Cursor, Claude Code, or Grok Bot. Include the source and verification date for curated route changes. State whether a recommendation has been evaluated.
 
 ## Instruction changes
 
@@ -41,3 +41,11 @@ Maintainers should follow the [release guide](docs/releasing.md) for versioned a
 For dashboard changes, run `npm ci --ignore-scripts`, `npx playwright install chromium`, and `npm run test:browser`. These tests use an isolated synthetic server on port 18766, never your real Local Control state. Keep node_modules and browser reports ignored. The optional restic, signing and physical acceptance workflows are described in the documentation; do not claim fixture success establishes physical hardware compatibility.
 
 Refresh the illustrated manual with `npm run screenshots` after dashboard or capture-source changes. Review the images before publication. The [screenshot maintenance guide](docs/screenshot-maintenance.md) explains fixtures, captions, CI comparisons, privacy review and explicitly pending external application captures.
+
+## Repository housekeeping
+
+Verification workflows cancel superseded runs for the same workflow, event and ref. Release publication and manually requested catalog refreshes retain their independent execution. Keep CI reports for their configured retention period; failed runs remain useful evidence.
+
+Before deleting a branch, check its worktree use and confirm its unique changes are merged or otherwise preserved. Held drafts are outstanding work, not disposable branches. Clean ignored build outputs only after classifying each target; preserve private backups, recovery records, tooling and current release evidence. Never use blanket cleanup against private state or a production deployment.
+
+Stable and preview downloads are separate channels. Housekeeping must not promote a preview, replace published binaries or remove historical releases to make the repository appear newer.

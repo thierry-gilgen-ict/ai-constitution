@@ -19,6 +19,10 @@ on:
       - 'templates/**'
       - 'requirements-*.txt'
       - '.github/workflows/package-preview.yml'
+# Cancel superseded checks for the same event/ref; never cancel release publication.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
